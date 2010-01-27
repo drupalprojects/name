@@ -6,219 +6,498 @@
  * Defines a persons name field type.
  */
 
-
 /**
- * Helper function to statically cache the translated
- * name parts.
- * @return
- *   A keyed array of name parts
+ * Implementation of hook_field_info().
  */
-function _name_field_parts() {
-  $parts = &drupal_static(__FUNCTION__, array());
-
-  if (empty($parts)) {
-    $parts = array(
-      'title' => t('Title'),
-      'name' => t('Name'),
-      'firstname' => t('First name'),
-      'middlename' => t('Middle name'),
-      'lastname' => t('Last name'),
-      'credentials' => t('Credentials'),
-    );
-  }
-  return $parts;
+function name_field_info() {
+  return array(
+    'name' => array(
+      'label' => t('Name'),
+      'description' => t('This field stores a users title, given, middle, family name, generational suffix and credentials in the database.'),
+      'field_settings' => array(
+        // Components used. At least given or family name is required.
+        'components' => array(
+          'title',
+          'given',
+          'middle',
+          'family',
+          'generational',
+          'credentials',
+        ),
+        // Minimal set of components before considered incomplete
+        'minimum_components' => array(
+          'given',
+          'family',
+        ),
+        'labels' => _name_translations(),
+        'max_length' => array(
+          'title' => 31,
+          'given' => 63,
+          'middle' => 127,
+          'family' => 63,
+          'generational' => 15,
+          'credentials' => 255,
+        ),
+        // TODO: Hook into a vocab to generate these. [vocabulary:vid]
+        'title_options' => implode("\n", array(t('-- -- '), t('Mr.'), t('Mrs.'), t('Miss'), t('Ms.'), t('Dr.'), t('Prof.'))),
+        'generational_options' => implode("\n", array(t('-- -- '), t('Jr.'), t('Sr.'), t('I'), t('II'), t('III'), t('IV'), t('V'), t('VI'), t('VII'), t('VIII'), t('IX'), t('X'))),
+      ),
+      'instance_settings' => array(
+        // Possible elements for either (free) text, autocomplete, select.
+        'title_field' => 'select',
+        'generational_field' => 'select',
+        'size' => array(
+          'title' => 6,
+          'given' => 20,
+          'middle' => 20,
+          'family' => 20,
+          'generational' => 5,
+          'credentials' => 35,
+        ),
+      ),
+    ),
+  );
 }
 
 /**
- * Helper function to get the columns for a given field.
+ * Statically cache these so we can reuse them without
+ * multiple redundant t() calls.
  */
-function _name_field_columns($type) {
-  switch ($type) {
-    case 'name_name':
-      return array('title', 'name');
-    case 'name_short':
-      return array('firstname', 'lastname');
-    case 'name_standard':
-      return array('title', 'firstname', 'lastname');
-    case 'name_full':
-      return array('title', 'firstname', 'middlename', 'lastname');
-    case 'name_extended':
-      return array('title', 'firstname', 'middlename', 'lastname', 'credentials');
+function _name_translations($intersect = NULL) {
+  $nt = NULL;
+  if (!isset($nt)) {
+    $nt = array(
+      'title' => t('Title'),
+      'given' => t('Given'),
+      'middle' => t('Middle name(s)'),
+      'family' => t('Family'),
+      'generational' => t('Generational'),
+      'credentials' => t('Credentials'),
+    );
   }
-  //drupal_set_message(t('Invalid type detected: %type', array('%type' => $type)));
-  return array();
+  return empty($intersect) ? $nt : array_intersect_key($nt, $intersect);
+}
+
+/**
+ * Helper function to set the defaults for a name field / widget.
+ */
+function _name_defaults(&$field, $key) {
+  $name_info = name_field_info();
+  $field[$key] = (array) $field[$key];
+  foreach ($name_info['name'][$key] as $index => $defaults) {
+    if (!isset($field[$key][$index])) {
+      if (is_array($defaults)) {
+        if (!array_key_exists($index, $field[$key])) {
+          $field[$key][$index] = array();
+        }
+        $field[$key][$index] += $defaults;
+      }
+      else {
+        $field[$key][$index] = $defaults;
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function name_field_settings($op, $field) {
+  _name_defaults($field, 'field_settings');
+  switch ($op) {
+    case 'form':
+      $form = array(
+        'field_settings' => array('#tree' => TRUE)
+      );
+      $components = _name_translations();
+      $form['field_settings']['components'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Components'),
+        '#default_value' => $field['field_settings']['components'],
+        '#required' => TRUE,
+        '#description' => t('Only selected components will be activated on this field. All non-selected components / component settings will be ignored.'),
+        '#options' => $components,
+        '#element_validate' => array('_name_field_minimal_component_requirements'),
+      );
+
+      $form['field_settings']['minimum_components'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Minimum components'),
+        '#default_value' => $field['field_settings']['minimum_components'],
+        '#required' => TRUE,
+        '#element_validate' => array('_name_field_minimal_component_requirements'),
+        '#description' => t('The minimal set of components required before considered the name field to be incomplete.'),
+        '#options' => $components,
+      );
+      $form['field_settings']['labels'] = array();
+      $form['field_settings']['max_length'] = array();
+      foreach ($components as $key => $title) {
+        $form['field_settings']['max_length'][$key] = array(
+          '#type' => 'textfield',
+          '#title' => t('Maximum length for !title', array('!title' => $title)),
+          '#default_value' => $field['field_settings']['max_length'][$key],
+          '#required' => FALSE,
+          '#size' => 10,
+          '#description' => t('The maximum length of the field in characters. This must be between 1 and 255.'),
+          '#element_validate' => array('_name_validate_integer_positive'),
+        );
+        $form['field_settings']['labels'][$key] = array(
+          '#type' => 'textfield',
+          '#title' => t('Label for !title', array('!title' => $title)),
+          '#default_value' => $field['field_settings']['labels'][$key],
+          '#required' => TRUE,
+        );
+      }
+      $title_options = implode("\n", array_filter(explode("\n", $field['field_settings']['title_options'])));
+      $form['field_settings']['title_options'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Title options'),
+        '#default_value' => $title_options,
+        '#required' => TRUE,
+        '#description' => t("Enter one title per line. Prefix a line using '--' to specifiy a blank value text. For example: '--Please select a title'."),
+      );
+      $generational_options = implode("\n", array_filter(explode("\n", $field['field_settings']['generational_options'])));
+      $form['field_settings']['generational_options'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Generational options'),
+        '#default_value' => $generational_options,
+        '#required' => TRUE,
+        '#description' => t("Enter one generational option per line. Prefix a line using '--' to specifiy a blank value text. For example: '----'"),
+      );
+      return $form;
+
+    case 'validate':
+      // Validates options against the title / generational sizes.
+      _element_validate_options_size($field['field_settings']['title_options'],
+          $field['field_settings']['max_length']['title'], t('Title options'));
+      _element_validate_options_size($field['field_settings']['generational_options'],
+          $field['field_settings']['max_length']['generational'], t('Generational options'));
+      _name_field_settings_validate($field);
+      break;
+
+    case 'save':
+      return array('field_settings');
+
+    case 'database columns':
+      $components = array_filter($field['field_settings']['components']);
+      $columns = array();
+      foreach (_name_translations($components) as $key => $title) {
+        $max = $field['field_settings']['max_length'][$key];
+        $columns[$key] = array(
+          'type' => 'varchar',
+          'length' => is_numeric($max) ? $max : 255,
+          'not null' => FALSE,
+          'sortable' => TRUE,
+          'views' => TRUE,
+        );
+      }
+      return $columns;
+    case 'views data':
+      $data = content_views_field_views_data($field);
+      $db_info = content_database_info($field);
+      $table_alias = content_views_tablename($field);
+      $field_data = $data[$table_alias][$field['field_name'] .'_value'];
+      // Make changes to $data as needed here.
+      return $data;
+  }
+}
+
+/**
+ * Drupal does not validate checkboxes by default. With checkbox validate, the
+ * user may get two error messages.
+ */
+function _name_field_minimal_component_requirements($element, &$form_state) {
+  $required_field_set = array_flip(array('given', 'middle', 'family'));
+  $value = array_intersect_key($required_field_set, array_filter((array)$element['#value']));
+  if (empty($value)) {
+    $required_fields = array_intersect_key(_name_translations(), $required_field_set);
+    form_set_error(implode('][', $element['#parents']) .'][given',
+        t('%label must have one of the following components: %components',
+        array('%label' => $element['#title'], '%components' => implode(', ', $required_fields))));
+  }
+
+}
+
+/**
+* Custom validation of settings values.
+*/
+function _name_validate_integer_positive($element, &$form_state) {
+  $value = $element['#value'];
+  if ($value && !is_numeric($value)|| $value < 1 || $value > 255) {
+    form_set_error(implode('][', $element['#array_parents']), t('%label must be a number between 1 and 255.', array('%label' => $element['#title'])));
+  }
+}
+
+function _name_field_settings_validate($field) {
+  $settings = $field['field_settings'];
+  $diff = array_diff_key(array_filter($settings['minimum_components']), array_filter($settings['components']));
+  if (count($diff)) {
+    $components = array_intersect_key(_name_translations(), $diff);
+    form_set_error('field_settings][minimum_components]['. key($diff),
+        t('The following components for %label are not selected for this name field: %components',
+        array('%label' => t('Minimum components'), '%components' => implode(', ', $components))));
+
+  }
+}
+
+/**
+* Implementation of hook_field().
+*/
+function name_field($op, &$node, $field, &$items, $teaser, $page) {
+  switch ($op) {
+    case 'validate':
+      // Validation on required is done here.
+      // The max. length is done via Drupal.
+      // Min. components is done via name_element validation callback.
+      if ($field['required']) {
+        if (is_array($items)) {
+          foreach ($items as $delta => $item) {
+            if (!name_content_is_empty($item, $field)) {
+              return $items;
+            }
+          }
+        }
+        $error_element = empty($items[0]['_error_element']) ? '' : $items[0]['_error_element'] .'][';
+        $error_element .= $field['field_name'] .'[0]'; // TODO
+        form_set_error($error_element, t('%label is required.', array('%label' => $field['widget']['label'])));
+      }
+      return $items;
+
+    case 'sanitize':
+      foreach ($items as $delta => $item) {
+        foreach (_name_translations() as $key => $title) {
+          $items[$delta]['safe'][$key] = check_plain($item[$key]);
+        }
+      }
+  }
+}
+
+/**
+ * Implementation of hook_content_is_empty().
+ */
+function name_content_is_empty($item, $field) {
+  foreach (_name_translations() as $key => $title) {
+    // Title has no meaning by itself.
+    if ($key == 'title' || $key == 'generational') {
+      continue;
+    }
+    if (!empty($item[$key])) {
+      return FALSE;
+    }
+  }
+  return TRUE;
 }
 
 /**
  * Implement hook_theme().
  */
 function name_theme() {
-  return array(
-    'name_element' => array('arguments' => array('element' => NULL)),
+  $theme = array(
+    'name_element' => array(
+      'arguments' => array('element' => NULL),
+//      'template' => 'name-element',
+    ),
+    'name_formatter_default' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'name_formatter_plain' => array(
+      'arguments' => array('element' => NULL),
+    ),
   );
+  return $theme;
 }
 
 /**
- * Implement hook_field_info().
+ * Implementation of hook_field_formatter_info().
  */
-function name_field_info() {
-  return array(
-    'name_name' => array(
-      'label' => t('Name: Mr "John Doe"'),
-      'description' => t('This field stores a users title and name in the database.'),
-      'settings' => array(
-        'required_components' => array('name'),
-        'title_options' => "Mr.\nMrs.\nMiss\nMs.\nDr.\nProf.",
-        'max_length_title' => 31, 'max_length_name' => 255,
-      ),
-      'instance_settings' => array(),
-      'default_widget' => 'name_textfields',
-      'default_formatter' => 'name_default',
-    ),
-    'name_short' => array(
-      'label' => t('Name: John Doe'),
-      'description' => t('This field stores a users firstname and lastname in the database.'),
-      'settings' => array(
-        'required_components' => array('firstname', 'lastname'),
-        'max_length_firstname' => 63, 'max_length_lastname' => 63,
-      ),
-      'instance_settings' => array(),
-      'default_widget' => 'name_textfields',
-      'default_formatter' => 'name_default',
-    ),
-    'name_standard' => array(
-      'label' => t('Name: Mr John Doe'),
-      'description' => t('This field stores a users title, firstname and lastname in the database.'),
-      'settings' => array(
-        'required_components' => array('firstname', 'lastname'),
-        'title_options' => "Mr.\nMrs.\nMiss\nMs.\nDr.\nProf.",
-        'max_length_title' => 31, 'max_length_firstname' => 63, 'max_length_lastname' => 63,
-      ),
-      'instance_settings' => array(),
-      'default_widget' => 'name_textfields',
-      'default_formatter' => 'name_default',
-    ),
-    'name_full' => array(
-      'label' => t('Name: Mr John A. Doe'),
-      'description' => t('This field stores a users title, firstname, middlename and lastname in the database.'),
-      'settings' => array(
-        'required_components' => array('firstname', 'lastname'),
-        'title_options' => "Mr.\nMrs.\nMiss\nMs.\nDr.\nProf.",
-        'max_length_title' => 31, 'max_length_firstname' => 63, 'max_length_middlename' => 127, 'max_length_lastname' => 63,
-      ),
-      'instance_settings' => array(),
-      'default_widget' => 'name_textfields',
-      'default_formatter' => 'name_default',
-    ),
-    'name_extended' => array(
-      'label' => t('Name: Mr John A. Doe, PhD'),
-      'description' => t('This field stores a users title, firstname, middlename, lastname and credentials in the database.'),
-      'settings' => array(
-        'required_components' => array('firstname', 'lastname'),
-        'title_options' => "Mr.\nMrs.\nMiss\nMs.\nDr.\nProf.",
-        'max_length_title' => 31, 'max_length_firstname' => 63, 'max_length_middlename' => 127, 'max_length_lastname' => 63, 'max_length_credentials' => 255,
-      ),
-      'instance_settings' => array(),
-      'default_widget' => 'name_textfields',
-      'default_formatter' => 'name_default',
-    ),
-  );
-}
-
-/**
- * Implement hook_field_schema().
- */
-function name_field_schema($field) {
-  // Defaults will be already set, but lazy setting of the $columns
-  // below requires this check.
-  $field['settings'] += array(
-    'max_length_title' => 31,
-    'max_length_name' => 255,
-    'max_length_firstname' => 63,
-    'max_length_middlename' => 127,
-    'max_length_lastname' => 63,
-    'max_length_credentials' => 255,
-  );
-  $columns = array(
-    'title' => array('type' => 'varchar', 'length' => $field['settings']['max_length_title'], 'not null' => FALSE),
-    'name' => array('type' => 'varchar', 'length' => $field['settings']['max_length_name'], 'not null' => FALSE),
-    'firstname' => array('type' => 'varchar', 'length' => $field['settings']['max_length_firstname'], 'not null' => FALSE),
-    'middlename' => array('type' => 'varchar', 'length' => $field['settings']['max_length_middlename'], 'not null' => FALSE),
-    'lastname' => array('type' => 'varchar', 'length' => $field['settings']['max_length_lastname'], 'not null' => FALSE),
-    'credentials' => array('type' => 'varchar', 'length' => $field['settings']['max_length_credentials'], 'not null' => FALSE),
-  );
-  $required_columns = _name_field_columns($field['type']);
-  $columns = array_intersect_key($columns, array_flip($required_columns));
-  $indexes = array();
-  switch ($field['type']) {
-    case 'name_name':
-      $indexes = array('fullname' => array('name'));
-      break;
-    case 'name_short':
-      $indexes = array('fullname' => array('firstname', 'lastname'));
-      break;
-    case 'name_standard':
-      $indexes = array('fullname' => array('firstname', 'lastname'));
-      break;
-    case 'name_full':
-      $indexes = array('fullname' => array('firstname', 'middlename', 'lastname'));
-      break;
-    case 'name_extended':
-      $indexes = array('fullname' => array('firstname', 'middlename', 'lastname'));
-      break;
-  }
-  return array(
-    'columns' => $columns,
-    'indexes' => $indexes,
-  );
-}
-
-/**
- * Implement hook_field_settings_form().
- */
-function name_field_settings_form($field, $instance) {
-  $columns = _name_field_columns($field['type']);
-  $name_parts = _name_field_parts();
-  $settings = $field['settings'];
-  $form['required_components'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Required components'),
-    '#default_value' => $settings['required_components'],
-    '#required' => FALSE,
-    '#description' => t('If the field is required, you need to select the required components.'),
-    '#options' => array_intersect_key($name_parts, array_flip($columns)),
-  );
-  foreach ($columns as $column) {
-    $form['max_length_' . $column] = array(
-      '#type' => 'textfield',
-      '#title' => t('Maximum length for !title', array('!title' => $name_parts[$column])),
-      '#default_value' => $settings['max_length_' . $column],
-      '#required' => FALSE,
-      '#size' => 10,
-      '#description' => t('The maximum length of the field in characters. Leave blank for an unlimited size.'),
-      '#element_validate' => array('_element_validate_integer_positive'),
+function name_field_formatter_info() {
+  $formatters = array();
+  foreach (array('default' => t('Default'), 'plain' => t('Plain')) as $type => $title) {
+    $formatters[$type] = array(
+      'label' => $title,
+      'field types' => array('name'),
+      'multiple values' => CONTENT_HANDLE_CORE,
     );
   }
-  if (in_array('title', $columns)) {
-    $form['title_options'] = array(
-      '#type' => 'textarea',
-      '#title' => t('Title options'),
-      '#default_value' => $settings['title_options'],
-      '#required' => TRUE,
-      '#element_validate' => array('_element_validate_title_options_size'),
-      '#description' => t("Enter one title per line. Prefix a line using '--' to specifiy a blank value text. For example: '--Please select a title'"),
-    );
-  }
-  return $form;
+  return $formatters;
 }
 
+/**
+ * Theme function for 'default' example field formatter.
+ */
+function theme_name_formatter_default($element) {
+  $parts = array();
+  foreach (_name_translations() as $key => $title) {
+    if (!empty($element['#item']['safe'][$key])) {
+      $parts[$key] = $element['#item']['safe'][$key];
+    }
+    else {
+      $parts[$key] = NULL;
+    }
+  }
+  return name_construct_components($parts);
+}
 
 /**
- * Helper form element validator: integer > 0.
+ * Constructs the individual parts into a single string.
+ * E.g. "Dr. Charles Augustus Phillips, Jr., DDS"
  */
-function _element_validate_title_options_size($element, &$form_state) {
-  $values = array_filter(explode("\n", $element['#value']));
-  $max_length = $form_state['values']['field']['settings']['max_length_title'];
+function name_construct_components($parts) {
+  global $language;
+  $name_parts = array();
+  switch ($language) {
+    // TODO what locales use the surname first
+    case 'cn':
+      $name_parts = array_filter(array($parts['title'], $parts['family'], $parts['given'], $parts['middle']));
+      break;
+    default:
+      $name_parts = array_filter(array($parts['title'], $parts['given'], $parts['middle'], $parts['family']));
+      break;
+  }
+  return implode(', ', array_filter(array(implode(' ', $name_parts), $parts['generational'], $parts['credentials'])));
+}
+
+/**
+ * Theme function for 'plain' example field formatter.
+ */
+function theme_name_formatter_plain($element) {
+  return strip_tags(theme('name_formatter_default', $element));
+}
+
+/**
+ * Implementation of hook_widget_info().
+ */
+function name_widget_info() {
+  return array(
+    'name_widget' => array(
+      'label' => t('Name'),
+      'field types' => array('name'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+      'callbacks' => array(
+        'default value' => CONTENT_CALLBACK_DEFAULT,
+      ),
+    ),
+  );
+}
+
+/**
+* Implementation of hook_widget_settings().
+*/
+function name_widget_settings($op, $widget) {
+  switch ($op) {
+    case 'form':
+      $form = array();
+      $form['instance_settings'] = array(
+        '#tree' => TRUE,
+      );
+      _name_defaults($widget, 'instance_settings');
+      $components = _name_translations();
+      $form['instance_settings']['size'] = array();
+      foreach ($components as $key => $title) {
+        $form['instance_settings']['size'][$key] = array(
+          '#type' => 'textfield',
+          '#title' => t('HTML size property for !title', array('!title' => $title)),
+          '#default_value' => $widget['instance_settings']['size'][$key],
+          '#required' => FALSE,
+          '#size' => 10,
+          '#description' => t('The maximum length of the field in characters. This must be between 1 and 255.'),
+          '#element_validate' => array('_name_validate_integer_positive'),
+        );
+      }
+      $form['instance_settings']['title_field'] = array(
+        '#type' => 'radios',
+        '#title' => t('Title field type'),
+        '#default_value' => $widget['instance_settings']['title_field'],
+        '#required' => TRUE,
+        '#options' => array('select' => t('Drop-down')),
+      );
+      $form['instance_settings']['generational_field'] = array(
+        '#type' => 'radios',
+        '#title' => t('Generational field type'),
+        '#default_value' => $widget['instance_settings']['generational_field'],
+        '#required' => TRUE,
+        '#options' => array('select' => t('Drop-down')),
+      );
+      return $form;
+
+    case 'save':
+      return array('instance_settings');
+  }
+}
+
+/**
+ * Implementation of hook_widget().
+ */
+function name_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  $widget = $field['widget'];
+  _name_defaults($widget, 'instance_settings');
+  _name_defaults($field, 'field_settings');
+  $fs = $field['field_settings'];
+  $ws = $widget['instance_settings'];
+  $element = array(
+    '#type' => 'name_element',
+    '#title' => $widget['label'],
+    '#label' => $widget['label'],
+    '#components' => array(),
+    '#minimum_components' => array_filter($fs['minimum_components']),
+    '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
+  );
+  $components = array_filter($fs['components']);
+  foreach (_name_translations() as $key => $title) {
+    if (in_array($key, $components)) {
+      $element['#components'][$key]['type'] = 'textfield';
+      $element['#components'][$key]['description'] = check_plain($fs['labels'][$key]);
+      $size = !empty($ws['size'][$key]) ? $ws['size'][$key] : 60;
+      $element['#components'][$key]['size'] = $size;
+      $element['#components'][$key]['maxlength'] = !empty($fs['max_length'][$key]) ? $fs['max_length'][$key] : 255;
+      if (isset($ws[$key .'_field']) && $ws[$key .'_field'] == 'select') {
+        $element['#components'][$key]['type'] = 'select';
+        $element['#components'][$key]['size'] = 1;
+
+        $options = array_filter(explode("\n", $fs[$key .'_options']));
+        // Roman numerials do not sort!
+        if ($key == 'title') {
+          natcasesort($options);
+        }
+        $default = FALSE;
+        foreach ($options as $index => $opt) {
+          if (strpos($opt, '--') === 0) {
+            unset($options[$index]);
+            $default = substr($opt, 2);
+          }
+        }
+        $options = drupal_map_assoc(array_map('trim', $options));
+        if ($default !== FALSE) {
+          $options = array('' => $default) + $options;
+        }
+        $element['#components'][$key]['options'] = $options;
+      }
+      elseif (isset($ws[$key .'_field']) && $ws[$key .'_field'] == 'autocomplete') {
+        // TODO $element['#components'][$key]['autocomplete'] = '';
+      }
+    }
+    else {
+      $element['#components'][$key]['exclude'] = TRUE;
+    }
+  }
+
+  // Used so that hook_field('validate') knows where to
+  // flag an error in deeply nested forms.
+  if (empty($form['#parents'])) {
+    $form['#parents'] = array();
+  }
+  $element['_error_element'] = array(
+    '#type' => 'value',
+    '#value' => implode('][', $form['#parents']),
+  );
+  return $element;
+}
+
+/**
+ * Helper form element validator.
+ */
+function _element_validate_options_size($field_options, $max_length, $label) {
+  $values = array_filter(explode("\n", $field_options));
   $long_options = array();
   $options = array();
   foreach ($values as $value) {
@@ -235,413 +514,224 @@ function _element_validate_title_options_size($element, &$form_state) {
     }
   }
   if (count($long_options)) {
-    form_error($element, t('The following options exceed the maximun allowed title length: %options', array('%options' => implode(', ', $long_options))));
+    form_set_error('field_settings][title_options', t('The following options exceed the maximun allowed %label length: %options', array('%options' => implode(', ', $long_options), '%label' => $label)));
   }
   elseif (empty($options)) {
-    form_error($element, t('%field are required.', array('%field' => t('Title options'))));
-  }
-  else {
-    form_set_value($element, implode("\n", $options), $form_state);
+    form_set_error('field_settings][title_options', t('%label are required.', array('%label' => $label)));
   }
 }
 
 /**
- * Implement hook_field_instance_settings_form().
- *
- * @todo - Remove if unused, this is just a placeholder function.
+ * Implementation of hook_token_list() and hook_token_values().
  */
-function name_field_instance_settings_form($field, $instance) {
-  $settings = $instance['settings'];
-  $form = array();
-  return $form;
+function name_token_list($type = 'all') {
+  if ($type == 'field' || $type == 'all') {
+    $tokens = array();
+    $tokens['name']['raw']       = t('Raw full name');
+    $tokens['name']['formatted'] = t('Full Name');
+    foreach (_name_translations() as $key => $title) {
+      $tokens['name'][$key .'-raw']       = t('Raw %part', array('%part' => $title));
+      $tokens['name'][$key .'-formatted'] = t('%part', array('%part' => $title));
+    }
+    return $tokens;
+  }
 }
 
-/**
- * Implement hook_field_validate().
- */
-function name_field_validate($obj_type, $object, $field, $instance, $langcode, $items, &$errors) {
-  $required_columns = _name_field_columns($field['type']);
-  $name_parts = _name_field_parts();
-  $settings = $field['settings'];
+function name_token_values($type, $object = NULL) {
+  if ($type == 'field') {
+    $item = $object[0];
 
-  foreach ($items as $delta => $item) {
-    foreach ($required_columns as $column) {
-      if (!empty($item[$column])) {
-        $max = $field['settings']['max_length_' . $column];
-        if (!empty($max) && drupal_strlen($item[$column]) > $max) {
-          $message = t('%name: the !title text may not be longer than %max characters.', array('%name' => $instance['label'], '!title' => $name_parts[$column], '%max' => $max));
-          $errors[$field['field_name']][$langcode][$delta][] = array(
-            'error' => "name_{$column}_length",
-            'message' => $message,
-          );
-        }
+    $raw_parts = array();
+    $safe_parts = array();
+    foreach (_name_translations() as $key => $title) {
+      if (!empty($item[$key])) {
+        $raw_parts[$key] = $item[$key];
+        $safe_parts[$key] = check_plain($item[$key]);
+      }
+      else {
+        $raw_parts[$key] = '';
+        $safe_parts[$key] = '';
       }
     }
-  }
-}
 
-/**
- * Implement hook_field_load().
- *
- * @see name_field_sanitize().
- */
-function name_field_load($obj_type, $objects, $field, $instances, $langcode, &$items) {
-  $required_columns = _name_field_columns($field['type']);
-  foreach ($objects as $id => $object) {
-    foreach ($items[$id] as $delta => $item) {
-      foreach ($required_columns as $column) {
-        if (isset($item[$column])) {
-          $items[$id][$delta]['safe_' . $column] = check_plain($item[$column]);
-        }
-      }
+    $tokens['raw'] = name_construct_components($raw_parts);
+    $tokens['formatted'] = name_construct_components($safe_parts);
+
+    foreach (_name_translations() as $key => $title) {
+      $tokens[$key .'-raw']       = $raw_parts[$key];
+      $tokens[$key .'-formatted'] =  $safe_parts[$key];
     }
+    return $tokens;
   }
 }
 
 /**
- * Implement hook_field_sanitize().
- *
- * @see name_field_load()
+ * Implementation of hook_elements().
  */
-function name_field_sanitize($obj_type, $object, $field, $instance, $langcode, &$items) {
-  $required_columns = _name_field_columns($field['type']);
-  foreach ($items as $delta => $item) {
-    if (!isset($items[$delta]['safe'])) {
-      foreach ($required_columns as $column) {
-        if (isset($item[$column])) {
-          $items[$delta]['safe_' . $column] = check_plain($item[$column]);
-        }
-      }
-    }
-  }
-}
-
-/**
- * Implement hook_field_is_empty().
- */
-function name_field_is_empty($item, $field) {
-  $required_columns = _name_field_columns($field['type']);
-  foreach ($required_columns as $column) {
-    if ($column != 'title' && isset($item[$column]) && drupal_strlen(trim($item[$column]))) {
-      return FALSE;
-    }
-  }
-  return TRUE;
-}
-
-/**
- * Implement hook_field_formatter_info().
- */
-function name_field_formatter_info() {
+function name_elements() {
+  $parts = _name_translations();
+  $field_info = name_field_info();
+  $name_info = $field_info['name'];
   return array(
-    'name_default' => array(
-      'label' => t('Title name(s)'),
-      'field types' => array('name_name', 'name_short', 'name_standard', 'name_full', 'name_extended'),
-    ),
-    'name_short' => array(
-      'label' => t('Name(s)'),
-      'field types' => array('name_name', 'name_short', 'name_standard', 'name_full', 'name_extended'),
-    ),
-    'name_complete' => array(
-      'label' => t('Title name(s), credentials'),
-      'field types' => array('name_extended'),
-    ),
-  );
-}
-
-/**
- * Theme function available for the all name fields.
- * Formatter display name: Name(s)
- */
-function theme_field_formatter_name_short($element) {
-  $name = isset($element['#item']['safe_firstname']) ? $element['#item']['safe_firstname'] : '';
-  $name .= isset($element['#item']['safe_lastname']) ? ' ' . $element['#item']['safe_lastname'] : '';
-  $name .= isset($element['#item']['safe_name']) ? ' ' . $element['#item']['safe_name'] : '';
-  return trim($name);
-}
-
-/**
- * Theme function available for the all name fields.
- * Formatter display name: Title name(s)
- */
-function theme_field_formatter_name_default($element) {
-  $name = isset($element['#item']['safe_title']) ? $element['#item']['safe_title'] : '';
-  $name .= isset($element['#item']['safe_name']) ? ' ' . $element['#item']['safe_name'] : '';
-  $name .= isset($element['#item']['safe_firstname']) ? ' ' . $element['#item']['safe_firstname'] : '';
-  $name .= isset($element['#item']['safe_lastname']) ? ' ' . $element['#item']['safe_lastname'] : '';
-  return trim($name);
-}
-
-/**
- * Theme function available for the extended name field.
- * Fields: "Mr John A. Doe, PhD" only
- * Formatter display name: Title name(s), credentials
- */
-function theme_field_formatter_name_complete($element) {
-  $name = isset($element['#item']['safe_title']) ? $element['#item']['safe_title'] : '';
-  $name .= isset($element['#item']['safe_name']) ? ' ' . $element['#item']['safe_name'] : '';
-  $name .= isset($element['#item']['safe_firstname']) ? ' ' . $element['#item']['safe_firstname'] : '';
-  $name .= isset($element['#item']['safe_middlename']) ? ' ' . $element['#item']['safe_middlename'] : '';
-  $name .= isset($element['#item']['safe_lastname']) ? ' ' . $element['#item']['safe_lastname'] : '';
-  $name .= isset($element['#item']['safe_credentials']) ? ', <em>' . $element['#item']['safe_credentials'] . '</em>' : '';
-  return trim($name);
-}
-
-/**
- * Implement hook_field_widget_info().
- */
-function name_field_widget_info() {
-  return array(
-    'name_textfields' => array(
-      'label' => t('Name'),
-      'field types' => array('name_name', 'name_short', 'name_standard', 'name_full', 'name_extended'),
-      'settings' => array(
-        'size_name' => 40, 'size_firstname' => 20, 'size_lastname' => 20,
-        'size_credentials' => 20, 'size_middlename' => 10,
+    'name_element' => array(
+      '#input' => TRUE,
+      '#process' => array('name_element_expand'),
+      '#element_validate' => array('name_element_validate'),
+      '#pre_render' =>  array('name_element_pre_render'),
+      '#default_value' => array('title' => '', 'given' => '', 'middle' => '',
+          'family' => '', 'generational' => '', 'credentials' => ''),
+      '#minimum_components' => $name_info['field_settings']['minimum_components'],
+      '#components' => array(
+        'title' => array(
+          'type' => $name_info['instance_settings']['title_field'],
+          'description' => $parts['title'],
+          'size' => $name_info['instance_settings']['size']['title'],
+          'maxlength' => $name_info['field_settings']['max_length']['title'],
+          'options' => $name_info['field_settings']['title_options'],
+          'autocomplete' => FALSE,
+        ),
+        'given' => array(
+          'type' => 'textfield',
+          'description' => $parts['given'],
+          'size' => $name_info['instance_settings']['size']['given'],
+          'maxlength' => $name_info['field_settings']['max_length']['given'],
+          'autocomplete' => FALSE,
+        ),
+        'middle' => array(
+          'type' => 'textfield',
+          'description' => $parts['middle'],
+          'size' => $name_info['instance_settings']['size']['middle'],
+          'maxlength' => $name_info['field_settings']['max_length']['middle'],
+          'autocomplete' => FALSE,
+        ),
+        'family' => array(
+          'type' => 'textfield',
+          'description' => $parts['family'],
+          'size' => $name_info['instance_settings']['size']['family'],
+          'maxlength' => $name_info['field_settings']['max_length']['family'],
+          'autocomplete' => FALSE,
+        ),
+        'generational' => array(
+          'type' => $name_info['instance_settings']['generational_field'],
+          'description' => $parts['generational'],
+          'size' => $name_info['instance_settings']['size']['generational'],
+          'maxlength' => $name_info['field_settings']['max_length']['generational'],
+          'options' => $name_info['field_settings']['generational_options'],
+          'autocomplete' => FALSE,
+        ),
+        'credentials' => array(
+          'type' => 'textfield',
+          'description' => $parts['credentials'],
+          'size' => $name_info['instance_settings']['size']['credentials'],
+          'maxlength' => $name_info['field_settings']['max_length']['credentials'],
+          'autocomplete' => FALSE,
+        ),
       ),
-      'behaviors' => array(
-        'multiple values' => FIELD_BEHAVIOR_DEFAULT,
-        'default value' => FIELD_BEHAVIOR_DEFAULT,
-      ),
-    ),
+    )
   );
 }
 
 /**
- * Implement hook_field_widget_settings_form().
- */
-function name_field_widget_settings_form($field, $instance) {
-  $required_columns = _name_field_columns($field['type']);
-  $name_parts = _name_field_parts();
-
-  $widget = $instance['widget'];
-  $settings = $widget['settings'];
-
-  $form = array();
-  // TODO - Implement these settings
-  foreach ($required_columns as $column) {
-    if ($column != 'title') {
-      $form['size_'  . $column] = array(
-        '#type' => 'textfield',
-        '#title' => t('Size of !title textfield', array('!title' => $name_parts[$column])),
-        '#default_value' => $settings['size_'  . $column],
-        '#required' => TRUE,
-        '#element_validate' => array('_element_validate_integer_positive'),
-      );
-    }
-  }
-
-  return $form;
-}
-
-/**
- * Implement hook_element_info().
- */
-function name_element_info() {
-  $parts = _name_field_parts();
-  $types['name_element'] = array(
-    '#input' => TRUE,
-    '#columns' => array(array_keys($parts)),
-    '#settings' => array(),
-    '#delta' => 0,
-    '#process' => array('name_element_process'),
-    '#theme_wrappers' => array('name_element'),
-    '#autocomplete_path' => FALSE,
-    '#attached' => array(
-      'css' => array(drupal_get_path('module', 'name') . '/name.css'),
-    ),
-
-  );
-  return $types;
-}
-
-/**
- * Implement hook_field_widget().
- */
-function name_field_widget(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
-  $element = array(
-    '#type' => 'name_element',
-    '#title' => $instance['label'],
-    '#cardinality' => $field['cardinality'],
-    '#columns' => _name_field_columns($field['type']),
-    '#settings' => $field['settings'] + $instance['widget']['settings'],
-    '#default_value' => isset($items[$delta]) ? $items[$delta] : array(),
-  );
-  // TODO: Label gets lost! Field bug??
-  $element['#settings']['title'] = $instance['label'];
-  // Parse the title options
-  if (isset($field['settings']['title_options'])) {
-    $title_options = explode("\n", $field['settings']['title_options']);
-    $blank = NULL;
-    foreach($title_options as $index => $title_option) {
-      if (strpos($title_option, '--') !== FALSE) {
-        $blank = drupal_substr($title_option, 2);
-        unset($title_options[$index]);
-      }
-    }
-    $title_options = drupal_map_assoc($title_options);
-    if (isset($blank)) {
-      $title_options = array('' => $blank) + $title_options;
-    }
-    $element['#title_options'] = $title_options;
-  }
-  return $element;
-}
-
-/**
- * Implement hook_field_widget_error().
- */
-function name_field_widget_error($element, $error) {
-  $column = str_replace('name_', '', str_replace('_length', '', $error['error']));
-  $error_element = isset($element[$column]) ? $element[$column] : $element;
-  form_error($error_element, $error['message']);
-}
-
-/**
- * Process an individual element.
- */
-function name_element_process($element, $form_state, $form) {
-  $name_parts = _name_field_parts();
-  foreach ($element['#columns'] as $column) {
-    if ($column == 'title') {
-      $options = isset($element['#title_options']) ? $element['#title_options'] : array();
-      $element[$column] = array(
-        '#type' => 'select',
-        '#default_value' => isset($element['#value'][$column]) ? $element['#value'][$column] : NULL,
-        '#attributes' => array('class' => array('name name-' . $column)),
-        '#title' => $name_parts[$column],
-        '#options' => $options,
-      );
-    }
-    else {
-      $element[$column] = array(
-        '#type' => 'textfield',
-        '#default_value' => isset($element['#value'][$column]) ? $element['#value'][$column] : NULL,
-        '#attributes' => array('class' => array('name name-' . $column)),
-        '#title' => $name_parts[$column],
-      );
-      if (isset($element['#settings'])) {
-        if (isset($element['#settings']['max_length_' . $column])) {
-          $element[$column]['#maxlength'] = $element['#settings']['max_length_' . $column];
-        }
-        if (isset($element['#settings']['size_' . $column])) {
-          $element[$column]['#size'] = $element['#settings']['size_' . $column];
-        }
-        if (isset($element['#settings']['required_components'])) {
-          if (in_array($column, $element['#settings']['required_components'])) {
-            $element[$column]['#attributes']['class'][0] .= ' required-part';
-          }
-        }
-      }
-
-    }
-  }
-  $element['#element_validate'] = array('_element_validate_has_partial_name');
-  if ($element['#required']) {
-    $element['#element_validate'][] = '_name_element_validate_is_required';
-  }
-  return $element;
-}
-
-/**
- * Helper form element validator: based on the attributes
- * '#columns' and '#settings][required_components'.
- */
-function _element_validate_has_partial_name($element, &$form_state) {
-  $element += array('#columns' => array(), '#settings' => array());
-  $element['#settings'] += array('required_components' => array(), 'title' => t('field'));
-  $required_components = array_filter($element['#settings']['required_components']);
-  $title = empty($element['#title']) ? $element['#settings']['title'] : $element['#title'];
-  // Nothing checked as required, so assume all columns are required.
-  if (empty($required_components)) {
-    $required_components = $element['#columns'];
-  }
-  $value = $element['#value'];
-  if (count($required_components)) {
-    $required_columns_found = array();
-    $required_columns_missing = array();
-    $columns_found = array();
-    foreach ($element['#columns'] as $column) {
-      if (isset($required_components[$column])) {
-        if (isset($value[$column]) && drupal_strlen(trim($value[$column]))) {
-          $required_columns_found[] = $column;
-        }
-        else {
-          $required_columns_missing[] = $column;
-        }
-      }
-      if ($column != 'title' && isset($value[$column]) && drupal_strlen(trim($value[$column]))) {
-        $columns_found[] = $column;
-      }
-    }
-    // Generate a list of the valid parts
-    $column_names = _name_field_parts();
-    $parts = array();
-    foreach ($element['#columns'] as $column) {
-      if (isset($required_components[$column])) {
-        $parts[] = $column_names[$column];
-      }
-    }
-    if (count($required_columns_found)) {
-      if (count($required_columns_missing)) {
-        $first_error = current($required_columns_missing);
-        form_error($element[$first_error], t('%name requires each of the following parts to be considered a valid name: !parts', array('%name' => $title, '!parts' => implode(', ', $parts))));
-      }
-    }
-    elseif (count($columns_found)) {
-      $first_error = current($required_components);
-      form_error($element[$first_error], t('%name requires each of the following parts to be considered a valid name: !parts', array('%name' => $title, '!parts' => implode(', ', $parts))));
-    }
-  }
-}
-
-/**
- * Helper form element validator: based on the attributes
- * '#columns' and '#settings][required_components'.
- */
-function _name_element_validate_is_required($element, &$form_state) {
-  $element += array('#columns' => array(), '#settings' => array());
-  $element['#settings'] += array('required_components' => array(), 'title' => t('field'));
-  $required_components = array_filter($element['#settings']['required_components']);
-  $title = empty($element['#title']) ? $element['#settings']['title'] : $element['#title'];
-
-  // Nothing checked as required, so assume all columns are required.
-  if (empty($required_components)) {
-    $required_components = $element['#columns'];
-  }
-  $value = $element['#value'];
-  if (count($required_components)) {
-    $required_columns_found = array();
-    foreach ($element['#columns'] as $column) {
-      if (isset($required_components[$column])) {
-        if (isset($value[$column]) && drupal_strlen(trim($value[$column]))) {
-          $required_columns_found[] = $column;
-        }
-      }
-    }
-    if (count($required_columns_found) == 0) {
-      $column_names = _name_field_parts();
-      $parts = array();
-      $first_key = current($required_components);
-      foreach ($element['#columns'] as $column) {
-        if (isset($required_components[$column])) {
-          $parts[] = $column_names[$column];
-        }
-      }
-      form_error($element[$first_key], t('%name is required. This must include all of these fields: !parts', array('%name' => $title, '!parts' => implode(', ', $parts))));
-    }
-  }
-}
-
-/**
- * FAPI theme for an individual name element.
+ * Custom theme callback for the name_element.
+ * TODO - template for this
  */
 function theme_name_element($element) {
-  // Provides a nice clean wrapper for multiple fields.
-  if (isset($element['#cardinality'])) {
-    if ($element['#cardinality'] != 1) {
-      return '<div class="name-field clearfix">' . $element['#children'] . '</div>';
+  return theme('form_element', $element, $element['#children']);
+}
+
+/**
+ * The #process callback to create the element.
+ */
+function name_element_expand($element, $edit, &$form_state, $complete_form) {
+  $element['#tree'] = TRUE;
+  if (!isset($element['#value'])) {
+    $element['#value'] = array('title' => '', 'given' => '', 'middle' => '',
+        'family' => '', 'generational' => '', 'credentials' => '');
+  }
+  $components = $element['#components'];
+  $min_components = (array) $element['#minimum_components'];
+  foreach (_name_translations() as $key => $title) {
+    if (!isset($components[$key]['exclude'])) {
+      $element[$key] = _name_render_component($components[$key], $key, $element['#value'][$key], isset($min_components[$key]));
+      if ($key == 'credentials') {
+        $element[$key]['#prefix'] = '<div class="clear-block" style="float: left;">';
+        $element[$key]['#suffix'] = '</div>';
+      }
+      else {
+        $element[$key]['#prefix'] = '<div style="float: left; margin-right: 1em;">';
+        $element[$key]['#suffix'] = '</div>';
+      }
     }
   }
-  return '<div class="name-field clearfix">' . theme('form_element', $element) . '</div>';
+  $element['#suffix'] = '<div class="clear-block"></div>';
+  return $element;
+}
+
+function _name_render_component($component, $name, $value, $core) {
+  $element = array(
+    '#attributes' => array(
+      'class' => 'name-element name-'. $name . ($core ? ' name-core-component' : ''),
+    ),
+  );
+  $base_attributes = array('type', 'description', 'size', 'maxlength');
+  foreach ($base_attributes as $key) {
+    $element['#'. $key] = $component[$key];
+  }
+  $element['#default_value'] = $value;
+  if ($component['type'] == 'select') {
+    $element['#options'] = $component['options'];
+    $element['#size'] = 1;
+  }
+  elseif (!empty($component['autocomplete'])) {
+    $element['#autocomplete_path'] = $component['autocomplete'];
+  }
+  return $element;
+}
+
+function name_element_validate($element, &$form_state) {
+  $minimum_components = array_filter($element['#minimum_components']);
+  $labels = array();
+  foreach ($element['#components'] as $key => $component) {
+    if (!isset($component['exclude'])) {
+      $labels[$key] = $component['description'];
+    }
+  }
+  $item = $element['#value'];
+  $empty = name_content_is_empty($item, NULL);
+  $item_components = array();
+  foreach (_name_translations() as $key => $title) {
+    if (isset($labels[$key]) && !empty($item[$key])) {
+      $item_components[$key] = $item[$key];
+    }
+  }
+  if (!$empty && (count($minimum_components) != count(array_intersect_key($minimum_components, $item_components)))) {
+    $missing_labels = array_diff_key(array_intersect_key($labels, $minimum_components), $item_components);
+    $label = empty($element['#title']) ? (empty($element['#label']) ? 'Field' : $element['#label']) : $element['#title'];
+    form_error($element[key($missing_labels)], t('%name also requires the following parts: %components.',
+      array('%name' => $label, '%components' => implode(', ', $missing_labels))));
+  }
+
+  return $element;
+}
+
+/**
+ * This forces the error class attribute onto the element components.
+ *
+ * TODO: There is alot of WTF here. Why does this need such a hack to
+ * propagate the error class down?
+ */
+function name_element_pre_render($element) {
+  $error_element = empty($element['_error_element']['#value']) ? '' : $element['_error_element']['#value'] .'][';
+  $error_element .= $element['#name'];
+  $errors = (array) form_set_error();
+  foreach ($errors as $error_key => $error) {
+    if (strpos($error_key, $error_element) === 0) {
+      foreach (_name_translations() as $key => $title) {
+        if (isset($element[$key]) && empty($element[$key]['#value'])) {
+          $element[$key]['#attributes']['class'] .= ' error';
+        }
+      }
+    }
+  }
+  return $element;
 }

@@ -4,24 +4,26 @@
 
 Name is a module that provides a number of name fields and a FAPI name element.
 
-Each field is summaried below: 
+There is a single new CCK name called Name. This contains a configurable selection
+of the following name parts:
 
-1) Name: 'Mr' 'John Doe' 
-2) Name: 'John' 'Doe'
-3) Name: 'Mr' 'John' 'Doe'
-4) Name: 'Mr' 'John' 'A.' 'Doe'
-5) Name: 'Mr' 'John' 'A.' 'Doe', 'PhD'
+1) Title (a select field)
+2) Given name
+3) Middle name(s)
+4) Family name
+5) Generational suffix (a select field)
+6) Credentials
 
-Each field is made up for two or more input fields. The title field is a select
-list and the other fields are all text fields.
+At least given or family name must be selected. You can specify which of these
+fields to display and the minimal required fields to consitute a valid name.
 
 Multiple values are supported via the core fields engine.
 
 -- REQUIREMENTS --
 
-* None.
+* CCK
 
-You will require the Field UI module to add fields to content.
+You will require the CCK module to add fields to content.
 
 -- INSTALLATION --
 
@@ -51,89 +53,16 @@ You will require the Field UI module to add fields to content.
 * There are no special configuration requirements. Just add these like any
   other Drupal fields.
 
--- DETAILS --
-
-The following is a more in depth summary of the five fields.
-
-Key:
-
-[-- \/] A select element
-[     ] A textfield
-
-1) Name: Mr "John Doe" 
-
-Input:              [-- \/] [     ]
-Description:        This field stores a users title and name.
-Database fields:    'title', 'name'
-
-2) Name: John Doe
-
-Input:              [     ] [     ]
-Description:        This field stores a users first and last name.
-Database fields:    'firstname', 'lastname'
-
-3) Name: Mr John Doe
-
-Input:              [-- \/] [     ] [     ]
-Description:        This field stores a users title, first and last names.
-Database fields:    'title', 'firstname', 'lastname'
-
-4) Name: Mr John A. Doe
-
-Input:              [-- \/] [     ] [     ] [     ]
-Description:        This field stores a users title, first, middle and last names.
-Database fields:    'title', 'firstname', 'middlename', 'lastname'
-
-5) Name: Mr John A. Doe, PhD
-
-Input:              [-- \/] [     ] [     ] [     ]
-                    [                           ]
-Description:        This field stores a users title, credentials, first, middle and last names.
-Database fields:    'title', 'firstname', 'middlename', 'lastname', 'credentials'
-
-For a full description visit the project page:
-  http://drupal.org/project/name
-Bug reports, feature suggestions and latest developments:
-  http://drupal.org/project/issues/name
-
--- THEMING --
-
-Two global theming functions are available. These can be
-used on all name fields. The <code>$element['#item']['safe_' . $KEY]</code>
-has been passed through the <code>check_plain</code> function.
-
-The <code>$element['#item']</code> values and their corresponding safe
-values are called keyed by their database field names. You must use isset()
-as many fields may not be set.
- 
-/**
- * Theme function available for the all name fields.
- * Display name: Name(s)
- */
-function THEME_field_formatter_name_short($element) {
-  return theme_field_formatter_name_short($element);
-}
-
-/**
- * Theme function available for the all name fields.
- * Display name: Title name(s)
- */
-function THEME_field_formatter_name_default($element) {
-  return theme_field_formatter_name_default($element);
-}
-
-/**
- * Theme function available for the extended name field.
- * Fields: "'Mr' 'John' 'A.' 'Doe', 'PhD'" only
- * Display name: Title name(s), credentials
- */
-function theme_field_formatter_name_complete($element) {
-  return theme_field_formatter_name_complete($element);
-}
-
 -- REFERENCES --
 
-For details about Drupal 7 Fields API:
+Drupal 6
+
+For details about CCK:
+  http://drupal.org/handbook/modules/cck
+
+Drupal 7
+
+For details about Fields API:
   http://drupal.org/node/443536
 For details about Drupal 7 FAPI:
   http://api.drupal.org/api/drupal/developer--topics--forms_api.html/7

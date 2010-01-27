@@ -1,0 +1,39 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Standard installation functions for cck_fullname.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function name_install() {
+  drupal_load('module', 'content');
+  content_notify('install', 'name');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function name_uninstall() {
+  drupal_load('module', 'content');
+  content_notify('uninstall', 'name');
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function name_enable() {
+  drupal_load('module', 'content');
+  content_notify('enable', 'name');
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function name_disable() {
+  drupal_load('module', 'content');
+  content_notify('disable', 'name');
+}

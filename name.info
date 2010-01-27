@@ -1,7 +1,7 @@
 ; $Id$
 name = Name
 description = Defines a persons name field type.
-package = Fields
+dependencies[] = content
+package = CCK
 version = VERSION
-core = 7.x
-files[]=name.module
+core = 6.x
