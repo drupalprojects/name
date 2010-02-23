@@ -38,9 +38,12 @@ function name_field_info() {
           'generational' => 15,
           'credentials' => 255,
         ),
-        // TODO: Hook into a vocab to generate these. [vocabulary:vid]
         'title_options' => implode("\n", array(t('-- -- '), t('Mr.'), t('Mrs.'), t('Miss'), t('Ms.'), t('Dr.'), t('Prof.'))),
         'generational_options' => implode("\n", array(t('-- -- '), t('Jr.'), t('Sr.'), t('I'), t('II'), t('III'), t('IV'), t('V'), t('VI'), t('VII'), t('VIII'), t('IX'), t('X'))),
+        'sort_options' => array(
+          'title' => 'title',
+          'generational' => 0,
+        ),
       ),
       'instance_settings' => array(
         // Possible elements for either (free) text, autocomplete, select.
@@ -148,13 +151,16 @@ function name_field_settings($op, $field) {
           '#required' => TRUE,
         );
       }
+
+      // TODO - Grouping & grouping sort
+      // TODO - Allow reverse free tagging back into the vocabulary.
       $title_options = implode("\n", array_filter(explode("\n", $field['field_settings']['title_options'])));
       $form['field_settings']['title_options'] = array(
         '#type' => 'textarea',
         '#title' => t('Title options'),
         '#default_value' => $title_options,
         '#required' => TRUE,
-        '#description' => t("Enter one title per line. Prefix a line using '--' to specifiy a blank value text. For example: '--Please select a title'."),
+        '#description' => t("Enter one title per line. Prefix a line using '--' to specify a blank value text. For example: '--Please select a title'.")
       );
       $generational_options = implode("\n", array_filter(explode("\n", $field['field_settings']['generational_options'])));
       $form['field_settings']['generational_options'] = array(
@@ -162,7 +168,22 @@ function name_field_settings($op, $field) {
         '#title' => t('Generational options'),
         '#default_value' => $generational_options,
         '#required' => TRUE,
-        '#description' => t("Enter one generational option per line. Prefix a line using '--' to specifiy a blank value text. For example: '----'"),
+        '#description' => t("Enter one generational suffix option per line. Prefix a line using '--' to specify a blank value text. For example: '----'."),
+      );
+      if (module_exists('taxonomy')) {
+        // Generational suffixes may be also imported from one or more vocabularies using the tag '[vocabulary:xxx]', where xxx is the vocabulary id. Terms that exceed the maximum length of the generational suffix are not added to the options list.
+        $form['field_settings']['title_options']['#description'] .= ' '. t("%label_plural may be also imported from one or more vocabularies using the tag '[vocabulary:xxx]', where xxx is the vocabulary id. Terms that exceed the maximum length of the %label are not added to the options list.",
+            array('%label_plural' => t('Titles'), '%label' => t('Title')));
+        $form['field_settings']['generational_options']['#description'] .= ' '. t("%label_plural may be also imported from one or more vocabularies using the tag '[vocabulary:xxx]', where xxx is the vocabulary id. Terms that exceed the maximum length of the %label are not added to the options list.",
+            array('%label_plural' => t('Generational suffixes'), '%label' => t('Generational suffix')));
+      }
+      $sort_options = is_array($field['field_settings']['sort_options']) ? $field['field_settings']['sort_options'] : array('title' => 'title', 'generational' => '');
+      $form['field_settings']['sort_options'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Select field sort options'),
+        '#default_value' => $sort_options,
+        '#description' => t("This enables sorting on the options after the vocabulary terms are added and duplicate values are removed."),
+        '#options' => _name_translations(array('title' => '', 'generational' => '')),
       );
       return $form;
 
@@ -241,8 +262,8 @@ function _name_field_settings_validate($field) {
 }
 
 /**
-* Implementation of hook_field().
-*/
+ * Implementation of hook_field().
+ */
 function name_field($op, &$node, $field, &$items, $teaser, $page) {
   switch ($op) {
     case 'validate':
@@ -295,16 +316,34 @@ function name_theme() {
   $theme = array(
     'name_element' => array(
       'arguments' => array('element' => NULL),
-//      'template' => 'name-element',
-    ),
-    'name_formatter_default' => array(
-      'arguments' => array('element' => NULL),
-    ),
-    'name_formatter_plain' => array(
-      'arguments' => array('element' => NULL),
     ),
   );
+  foreach (_name_formatter_output_types() as $type => $title) {
+    $theme['name_formatter_'. $type] = array(
+      'arguments' => array('element' => NULL),
+    );
+    foreach (_name_formatter_output_styles() as $style => $style_title) {
+      $theme['name_formatter_'. $type. '_'. $style] = array(
+        'arguments' => array('element' => NULL),
+        'function' => 'theme_name_formatter_'. $type,
+      );
+    }
+  }
   return $theme;
+}
+
+/**
+ * Private helper function to define the formatter types.
+ */
+function _name_formatter_output_types() {
+  return array('default' => t('Default'), 'plain' => t('Plain'));
+}
+
+/**
+ * Private helper function to define the formatter styles.
+ */
+function _name_formatter_output_styles() {
+  return array('given' => t('Given'), 'family' => t('Family'), 'formal' => t('Title Family'), 'short_full' => t('Given Family'));
 }
 
 /**
@@ -312,12 +351,19 @@ function name_theme() {
  */
 function name_field_formatter_info() {
   $formatters = array();
-  foreach (array('default' => t('Default'), 'plain' => t('Plain')) as $type => $title) {
+  foreach (_name_formatter_output_types() as $type => $title) {
     $formatters[$type] = array(
-      'label' => $title,
+      'label' =>  t('Full') .' ('. $title .')',
       'field types' => array('name'),
       'multiple values' => CONTENT_HANDLE_CORE,
     );
+    foreach (_name_formatter_output_styles() as $style => $style_title) {
+      $formatters[$type. '_'. $style] = array(
+        'label' => $style_title .' ('. $title .')',
+        'field types' => array('name'),
+        'multiple values' => CONTENT_HANDLE_CORE,
+      );
+    }
   }
   return $formatters;
 }
@@ -327,6 +373,10 @@ function name_field_formatter_info() {
  */
 function theme_name_formatter_default($element) {
   $parts = array();
+  $format = 'full';
+  if (strpos($element['#formatter'], '_')) {
+    list($type, $format) = explode('_', $element['#formatter'], 2);
+  }
   foreach (_name_translations() as $key => $title) {
     if (!empty($element['#item']['safe'][$key])) {
       $parts[$key] = $element['#item']['safe'][$key];
@@ -335,26 +385,53 @@ function theme_name_formatter_default($element) {
       $parts[$key] = NULL;
     }
   }
-  return name_construct_components($parts);
+  return name_construct_components($parts, $format);
 }
 
 /**
  * Constructs the individual parts into a single string.
  * E.g. "Dr. Charles Augustus Phillips, Jr., DDS"
  */
-function name_construct_components($parts) {
+function name_construct_components($parts, $format = 'default') {
   global $language;
-  $name_parts = array();
-  switch ($language) {
-    // TODO what locales use the surname first
-    case 'cn':
-      $name_parts = array_filter(array($parts['title'], $parts['family'], $parts['given'], $parts['middle']));
-      break;
+  switch ($format) {
+    // Given name, but will return family name if given name is empty.
+    case 'given':
+      return empty($parts['given']) ? $parts['family'] : $parts['given'];
+
+    // Family name, but will return given name if family name is empty.
+    case 'family':
+      return empty($parts['family']) ? $parts['given'] : $parts['family'];
+
+    // Title and family name. (Given if Family is empty).
+    case 'formal':
+      $name_parts = array_filter(array($parts['title'], name_construct_components($parts, 'family')));
+      return implode(' ', $name_parts);
+
+    // Given and Family names, reversed order for Chinese.
+    case 'short_full':
+      $name_parts = array_filter(array($parts['given'], $parts['family']));
+      if ($language == 'cn') {
+        $name_parts = array_reverse($name_parts);
+      }
+      return implode(' ', $name_parts);
+
+    // Title, Given, Middle, and Family names with Generational and Credentials.
+    // The order would be Family, Given and Middle names for Chinese viewers.
+    case 'default':
     default:
-      $name_parts = array_filter(array($parts['title'], $parts['given'], $parts['middle'], $parts['family']));
-      break;
+      $name_parts = array();
+      switch ($language) {
+        // TODO what locales use the surname first
+        case 'cn':
+          $name_parts = array_filter(array($parts['title'], $parts['family'], $parts['given'], $parts['middle']));
+          break;
+        default:
+          $name_parts = array_filter(array($parts['title'], $parts['given'], $parts['middle'], $parts['family']));
+          break;
+      }
+      return implode(', ', array_filter(array(implode(' ', $name_parts), $parts['generational'], $parts['credentials'])));
   }
-  return implode(', ', array_filter(array(implode(' ', $name_parts), $parts['generational'], $parts['credentials'])));
 }
 
 /**
@@ -455,8 +532,21 @@ function name_widget(&$form, &$form_state, $field, $items, $delta = 0) {
         $element['#components'][$key]['size'] = 1;
 
         $options = array_filter(explode("\n", $fs[$key .'_options']));
-        // Roman numerials do not sort!
-        if ($key == 'title') {
+        foreach ($options as $index => $opt) {
+          if (preg_match('/^\[vocabulary:([0-9]{1,})\]/', trim($opt), $matches)) {
+            unset($options[$index]);
+            $max_length = isset($fs['max_length'][$key]) ? $fs['max_length'][$key] : 255;
+            foreach (taxonomy_get_tree($matches[1]) as $term) {
+              if (drupal_strlen($term->name) <= $max_length) {
+                $options[] = $term->name;
+              }
+            }
+          }
+        }
+        // Options could come from multiple sources, filter duplicates.
+        $options = array_unique($options);
+
+        if ($fs && isset($fs['sort_options']) && !empty($fs['sort_options'][$key])) {
           natcasesort($options);
         }
         $default = FALSE;
@@ -633,7 +723,6 @@ function name_elements() {
 
 /**
  * Custom theme callback for the name_element.
- * TODO - template for this
  */
 function theme_name_element($element) {
   return theme('form_element', $element, $element['#children']);
@@ -715,10 +804,10 @@ function name_element_validate($element, &$form_state) {
 }
 
 /**
- * This forces the error class attribute onto the element components.
+ * This forces the error class attribute onto each of the empty element components.
  *
- * TODO: There is alot of WTF here. Why does this need such a hack to
- * propagate the error class down?
+ * TODO: There is a lot of WTF here. Why does this need such a hack to
+ * propagate the error class down? Is the error element name wrong??
  */
 function name_element_pre_render($element) {
   $error_element = empty($element['_error_element']['#value']) ? '' : $element['_error_element']['#value'] .'][';

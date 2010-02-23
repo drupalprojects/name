@@ -15,7 +15,7 @@ of the following name parts:
 6) Credentials
 
 At least given or family name must be selected. You can specify which of these
-fields to display and the minimal required fields to consitute a valid name.
+fields to display and the minimal required fields to constitute a valid name.
 
 Multiple values are supported via the core fields engine.
 
@@ -28,6 +28,25 @@ You will require the CCK module to add fields to content.
 -- INSTALLATION --
 
 * Standard installation, see http://drupal.org/node/70151 for further information.
+
+-- Usage
+
+Simply create a Name field and follow the instructions. 
+
+Of note is that you can tie the generational and title into a vocabulary, to enable sharing of the same options in all name fields.
+
+There are five built-in formatters to control the output.
+
+Full – the complete name using all parts.
+Given Family – the given and family names.
+
+Given – the given name, but has a fallback to the surname if empty
+Family – the family name, but has a fallback to the given name if empty
+Formal – the title and family name components. If the family name is empty, the given name is used.
+
+You should be able to use the Custom Formatter module to define up more combinations, but I have not personally tried this.
+
+Note: The format of these two change with the users’ language. In Chinese, the family name comes before the given and / or middle names. Please let me know if other locales require this reversed ordering.
 
 -- UPGRADING --
 
