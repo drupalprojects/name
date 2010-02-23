@@ -612,21 +612,29 @@ function _element_validate_options_size($field_options, $max_length, $label) {
 }
 
 /**
- * Implementation of hook_token_list() and hook_token_values().
+ * Implementation of hook_token_list().
  */
 function name_token_list($type = 'all') {
   if ($type == 'field' || $type == 'all') {
     $tokens = array();
     $tokens['name']['raw']       = t('Raw full name');
     $tokens['name']['formatted'] = t('Full Name');
+    foreach (_name_formatter_output_styles() as $key => $value) {
+      $tokens['name']['formatted-'. $key] = t('Field formatted: %title', array('%title' => $value));
+      $tokens['name']['formatted-'. $key. '-plain'] = t('Field formatted: %title plain', array('%title' => $value));
+    }
+
     foreach (_name_translations() as $key => $title) {
-      $tokens['name'][$key .'-raw']       = t('Raw %part', array('%part' => $title));
-      $tokens['name'][$key .'-formatted'] = t('%part', array('%part' => $title));
+      $tokens['name'][$key .'-raw']       = t('Raw %part component', array('%part' => $title));
+      $tokens['name'][$key .'-formatted'] = t('%part component', array('%part' => $title));
     }
     return $tokens;
   }
 }
 
+/**
+ * Implementation of hook_token_values().
+ */
 function name_token_values($type, $object = NULL) {
   if ($type == 'field') {
     $item = $object[0];
@@ -651,6 +659,12 @@ function name_token_values($type, $object = NULL) {
       $tokens[$key .'-raw']       = $raw_parts[$key];
       $tokens[$key .'-formatted'] =  $safe_parts[$key];
     }
+
+    foreach (_name_formatter_output_styles() as $key => $value) {
+      $tokens['formatted-'. $key] = name_construct_components($safe_parts, $key);
+      $tokens['formatted-'. $key. '-plain'] = strip_tags($tokens['name']['formatted-'. $key]);
+    }
+
     return $tokens;
   }
 }
