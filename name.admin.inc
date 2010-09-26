@@ -34,6 +34,16 @@ function name_admin_settings_form() {
     '#title' => t('Separator 3 replacement token'),
     '#default_value' => $settings['sep3'],
   );
+  $form['name_format_help'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Format string help'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#suffix' => '<div><br/>&nbsp;</div>' // Too close to the save button
+  );
+  $form['name_format_help']['help'] = array(
+    '#value' => theme('name_format_parameter_help'),
+  );
   return system_settings_form($form);
 }
 
@@ -48,19 +58,28 @@ function name_list_custom_formats() {
     array(
       'title' => 'Mr',
       'given' => 'Joe',
-      'middle' => 'John Peter',
+      'middle' => 'John Peter Mark',
       'family' => 'Doe',
       'generational' => 'Jnr.',
       'credentials' => 'B.Sc., Ph.D.',
     ),
     array(
-      'title' => 'Miss',
-      'given' => 'Joan',
-      'middle' => 'Sue',
-      'family' => 'Doe',
-      'generational' => 'VI',
+      'title' => '',
+      'given' => 'JOAN',
+      'middle' => 'SUE',
+      'family' => 'DOE',
+      'generational' => '',
       'credentials' => '',
     ),
+    array(
+      'title' => '',
+      'given' => 'Prince',
+      'middle' => '',
+      'family' => '',
+      'generational' => '',
+      'credentials' => '',
+    ),
+
   );
   $schema['name_custom_format'] = array(
     'fields' => array(
@@ -119,7 +138,31 @@ function name_list_custom_formats() {
     $rows[] = $row;
   }
 
-  $output = theme('table', $header, $rows);
+  $help = '<p><strong>'. t('The three examples are for the following users:') .'</strong><p>';
+  $help_items = array();
+  foreach ($example_names as $example_name) {
+    $help_items[] = t('The example %user has the following components; title - %title, given - %given, middle - %middle, family - %family, generational - %generational, credentials - %credentials',
+    array(
+      '%user' => name_format($example_name, 't+ g+ m+ f+ g+ c'),
+      '%title' => $example_name['title'] ? $example_name['title'] : '<none>',
+      '%given' => $example_name['given'] ? $example_name['given'] : '<none>',
+      '%middle' => $example_name['middle'] ? $example_name['middle'] : '<none>',
+      '%family' => $example_name['family'] ? $example_name['family'] : '<none>',
+      '%generational' => $example_name['generational'] ? $example_name['generational'] : '<none>',
+      '%credentials' => $example_name['credentials'] ? $example_name['credentials'] : '<none>',
+    ));
+  }
+
+  $fieldset = array(
+    '#type' => 'fieldset',
+    '#title' => t('Format string help'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $fieldset['help'] = array(
+    '#value' => theme('name_format_parameter_help'),
+  );
+  $output = theme('table', $header, $rows) . $help . theme('item_list', $help_items) . drupal_render($fieldset);
   return $output;
 }
 
@@ -156,6 +199,16 @@ function name_custom_formats_form($form_state, $edit = array()) {
     '#default_value' => $edit['format'],
     '#maxlength' => 255,
     '#required' => TRUE,
+  );
+
+  $form['format_help'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Format string help'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['format_help']['help'] = array(
+    '#value' => theme('name_format_parameter_help'),
   );
 
   $form['submit'] = array(

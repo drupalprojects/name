@@ -12,7 +12,7 @@
  * the name_format() format parameter string.
  */
 function theme_name_format_parameter_help() {
-  $output = t('The following characters are recognized in the format parameter string:');
+  $output = '<div>'. t('The following characters are recognized in the format parameter string:') .'</div>';
   $output .= '<dl>';
   foreach (name_replacement_tokens() as $token => $title) {
     $output .= "<dt>{$token}</dt><dd>{$title}</dd>";

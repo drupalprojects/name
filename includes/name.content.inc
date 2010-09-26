@@ -198,7 +198,6 @@ function name_field_settings($op, $field) {
       $data = content_views_field_views_data($field);
       $db_info = content_database_info($field);
       $table_alias = content_views_tablename($field);
-      $field_data = $data[$table_alias][$field['field_name'] .'_value'];
       // Make changes to $data as needed here.
       return $data;
   }
