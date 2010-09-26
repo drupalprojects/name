@@ -48,8 +48,10 @@ function name_replacement_tokens() {
     'S' => t('Modifier: Ensures that the next token is safe for the display.'),
 
     '+' => t('Conditional: Insert the token if both the surrounding tokens are not empty.'),
-    '=' => t('Conditional: Insert the token, if the next token after it is not empty.'),
-    '^' => t('Conditional: Insert the token, if the next token after it is empty.'),
+    '-' => t('Conditional: Insert the token if the previous token is not empty'),
+    '~' => t('Conditional: Insert the token if the previous token is empty'),
+    '=' => t('Conditional: Insert the token if the next token is not empty.'),
+    '^' => t('Conditional: Insert the token if the next token is empty.'),
 
     '|' => t('Conditional: Uses the previous token unless empty, otherwise it uses this token.'),
 
@@ -153,7 +155,7 @@ function _name_format($name_components, $format = '', $settings = array(), $toke
         break;
 
       case '=': case '^': case '|':
-      case '+':
+      case '+': case '-': case '~':
         $conditions .= $char;
         break;
 
@@ -195,6 +197,16 @@ function _name_format($name_components, $format = '', $settings = array(), $toke
     else {
       // Modifier: Conditional insertion. Insert if both the surrounding tokens are not empty.
       if (strpos($conditions, '+') !== FALSE && !empty($last_component) && !empty($next_component)) {
+        $parsed_pieces[$i] = $component;
+      }
+
+      // Modifier: Conditional insertion. Insert if the previous token is not empty.
+      if (strpos($conditions, '-') !== FALSE && !empty($last_component)) {
+        $parsed_pieces[$i] = $component;
+      }
+
+      // Modifier: Conditional insertion. Insert if the previous token is empty.
+      if (strpos($conditions, '~') !== FALSE && empty($last_component)) {
         $parsed_pieces[$i] = $component;
       }
 
