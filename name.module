@@ -7,6 +7,41 @@
  */
 
 /**
+ * Provides a hook into the theming of the field and instance settings, using
+ * #pre_render callbacks.
+ */
+function name_form_content_field_edit_form_alter(&$form, &$form_state) {
+  $field = $form['#field'];
+  if (!$field['module'] == 'name') {
+    return;
+  }
+
+  // Moves the instance settings into a nicer table.
+  if (!isset($form['widget']['instance_settings']['#pre_render'])) {
+    $form['widget']['instance_settings']['#pre_render'] = array();
+  }
+  $form['widget']['instance_settings']['#pre_render'][] = 'name_field_instance_settings_pre_render';
+  $form['widget']['instance_settings']['#field'] = $field;
+
+  // Moves the instance settings into a nicer table.
+  if (!isset($form['field']['field_settings']['#pre_render'])) {
+    $form['field']['field_settings']['#pre_render'] = array();
+  }
+  $form['field']['field_settings']['#pre_render'][] = 'name_field_settings_pre_render';
+  $form['field']['field_settings']['#field'] = $field;
+}
+
+function name_field_instance_settings_pre_render($form) {
+  module_load_include('inc', 'name', 'name.admin');
+  return _name_field_instance_settings_pre_render($form);
+}
+
+function name_field_settings_pre_render($form) {
+  module_load_include('inc', 'name', 'name.admin');
+  return _name_field_settings_pre_render($form);
+}
+
+/**
  * This is the main function that formats a name from an array of components.
  *
  * @param array $name_components
@@ -231,60 +266,73 @@ function name_construct_components() {
 function name_elements() {
   $parts = _name_translations();
   $field_info = name_field_info();
-  $name_info = $field_info['name'];
-  $field_settings = $name_info['field_settings'];
+  $field_settings = $field_info['name']['field_settings'];
+  $instance_settings = $field_info['name']['instance_settings'];
+
   return array(
     'name_element' => array(
       '#input' => TRUE,
       '#process' => array('name_element_expand'),
       '#element_validate' => array('name_element_validate'),
-      '#pre_render' =>  array('name_element_pre_render'),
       '#default_value' => array('title' => '', 'given' => '', 'middle' => '',
           'family' => '', 'generational' => '', 'credentials' => ''),
       '#minimum_components' => $field_settings['minimum_components'],
+      '#inline_css' => $instance_settings['inline_css'],
       '#components' => array(
         'title' => array(
-          'type' => $name_info['instance_settings']['title_field'],
-          'description' => $parts['title'],
-          'size' => $name_info['instance_settings']['size']['title'],
+          'type' => $instance_settings['title_field'],
+          'title' => $parts['title'],
+          'title_display' => 'description',
+          'inline_css' => 0,
+          'size' => $instance_settings['size']['title'],
           'maxlength' => $field_settings['max_length']['title'],
           'options' => $field_settings['title_options'],
           'autocomplete' => FALSE,
         ),
         'given' => array(
           'type' => 'textfield',
-          'description' => $parts['given'],
-          'size' => $name_info['instance_settings']['size']['given'],
+          'title' => $parts['given'],
+          'title_display' => 'description',
+          'inline_css' => 0,
+          'size' => $instance_settings['size']['given'],
           'maxlength' => $field_settings['max_length']['given'],
           'autocomplete' => FALSE,
         ),
         'middle' => array(
           'type' => 'textfield',
-          'description' => $parts['middle'],
-          'size' => $name_info['instance_settings']['size']['middle'],
+          'title' => $parts['middle'],
+          'title_display' => 'description',
+          'inline_css' => 0,
+          'size' => $instance_settings['size']['middle'],
           'maxlength' => $field_settings['max_length']['middle'],
           'autocomplete' => FALSE,
         ),
         'family' => array(
           'type' => 'textfield',
-          'description' => $parts['family'],
-          'size' => $name_info['instance_settings']['size']['family'],
+          'title' => $parts['family'],
+          'title_display' => 'description',
+          'inline_css' => 0,
+          'size' => $instance_settings['size']['family'],
           'maxlength' => $field_settings['max_length']['family'],
           'autocomplete' => FALSE,
         ),
         'generational' => array(
-          'type' => $name_info['instance_settings']['generational_field'],
-          'description' => $parts['generational'],
-          'size' => $name_info['instance_settings']['size']['generational'],
-          'maxlength' => $name_info['field_settings']['max_length']['generational'],
-          'options' => $name_info['field_settings']['generational_options'],
+          'type' => $instance_settings['generational_field'],
+          'title' => $parts['generational'],
+          'title_display' => 'description',
+          'inline_css' => 0,
+          'size' => $instance_settings['size']['generational'],
+          'maxlength' => $field_settings['max_length']['generational'],
+          'options' => $field_settings['generational_options'],
           'autocomplete' => FALSE,
         ),
         'credentials' => array(
           'type' => 'textfield',
-          'description' => $parts['credentials'],
-          'size' => $name_info['instance_settings']['size']['credentials'],
-          'maxlength' => $name_info['field_settings']['max_length']['credentials'],
+          'title' => $parts['credentials'],
+          'title_display' => 'description',
+          'inline_css' => 0,
+          'size' => $instance_settings['size']['credentials'],
+          'maxlength' => $field_settings['max_length']['credentials'],
           'autocomplete' => FALSE,
         ),
       ),
@@ -305,9 +353,10 @@ function theme_name_element($element) {
 function name_element_expand($element, $edit, &$form_state, $complete_form) {
   $element['#tree'] = TRUE;
   if (empty($element['#value'])) {
-    $element['#value'] = array('title' => '', 'given' => '', 'middle' => '',
-        'family' => '', 'generational' => '', 'credentials' => '');
+    $element['#value'] = array();
   }
+  $element['#value'] += array('title' => '', 'given' => '', 'middle' => '',
+        'family' => '', 'generational' => '', 'credentials' => '');
   $components = $element['#components'];
   $min_components = (array) $element['#minimum_components'];
 
@@ -328,8 +377,8 @@ function name_element_expand($element, $edit, &$form_state, $complete_form) {
   // Try to prevent wrapping errors without any additional styles.
   $element['#prefix'] = '<div class="clear-block">';
   $element['#suffix'] = '</div>';
+  $element['#pre_render'] =  array('name_element_pre_render');
 
-  $element['#pre_render'] = array('_name_element_prerender');
   return $element;
 }
 
@@ -339,10 +388,22 @@ function _name_render_component($component, $name, $value, $core) {
       'class' => 'name-element name-'. $name . ($core ? ' name-core-component' : ''),
     ),
   );
-  $base_attributes = array('type', 'description', 'size', 'maxlength');
+  if (isset($component['attributes'])) {
+    foreach ($component['attributes'] as $key => $attribute) {
+      if (!isset($element['#attributes'][$key])) {
+        $element['#attributes'][$key] = $attribute;
+      }
+      else {
+        $element['#attributes'][$key] .= ' ' . $attribute;
+      }
+    }
+  }
+
+  $base_attributes = array('type', 'title', 'size', 'maxlength');
   foreach ($base_attributes as $key) {
     $element['#'. $key] = $component[$key];
   }
+
   $element['#default_value'] = $value;
   if ($component['type'] == 'select') {
     $element['#options'] = $component['options'];
@@ -351,6 +412,10 @@ function _name_render_component($component, $name, $value, $core) {
   elseif (!empty($component['autocomplete'])) {
     $element['#autocomplete_path'] = $component['autocomplete'];
   }
+
+  // Enable the title options.
+  $element['#title_display'] = isset($component['title_display']) ? $component['title_display'] : 'description';
+
   return $element;
 }
 
@@ -359,7 +424,7 @@ function name_element_validate($element, &$form_state) {
   $labels = array();
   foreach ($element['#components'] as $key => $component) {
     if (!isset($component['exclude'])) {
-      $labels[$key] = $component['description'];
+      $labels[$key] = $component['title'];
     }
   }
   $item = $element['#value'];
@@ -381,7 +446,8 @@ function name_element_validate($element, &$form_state) {
 }
 
 /**
- * This forces the error class attribute onto each of the empty element components.
+ * This function forces the error class attribute onto each of the empty element
+ * components as required, themes the element and controls the title display.
  *
  * TODO: There is a lot of WTF here. Why does this need such a hack to
  * propagate the error class down? Is the error element name wrong??
@@ -399,14 +465,7 @@ function name_element_pre_render($element) {
       }
     }
   }
-  return $element;
-}
 
-/**
- * A hack to theme the FAPI name elements sub-elements. These are not available
- * using the theme_name_element() function.
- */
-function _name_element_prerender($element) {
   // Add a wrapper to single fields that have a description to prevent wrapping.
   if (!empty($element['#description']) && !empty($element['#description'])) {
     $field = NULL;
@@ -431,5 +490,29 @@ function _name_element_prerender($element) {
     }
   }
 
+  foreach (_name_translations() as $key => $title) {
+    if (isset($element['_name']) && isset($element['_name'][$key])) {
+      if (isset($element['_name'][$key]['#title_display'])) {
+        if ($element['_name'][$key]['#title_display'] == 'description') {
+          $element['_name'][$key]['#description'] = $element['_name'][$key]['#title'];
+        }
+        if ($element['_name'][$key]['#title_display'] == 'description' || $element['_name'][$key]['#title_display'] == 'none') {
+          $element['_name'][$key]['#title'] = NULL;
+        }
+      }
+    }
+    elseif (isset($element[$key])) {
+      if (isset($element[$key]['#title_display'])) {
+        if ($element[$key]['#title_display'] == 'description') {
+          $element[$key]['#description'] = $element[$key]['#title'];
+        }
+        if ($element[$key]['#title_display'] == 'description' || $element[$key]['#title_display'] == 'none') {
+          $element[$key]['#title'] = NULL;
+        }
+      }
+    }
+  }
+
   return $element;
 }
+
