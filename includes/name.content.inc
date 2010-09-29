@@ -70,6 +70,10 @@ function name_field_info() {
         // Possible elements for either (free) text, autocomplete, select.
         'title_field' => 'select',
         'generational_field' => 'select',
+        'inline_css' => array(
+          'multiplier' => '0.9',
+          'unit' => 'em',
+        ),
         'size' => array(
           'title' => 6,
           'given' => 20,
@@ -77,6 +81,22 @@ function name_field_info() {
           'family' => 20,
           'generational' => 5,
           'credentials' => 35,
+        ),
+        'inline_css_enabled' => array(
+          'title' => 0,
+          'given' => 0,
+          'middle' => 0,
+          'family' => 0,
+          'generational' => 0,
+          'credentials' => 0,
+        ),
+        'title_display' => array(
+          'title' => 'description',
+          'given' => 'description',
+          'middle' => 'description',
+          'family' => 'description',
+          'generational' => 'description',
+          'credentials' => 'description',
         ),
       ),
     ),
@@ -194,12 +214,14 @@ function name_field_settings($op, $field) {
         );
       }
       return $columns;
+
     case 'views data':
       $data = content_views_field_views_data($field);
       $db_info = content_database_info($field);
       $table_alias = content_views_tablename($field);
       // Make changes to $data as needed here.
       return $data;
+
   }
 }
 
@@ -379,6 +401,7 @@ function name_widget_settings($op, $widget) {
       _name_defaults($widget, 'instance_settings');
       $components = _name_translations();
       $form['instance_settings']['size'] = array();
+      $form['instance_settings']['title_display'] = array();
       foreach ($components as $key => $title) {
         $form['instance_settings']['size'][$key] = array(
           '#type' => 'textfield',
@@ -389,6 +412,24 @@ function name_widget_settings($op, $widget) {
           '#description' => t('The maximum length of the field in characters. This must be between 1 and 255.'),
           '#element_validate' => array('_name_validate_integer_positive'),
         );
+        $form['instance_settings']['title_display'][$key] = array(
+          '#type' => 'radios',
+          '#title' => t('Label display for !title', array('!title' => $title)),
+          '#default_value' => $widget['instance_settings']['title_display'][$key],
+          '#options' => array(
+            'title' => t('above'),
+            'description' => t('below'),
+            'none' => t('hidden'),
+          ),
+          '#description' => t('This controls how the label of the name component is displayed in the form.'),
+        );
+        $form['instance_settings']['inline_css_enabled'][$key] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Use inline styles for !title', array('!title' => $title)),
+          '#default_value' => $widget['instance_settings']['inline_css_enabled'][$key],
+        );
+
+
       }
       $form['instance_settings']['title_field'] = array(
         '#type' => 'radios',
@@ -403,6 +444,25 @@ function name_widget_settings($op, $widget) {
         '#default_value' => $widget['instance_settings']['generational_field'],
         '#required' => TRUE,
         '#options' => array('select' => t('Drop-down')),
+      );
+      $form['instance_settings']['inline_css'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Inline CSS styles for name components'),
+        '#description' => t('This gives you the option of specifying CSS rules to control the width of the name components. The HTML size for the component is used with the multiplier and the resulting width is rendered as an inline style such as: <em>style="width: 345px;"</em>'),
+      );
+      $form['instance_settings']['inline_css']['multiplier'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Multiplier'),
+        '#default_value' => $widget['instance_settings']['inline_css']['multiplier'],
+        '#required' => TRUE,
+        '#description' => t('The width is set by multipling the HTML size with this.'),
+      );
+      $form['instance_settings']['inline_css']['unit'] = array(
+        '#type' => 'radios',
+        '#title' => t('CSS Unit'),
+        '#default_value' => $widget['instance_settings']['inline_css']['unit'],
+        '#required' => TRUE,
+        '#options' => array('em' => 'em', 'px' => 'px'),
       );
       return $form;
 
@@ -420,6 +480,7 @@ function name_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   _name_defaults($field, 'field_settings');
   $fs = $field['field_settings'];
   $ws = $widget['instance_settings'];
+
   $element = array(
     '#type' => 'name_element',
     '#title' => $widget['label'],
@@ -428,12 +489,21 @@ function name_widget(&$form, &$form_state, $field, $items, $delta = 0) {
     '#minimum_components' => array_filter($fs['minimum_components']),
     '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
   );
+
+  // Field only property. Do the calculations here.
+  $inline_css = $ws['inline_css'];
+
   $components = array_filter($fs['components']);
   foreach (_name_translations() as $key => $title) {
     if (in_array($key, $components)) {
       $element['#components'][$key]['type'] = 'textfield';
-      $element['#components'][$key]['description'] = check_plain($fs['labels'][$key]);
+
       $size = !empty($ws['size'][$key]) ? $ws['size'][$key] : 60;
+      $title_display = isset($ws['title_display'][$key]) ? $ws['title_display'][$key] : 'description';
+
+      $element['#components'][$key]['title'] = check_plain($fs['labels'][$key]);
+      $element['#components'][$key]['title_display'] = $title_display;
+
       $element['#components'][$key]['size'] = $size;
       $element['#components'][$key]['maxlength'] = !empty($fs['max_length'][$key]) ? $fs['max_length'][$key] : 255;
       if (isset($ws[$key .'_field']) && $ws[$key .'_field'] == 'select') {
@@ -474,10 +544,27 @@ function name_widget(&$form, &$form_state, $field, $items, $delta = 0) {
       elseif (isset($ws[$key .'_field']) && $ws[$key .'_field'] == 'autocomplete') {
         // TODO $element['#components'][$key]['autocomplete'] = '';
       }
+
+
+      if (isset($ws['inline_css_enabled'][$key]) && $ws['inline_css_enabled'][$key]) {
+        $width = $size * $inline_css['multiplier'];
+        switch ($inline_css['unit']) {
+          case 'px':
+             $width = round($width) . 'px';
+             break;
+          case 'em':
+          default:
+             $width = round($width, 1) . 'em';
+             break;
+        }
+        $element['#components'][$key]['attributes'] = array();
+        $element['#components'][$key]['attributes']['style'] = 'width:'. $width .';';
+      }
     }
     else {
       $element['#components'][$key]['exclude'] = TRUE;
     }
+
   }
 
   // Used so that hook_field('validate') knows where to
