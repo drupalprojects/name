@@ -143,7 +143,7 @@ function name_list_custom_formats() {
   foreach ($example_names as $example_name) {
     $help_items[] = t('The example %user has the following components; title - %title, given - %given, middle - %middle, family - %family, generational - %generational, credentials - %credentials',
     array(
-      '%user' => name_format($example_name, 't+ g+ m+ f+ g+ c'),
+      '%user' => name_format($example_name, 't+ g+ m+ f+ s+ c'),
       '%title' => $example_name['title'] ? $example_name['title'] : '<none>',
       '%given' => $example_name['given'] ? $example_name['given'] : '<none>',
       '%middle' => $example_name['middle'] ? $example_name['middle'] : '<none>',
