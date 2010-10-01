@@ -34,16 +34,9 @@ function name_admin_settings_form() {
     '#title' => t('Separator 3 replacement token'),
     '#default_value' => $settings['sep3'],
   );
-  $form['name_format_help'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Format string help'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-    '#suffix' => '<div><br/>&nbsp;</div>' // Too close to the save button
-  );
-  $form['name_format_help']['help'] = array(
-    '#value' => theme('name_format_parameter_help'),
-  );
+  // As the fieldset does not have the #input flag, this is not saved.
+  $form['name_format_help'] = _name_get_name_format_help_form();
+
   return system_settings_form($form);
 }
 
@@ -55,7 +48,7 @@ function name_list_custom_formats() {
   $rows = array();
 
   $example_names = array(
-    array(
+    1 => array(
       'title' => 'Mr',
       'given' => 'Joe',
       'middle' => 'John Peter Mark',
@@ -63,7 +56,7 @@ function name_list_custom_formats() {
       'generational' => 'Jnr.',
       'credentials' => 'B.Sc., Ph.D.',
     ),
-    array(
+    2 => array(
       'title' => '',
       'given' => 'JOAN',
       'middle' => 'SUE',
@@ -71,7 +64,7 @@ function name_list_custom_formats() {
       'generational' => '',
       'credentials' => '',
     ),
-    array(
+    3 => array(
       'title' => '',
       'given' => 'Prince',
       'middle' => '',
@@ -80,31 +73,6 @@ function name_list_custom_formats() {
       'credentials' => '',
     ),
 
-  );
-  $schema['name_custom_format'] = array(
-    'fields' => array(
-      'ncfid' => array(
-        'description' => t('The primary identifier for a custom format.'),
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE),
-      'name' => array(
-        'description' => t('The name to identify the custom format to a user.'),
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE),
-      'machine_name' => array(
-        'description' => t('The machine name to identify the custom format to the system.'),
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE),
-      'format' => array(
-        'description' => t('The format string to apply to names.'),
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE),
-    ),
-    'primary key' => array('ncfid'),
   );
   $default_format = array(
     'ncfid' => 0,
@@ -116,20 +84,24 @@ function name_list_custom_formats() {
 
   foreach ($custom_formats as $ncfid => $tag) {
     $row = array();
-    $row[] = l($tag['name'], 'admin/settings/name/'. ($ncfid ? $ncfid : 'settings'));
+    $row[] = l($tag['name'], 'admin/settings/name/' . ($ncfid ? $ncfid : 'settings'));
     $row[] = $tag['machine_name'];
     $row[] = check_plain($tag['format']);
 
     $examples = array();
-    foreach ($example_names as $example_name) {
-      $examples []= check_plain(name_format($example_name, $tag['format']));
+    foreach ($example_names as $index => $example_name) {
+      $formatted = check_plain(name_format($example_name, $tag['format']));
+      if (empty($formatted)) {
+        $formatted = '<em>&lt;&lt;empty&gt;&gt;</em>';
+      }
+      $examples[] = $formatted . " <sup>{$index}</sup>";
     }
     $row[] = implode('<br/>', $examples);
 
     if ($ncfid) {
       $links = array();
-      $links[] = l(t('Edit'), 'admin/settings/name/'. $ncfid);
-      $links[] = l(t('Delete'), 'admin/settings/name/'. $ncfid .'/delete');
+      $links[] = l(t('Edit'), 'admin/settings/name/' . $ncfid);
+      $links[] = l(t('Delete'), 'admin/settings/name/' . $ncfid . '/delete');
       $row[] = implode('&nbsp;&nbsp;&nbsp;&nbsp;', $links);
     }
     else {
@@ -138,34 +110,47 @@ function name_list_custom_formats() {
     $rows[] = $row;
   }
 
-  $help = '<p><strong>'. t('The three examples are for the following users:') .'</strong><p>';
+  $help = '<p><strong>' . t('The three examples are for the following users:') . '</strong><p>';
   $help_items = array();
   foreach ($example_names as $example_name) {
-    $help_items[] = t('The example %user has the following components; title - %title, given - %given, middle - %middle, family - %family, generational - %generational, credentials - %credentials',
+    $help_items[] = t('The example %user has the following components; title is "%title", given is "%given", middle is "%middle", family is "%family", generational is "%generational", credentials are "%credentials"',
     array(
       '%user' => name_format($example_name, 't+ g+ m+ f+ s+ c'),
-      '%title' => $example_name['title'] ? $example_name['title'] : '<none>',
-      '%given' => $example_name['given'] ? $example_name['given'] : '<none>',
-      '%middle' => $example_name['middle'] ? $example_name['middle'] : '<none>',
-      '%family' => $example_name['family'] ? $example_name['family'] : '<none>',
-      '%generational' => $example_name['generational'] ? $example_name['generational'] : '<none>',
-      '%credentials' => $example_name['credentials'] ? $example_name['credentials'] : '<none>',
+      '%title' => $example_name['title'] ? $example_name['title'] : '<<empty>>',
+      '%given' => $example_name['given'] ? $example_name['given'] : '<<empty>>',
+      '%middle' => $example_name['middle'] ? $example_name['middle'] : '<<empty>>',
+      '%family' => $example_name['family'] ? $example_name['family'] : '<<empty>>',
+      '%generational' => $example_name['generational'] ? $example_name['generational'] : '<<empty>>',
+      '%credentials' => $example_name['credentials'] ? $example_name['credentials'] : '<<empty>>',
     ));
   }
 
-  $fieldset = array(
+  $fieldset = _name_get_name_format_help_form();
+
+  $output = theme('table', $header, $rows) . $help . theme('item_list', $help_items, NULL, 'ol') . drupal_render($fieldset);
+  return $output;
+}
+
+/**
+ * A helper function to generate the format string parameter help fieldset.
+ */
+function _name_get_name_format_help_form() {
+  $form = array(
     '#type' => 'fieldset',
     '#title' => t('Format string help'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
+    '#parents' => array(),
+    'format_parameters' => array(
+      '#value' => theme('name_format_parameter_help'),
+    ),
   );
-  $fieldset['help'] = array(
-    '#value' => theme('name_format_parameter_help'),
-  );
-  $output = theme('table', $header, $rows) . $help . theme('item_list', $help_items) . drupal_render($fieldset);
-  return $output;
+  return $form;
 }
 
+/**
+ * Form callback to edit or add a new custom name format.
+ */
 function name_custom_formats_form($form_state, $edit = array()) {
   $edit += array(
     'ncfid' => NULL,
@@ -201,15 +186,7 @@ function name_custom_formats_form($form_state, $edit = array()) {
     '#required' => TRUE,
   );
 
-  $form['format_help'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Format string help'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-  $form['format_help']['help'] = array(
-    '#value' => theme('name_format_parameter_help'),
-  );
+  $form['name_format_help'] = _name_get_name_format_help_form();
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -218,12 +195,16 @@ function name_custom_formats_form($form_state, $edit = array()) {
   if (!empty($edit['ncfid'])) {
     $form['delete'] = array(
       '#type' => 'submit',
-      '#value' => t('Delete'));
+      '#value' => t('Delete'),
+    );
   }
   return $form;
 }
 
 
+/**
+ * Custom validation for name_custom_formats_form().
+ */
 function name_custom_formats_form_validate($form, &$form_state) {
   $values = $form_state['values'];
   // Ensure that the name is unique
@@ -256,6 +237,10 @@ function name_custom_formats_form_validate($form, &$form_state) {
 //    }
 //  }
 }
+
+/**
+ * Submit handler for name_custom_formats_form().
+ */
 function name_custom_formats_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   if (empty($values['ncfid'])) {
@@ -285,6 +270,9 @@ function name_custom_format_edit($ncfid) {
   drupal_not_found();
 }
 
+/**
+ * Custom name format deletion form.
+ */
 function name_custom_format_delete_form($form_state, $ncfid) {
   $name = db_fetch_array(db_query("SELECT * FROM {name_custom_format} WHERE ncfid = %d", $ncfid));
 
@@ -293,7 +281,10 @@ function name_custom_format_delete_form($form_state, $ncfid) {
     drupal_goto('admin/settings/name');
   }
   $form = array();
-  $form['ncfid'] = array('#type' => 'value', '#value' => $name['ncfid']);
+  $form['ncfid'] = array(
+    '#type' => 'value',
+    '#value' => $name['ncfid'],
+  );
   $form['#name'] = $name;
   return confirm_form(
     $form,
@@ -306,10 +297,13 @@ function name_custom_format_delete_form($form_state, $ncfid) {
   );
 }
 
+/**
+ * Submit handler for name_custom_format_delete_form().
+ */
 function name_custom_format_delete_form_submit($form, &$form_state) {
-  $ncfid = (int) $form_state['values']['ncfid'];
-  db_query("DELETE FROM {name_custom_format} WHERE ncfid = %d", $ncfid);
-  drupal_set_message(t('The custom name format %name was deleted.', array('%name' => $form['#name']['name'])));
+  db_query("DELETE FROM {name_custom_format} WHERE ncfid = %d", $form_state['values']['ncfid']);
+  drupal_set_message(t('The custom name format %name was deleted.',
+      array('%name' => $form['#name']['name'])));
   $form_state['redirect'] = 'admin/settings/name';
 }
 
