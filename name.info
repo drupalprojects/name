@@ -1,5 +1,5 @@
 ; $Id$
-name = Name
+name = Name Field
 description = Defines a persons name field type.
 dependencies[] = content
 package = CCK
