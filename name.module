@@ -96,7 +96,7 @@ function name_token_list($type = 'all') {
 function name_token_values($type, $object = NULL) {
   if ($type == 'field') {
     module_load_include('inc', 'name', 'includes/name.token');
-    return _name_token_values($type);
+    return _name_token_values($type, $object);
   }
 }
 
