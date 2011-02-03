@@ -1144,3 +1144,14 @@ function _name_defaults(&$field, $key) {
     }
   }
 }
+
+/**
+ * Implementation of CCK's hook_content_diff_values().
+ */
+function name_content_diff_values($node, $field, $items) {
+  $return = array();
+  foreach ($items as $delta => $item) {
+    $return[] = implode('~', $item);
+  }
+  return $return;
+}
