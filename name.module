@@ -12,7 +12,7 @@
  */
 function name_form_content_field_edit_form_alter(&$form, &$form_state) {
   $field = $form['#field'];
-  if (!$field['module'] == 'name') {
+  if (!$field['module'] != 'name') {
     return;
   }
 
