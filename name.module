@@ -805,7 +805,7 @@ function name_field($op, &$node, $field, &$items, $teaser, $page) {
     case 'sanitize':
       foreach ($items as $delta => $item) {
         foreach (_name_translations() as $key => $title) {
-          $items[$delta]['safe'][$key] = check_plain($item[$key]);
+          $items[$delta]['safe'][$key] = empty($item[$key]) ? '' : check_plain($item[$key]);
         }
       }
   }
