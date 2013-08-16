@@ -555,6 +555,25 @@ function _name_field_instance_settings_pre_render($form) {
         '#suffix' => '</tr>',
         '#weight' => 4,
       ),
+      'field_override_label' => array(
+        '#markup' => '<tr><td colspan="7"><strong><em>' . t('Field setting overrides') . '</em></strong></td>',
+        '#weight' => 5,
+      ),
+      'components' => array(
+        '#prefix' => '<tr><td><strong>' . t('Components') . '<sup>5</sup></strong></td>',
+        '#suffix' => '</tr>',
+        '#weight' => 6,
+      ),
+      'minimum_components' => array(
+        '#prefix' => '<tr><td><strong>' . t('Minimum components') . '<sup>6</sup></strong></td>',
+        '#suffix' => '</tr>',
+        '#weight' => 7,
+      ),
+      'labels' => array(
+        '#prefix' => '<tr><td><strong>' . t('Labels') . '<sup>7</sup></strong></td>',
+        '#suffix' => '</tr>',
+        '#weight' => 8,
+      ),
     ),
     'tfoot' => array(
       '#markup' => '<tfoot><tr><td colspan="7"><ol>'
@@ -563,6 +582,9 @@ function _name_field_instance_settings_pre_render($form) {
         . '<li>' . t('The Field type controls how the field is rendered. Autocomplete is a text field with autocomplete, and the behaviour of this is controlled by the field settings.') . '</li>'
         . '<li>' . t('The HTML size property tells the browser what the width of the field should be when it is rendered. This gets overriden by the themes CSS properties. This must be between 1 and 255.') . '</li>'
         . '<li>' . t('Additional inline styles for the input element. For example, "width: 45px; background-color: #f3f3f3"') . '</li>'
+        . '<li>' . t('Optional overrides for <em>Components</em> used. Leave all unchecked to use the field settings.') . '</li>'
+        . '<li>' . t('Optional overrides for <em>Minimum components</em> used. Leave all unchecked to use the field settings.') . '</li>'
+        . '<li>' . t('Optional overrides for field labels.') . '</li>'
         . '</ol></td></tr></tfoot>',
       '#weight' => 2,
     ),
@@ -591,6 +613,9 @@ function _name_field_instance_settings_pre_render($form) {
     unset($form['instance_inline_css'][$key]['#description']);
     unset($form['instance_inline_css'][$key]['#title']);
 
+    unset($form['instance_labels'][$key]['#description']);
+    unset($form['instance_labels'][$key]['#title']);
+
     // Moves the size element into the table.
     $form['styled_settings']['tbody']['size'][$key] = $form['instance_size'][$key];
     $form['styled_settings']['tbody']['size'][$key]['#prefix'] = '<td>';
@@ -612,6 +637,21 @@ function _name_field_instance_settings_pre_render($form) {
     $form['styled_settings']['tbody']['inline_css'][$key]['#suffix'] = '</td>';
     $form['styled_settings']['tbody']['inline_css'][$key]['#weight'] = $i;
 
+    $form['styled_settings']['tbody']['labels'][$key] = $form['instance_labels'][$key];
+    $form['styled_settings']['tbody']['labels'][$key]['#prefix'] = '<td>';
+    $form['styled_settings']['tbody']['labels'][$key]['#suffix'] = '</td>';
+    $form['styled_settings']['tbody']['labels'][$key]['#weight'] = $i;
+
+    $form['styled_settings']['tbody']['components'][$key] = $form['instance_components'][$key];
+    $form['styled_settings']['tbody']['components'][$key]['#prefix'] = '<td>';
+    $form['styled_settings']['tbody']['components'][$key]['#suffix'] = '</td>';
+    $form['styled_settings']['tbody']['components'][$key]['#weight'] = $i;
+
+    $form['styled_settings']['tbody']['minimum_components'][$key] = $form['instance_minimum_components'][$key];
+    $form['styled_settings']['tbody']['minimum_components'][$key]['#prefix'] = '<td>';
+    $form['styled_settings']['tbody']['minimum_components'][$key]['#suffix'] = '</td>';
+    $form['styled_settings']['tbody']['minimum_components'][$key]['#weight'] = $i;
+
     // Clean up the leftovers.
     unset($form['instance_size'][$key]);
     $form['instance_size']['#access'] = FALSE;
@@ -625,6 +665,14 @@ function _name_field_instance_settings_pre_render($form) {
     unset($form['instance_inline_css'][$key]);
     $form['instance_inline_css']['#access'] = FALSE;
 
+    unset($form['instance_labels'][$key]);
+    $form['instance_labels']['#access'] = FALSE;
+
+    unset($form['instance_components'][$key]);
+    $form['instance_components']['#access'] = FALSE;
+
+    unset($form['instance_minimum_components'][$key]);
+    $form['instance_minimum_components']['#access'] = FALSE;
   }
 
   return $form;

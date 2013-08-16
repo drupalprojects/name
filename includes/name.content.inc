@@ -172,9 +172,28 @@ function _name_field_settings_form_validate($elements, &$form_state, $form) {
   _name_options_validate($values['generational_options'], $values['max_length']['generational'],
       t('Generational options'), 'field][settings][generational_options');
 
-  // Validates that a minimum component is checked when that component is not used.
+  // Validates that a minimum component is not selected when that component is
+  // not selected.
   _name_field_components_validate($values['components'],
       $values['minimum_components'], 'field][settings][minimum_components');
+
+  if (!empty($form_state['values']['instance'])) {
+    $instance_settings = $form_state['values']['instance']['settings'];
+    $instance_components = array_filter($instance_settings['components']);
+    $instance_minimum_components = array_filter($instance_settings['minimum_components']);
+    if ($instance_components && $instance_minimum_components) {
+      _name_field_components_validate($instance_components,
+          $instance_minimum_components, 'instance[settings][minimum_components');
+    }
+    elseif ($instance_minimum_components) {
+      _name_field_components_validate($values['components'],
+          $instance_minimum_components, 'instance[settings][minimum_components');
+    }
+    elseif ($instance_components) {
+      _name_field_components_validate($instance_components,
+          $values['minimum_components'], 'instance[settings][components');
+    }
+  }
 }
 
 // TODO - hook_field_views_data() if required
@@ -304,8 +323,28 @@ function _name_field_instance_settings_form($field, $instance = NULL) {
       '#default_value' => isset($settings['inline_css']) ? $settings['inline_css'][$key] : '',
       '#size' => 8,
     );
+    $form['labels'][$key] = array(
+      '#type' => 'textfield',
+      '#title' => t('Label for !title', array('!title' => $title)),
+      '#default_value' => isset($settings['labels']) ? $settings['labels'][$key] : '',
+      '#size' => 12,
+    );
   }
+  $form['components'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Components overrides'),
+    '#default_value' => $settings['components'],
+    '#options' => $components,
+    '#element_validate' => array('_name_field_minimal_component_requirements'),
+  );
 
+  $form['minimum_components'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Minimum components overrides'),
+    '#default_value' => $settings['minimum_components'],
+    '#element_validate' => array('_name_field_minimal_component_requirements'),
+    '#options' => $components,
+  );
   $form['component_css'] = array(
     '#type' => 'textfield',
     '#title' => t('Component separator CSS'),
@@ -381,7 +420,18 @@ function _name_field_widget_form(&$form, &$form_state, $field, $instance, $langc
   _name_defaults($field['settings'], 'settings');
   $fs = $field['settings'];
   $ws = $instance['settings'];
+  $ws += array(
+    'components' => array(),
+    'minimum_components' => array(),
+  );
 
+  // Use populated overrides if present.
+  if (array_filter($ws['components'])) {
+    $fs['components'] = $ws['components'];
+  }
+  if (array_filter($ws['minimum_components'])) {
+    $fs['minimum_components'] = $ws['minimum_components'];
+  }
   $element += array(
     '#type' => 'name_element',
     '#title' => check_plain($instance['label']),
@@ -405,7 +455,8 @@ function _name_field_widget_form(&$form, &$form_state, $field, $instance, $langc
       $size = !empty($ws['size'][$key]) ? $ws['size'][$key] : 60;
       $title_display = isset($ws['title_display'][$key]) ? $ws['title_display'][$key] : 'description';
 
-      $element['#components'][$key]['title'] = check_plain($fs['labels'][$key]);
+      $component_label = empty($ws['labels'][$key]) ? $fs['labels'][$key] : $ws['labels'][$key];
+      $element['#components'][$key]['title'] = check_plain($component_label);
       $element['#components'][$key]['title_display'] = $title_display;
 
       $element['#components'][$key]['size'] = $size;

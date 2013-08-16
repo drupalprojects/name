@@ -514,10 +514,12 @@ class Name_FieldTestCase extends NameTestHelper {
       t('!field options field is required.', array('!field' => $n['title'])),
       t('!field options field is required.', array('!field' => $n['generational'])),
 
+      // There is now empty tests on both of these fields, so the second
+      // message will not show if the required message is shown.
       t('!field field is required.', array('!field' => t('Components'))),
-      t('!field must have one of the following components: !components', array('!field' => t('Components'), '!components' => check_plain(implode(', ', array($n['given'], $n['family']))))),
       t('!field field is required.', array('!field' => t('Minimum components'))),
-      t('!field must have one of the following components: !components', array('!field' => t('Minimum components'), '!components' => check_plain(implode(', ', array($n['given'], $n['family']))))),
+      // t('!field must have one of the following components: !components', array('!field' => t('Components'), '!components' => check_plain(implode(', ', array($n['given'], $n['family']))))),
+      // t('!field must have one of the following components: !components', array('!field' => t('Minimum components'), '!components' => check_plain(implode(', ', array($n['given'], $n['family']))))),
     );
     foreach ($required_messages as $message) {
       $this->assertText($message);
