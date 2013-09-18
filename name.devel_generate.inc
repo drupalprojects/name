@@ -28,6 +28,9 @@ function _name_devel_generate($object, $field, $instance, $bundle) {
 
   $func = variable_get('name_devel_generate_names', '_name_devel_generate_name');
   $names = $func($field);
+  if (!isset($instance['setting'])) {
+    $instance['setting'] = array();
+  }
   $instance['setting'] += array(
     'components' => array(),
   );
