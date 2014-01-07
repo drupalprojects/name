@@ -652,7 +652,7 @@ function _name_render_component($components, $component_key, $base_element, $cor
   $element = array();
   // Allow other modules to append additional FAPI properties to the element.
   foreach (element_properties($component) as $key) {
-    $element[$key] = $element[$key];
+    $element[$key] = $component[$key];
   }
 
   $element['#attributes']['class'][] = 'name-element';
