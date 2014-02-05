@@ -287,7 +287,7 @@ function name_list_custom_formats() {
 
   foreach ($custom_formats as $ncfid => $tag) {
     $row = array();
-    $row[] = l($tag->name, 'admin/config/regional/name/' . ($ncfid ? $ncfid : 'settings'));
+    $row[] = l($tag->name, 'admin/config/content/name/' . ($ncfid ? $ncfid : 'settings'));
     $row[] = $tag->machine_name;
     $row[] = check_plain($tag->format);
 
@@ -303,12 +303,12 @@ function name_list_custom_formats() {
 
     if ($ncfid) {
       $links = array();
-      $links[] = l(t('Edit'), 'admin/config/regional/name/' . $ncfid);
-      $links[] = l(t('Delete'), 'admin/config/regional/name/' . $ncfid . '/delete');
+      $links[] = l(t('Edit'), 'admin/config/content/name/' . $ncfid);
+      $links[] = l(t('Delete'), 'admin/config/content/name/' . $ncfid . '/delete');
       $row[] = implode('&nbsp;&nbsp;&nbsp;&nbsp;', $links);
     }
     else {
-      $row[] = l(t('Edit'), 'admin/config/regional/name/settings');
+      $row[] = l(t('Edit'), 'admin/config/content/name/settings');
     }
     $rows[] = array('data' => $row, 'id' => 'name-' . $ncfid);
   }
@@ -459,7 +459,7 @@ function name_custom_formats_form_submit($form, &$form_state) {
   }
   drupal_set_message(t($message, array('%name' => $values['name'])));
 
-  $form_state['redirect'] = 'admin/config/regional/name';
+  $form_state['redirect'] = 'admin/config/content/name';
 }
 
 /**
@@ -474,7 +474,7 @@ function name_custom_format_edit($ncfid) {
     return drupal_get_form('name_custom_formats_form', $name);
   }
   drupal_set_message(t('The custom format could not be found.'), 'error');
-  drupal_goto('admin/config/regional/name');
+  drupal_goto('admin/config/content/name');
 }
 
 /**
@@ -485,7 +485,7 @@ function name_custom_format_delete_form($form, $form_state, $ncfid) {
 
   if (!$name) {
     drupal_set_message(t('The custom format could not be found.'), 'error');
-    drupal_goto('admin/config/regional/name');
+    drupal_goto('admin/config/content/name');
   }
   $form = array();
   $form['ncfid'] = array(
@@ -498,7 +498,7 @@ function name_custom_format_delete_form($form, $form_state, $ncfid) {
     t('Are you sure you want to delete the custom format %name ("%format")?',
       array('%name' => $name['name'], '%format' => $name['format'])
     ),
-    'admin/config/regional/name',
+    'admin/config/content/name',
     t('This action cannot be undone.'),
     t('Delete'),   t('Cancel')
   );
@@ -513,7 +513,7 @@ function name_custom_format_delete_form_submit($form, &$form_state) {
       ->execute();
   drupal_set_message(t('The custom name format %name was deleted.',
       array('%name' => $form['#name']['name'])));
-  $form_state['redirect'] = 'admin/config/regional/name';
+  $form_state['redirect'] = 'admin/config/content/name';
 }
 
 /**

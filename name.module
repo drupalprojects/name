@@ -70,38 +70,37 @@ function name_menu() {
   );
 
   // Admin menu items
-  $items['admin/config/regional/name'] = array(
-    'title' => 'Names',
+  $items['admin/config/content/name'] = array(
+    'title' => 'Name field',
     'page callback' => 'name_list_custom_formats',
     'description' => 'Configure, edit and maintain names and name custom formats.',
     'access arguments' => array('administer site configuration'),
     'file' => 'name.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['admin/config/regional/name/list'] = array(
-    'title' => 'Custom formats',
+  $items['admin/config/content/name/formats'] = array(
+    'title' => 'Name formats',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
-  $items['admin/config/regional/name/add'] = array(
-    'title' => 'Add custom format',
+  $items['admin/config/content/name/add'] = array(
+    'title' => 'Add name format',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('name_custom_formats_form'),
     'access arguments' => array('administer site configuration'),
     'file' => 'name.admin.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_ACTION,
   );
-  $items['admin/config/regional/name/settings'] = array(
+  $items['admin/config/content/name/settings'] = array(
     'title' => 'Settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('name_admin_settings_form'),
-    'description' => 'Administer the Names module and custom name formats.',
     'access arguments' => array('administer site configuration'),
     'file' => 'name.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
   );
-  $items['admin/config/regional/name/%'] = array(
+  $items['admin/config/content/name/%'] = array(
     'title' => 'Edit custom format',
     'page callback' => 'name_custom_format_edit',
     'page arguments' => array(4),
@@ -109,7 +108,7 @@ function name_menu() {
     'file' => 'name.admin.inc',
     'type' => MENU_CALLBACK,
   );
-  $items['admin/config/regional/name/%/delete'] = array(
+  $items['admin/config/content/name/%/delete'] = array(
     'title' => 'Delete custom name format',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('name_custom_format_delete_form', 4),
