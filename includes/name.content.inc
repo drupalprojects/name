@@ -8,6 +8,8 @@
  * instance and formatter.
  */
 
+define('NAME_FIELD_TAXONOMY_OPTION_REGEX', '/^\[vocabulary:([0-9a-z\_]{1,})\]/');
+
 /* ----------------------------- Field Code --------------------------------- */
 
 /**
@@ -214,7 +216,7 @@ function _name_options_validate($options, $max, $label, $error_element) {
       $default_options[] = $value;
     }
     // Simple checks on the taxonomy includes.
-    elseif (preg_match('/^\[vocabulary:([0-9a-z\_]{1,})\]/', $value, $matches)) {
+    elseif (preg_match(NAME_FIELD_TAXONOMY_OPTION_REGEX, $value, $matches)) {
       if (!module_exists('taxonomy')) {
         form_set_error($error_element, t("The taxonomy module must be enabled before using the '%tag' tag in %label.",
             array('%tag' => $matches[0], '%label' => $label)));
@@ -223,8 +225,11 @@ function _name_options_validate($options, $max, $label, $error_element) {
         form_set_error($error_element, t("The '%tag' tag in %label should be on a line by itself.",
             array('%tag' => $matches[0], '%label' => $label)));
       }
-      else{
-        if (!_name_get_vocabulary_id_by_code_or_number($matches[1])) {
+      else {
+        if (_name_get_vocabulary_id_by_code_or_number($matches[1])) {
+          $valid_options[] = $value;
+        }
+        else {
           form_set_error($error_element, t("The vocabulary '%tag' in %label could not be found.",
             array('%tag' => $matches[1], '%label' => $label)));
         }
@@ -507,7 +512,7 @@ function _name_field_get_options($field, $key) {
 
   $options = array_filter(explode("\n", $fs[$key . '_options']));
   foreach ($options as $index => $opt) {
-    if (preg_match('/^\[vocabulary:([0-9a_z\_]{1,})\]/', trim($opt), $matches)) {
+    if (preg_match(NAME_FIELD_TAXONOMY_OPTION_REGEX, trim($opt), $matches)) {
       unset($options[$index]);
       if (module_exists('taxonomy')) {
         if ($vid = _name_get_vocabulary_id_by_code_or_number($matches[1])) {
