@@ -11,6 +11,8 @@ use Drupal\name\NameFormatParser;
 use Drupal\Tests\UnitTestCase;
 
 /**
+ * Tests the name formatter.
+ *
  * @group name
  */
 class NameFormatParserTest extends UnitTestCase {
