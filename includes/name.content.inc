@@ -420,6 +420,8 @@ function _name_field_instance_settings_form($field, $instance = NULL) {
  * Implements hook_field_widget_form().
  */
 function _name_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  form_load_include($form_state, 'inc', 'name', 'includes/name.content');
+
   $widget = $instance['widget'];
   _name_defaults($instance['settings'], 'instance_settings');
   _name_defaults($field['settings'], 'settings');
