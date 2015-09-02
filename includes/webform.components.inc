@@ -268,6 +268,7 @@ function _webform_render_name($name, $value = NULL, $filter = TRUE) {
     '#minimum_components' => $name['extra']['minimum_components'],
     '#components' => $name['extra']['components'],
     '#default_value' => empty($value) ? $default_value : $value,
+    '#theme_wrappers' => array('webform_element'),
   );
 
   return $form_item;
