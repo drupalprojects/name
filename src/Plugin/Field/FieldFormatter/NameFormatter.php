@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\name\NameFormatParser;
 
 /**
@@ -202,7 +203,7 @@ class NameFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = array();
     $entity = $items->getEntity();
 
@@ -235,7 +236,7 @@ class NameFormatter extends FormatterBase {
 
     if (isset($settings['multiple']) && $settings['multiple'] == 'inline_list') {
       $items = array();
-      foreach (element_children($elements) as $delta) {
+      foreach (Element::children($elements) as $delta) {
         if (!empty($elements[$delta]['#markup'])) {
           $items[] = $elements[$delta]['#markup'];
           unset($elements[$delta]);
@@ -243,10 +244,11 @@ class NameFormatter extends FormatterBase {
       }
 
       if (!empty($items)) {
-        $elements[0]['#markup'] = _theme('name_item_list', array(
-          'items' => $items,
-          'settings' => $settings
-        ));
+        $elements[0] = [
+          '#theme' => 'name_item_list',
+          '#items' => $items,
+          '#settings' => $settings
+        ];
       }
     }
 
