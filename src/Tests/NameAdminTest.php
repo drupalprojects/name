@@ -164,7 +164,7 @@ class NameAdminTest extends NameTestBase {
     $values = array('label' => '', 'id' => '', 'pattern' => '');
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
     foreach (array(t('Name'), t('Machine-readable name'), t('Format')) as $title) {
-      $this->assertText(t('!field field is required', array('!field' => $title)));
+      $this->assertText(t('@field field is required', array('@field' => $title)));
     }
     $values = array('label' => 'given', 'id' => '1234567890abcdefghijklmnopqrstuvwxyz_', 'pattern' => 'a');
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
@@ -212,10 +212,10 @@ class NameAdminTest extends NameTestBase {
     $this->assertResponse(404);
 
     $this->drupalGet('admin/config/regional/name/manage/test/delete');
-    $this->assertText(t('Are you sure you want to delete the custom format !title?', array('!title' => $values['label'])));
+    $this->assertText(t('Are you sure you want to delete the custom format @title?', array('@title' => $values['label'])));
 
     $this->drupalPostForm(NULL, array('confirm' => 1), t('Delete'));
-    $this->assertText(t('The custom name format !title has been deleted.', array('!title' => $values['label'])));
+    $this->assertText(t('The custom name format @title has been deleted.', array('@title' => $values['label'])));
   }
 
   /**
