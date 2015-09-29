@@ -100,7 +100,8 @@ class NameUserTest extends KernelTestBase {
     $account = User::load($account->id());
     $this->assertEqual('Max Mustermann', $account->realname);
     $this->assertEqual('Max Mustermann', user_format_name($account));
-    $this->assertEqual('Max Mustermann', $account->getUsername());
+    $this->assertEqual('test', $account->getUsername());
+    $this->assertEqual('Max Mustermann', $account->getDisplayName());
   }
 
 }
