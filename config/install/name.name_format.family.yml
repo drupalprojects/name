@@ -1,7 +1,7 @@
 id: family
 uuid: 1c11090b-8a62-4bbf-be34-5258ee8007ea
 label: Family
-status: '1'
+status: true
 langcode: en
-locked: '0'
+locked: false
 pattern: f

@@ -22,7 +22,7 @@ name.name_format.*:
       label: 'Pattern'
 
 name.settings:
-  type: mapping
+  type: config_object
   label: 'Name sttings'
   mapping:
     component_required_marker:
@@ -54,7 +54,7 @@ name.settings:
       label: 'User preferred'
 
 name.examples.*:
-  type: mapping
+  type: config_object
   label: 'Examples'
   mapping:
     examples:
