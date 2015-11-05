@@ -185,12 +185,12 @@ function _name_translations($intersect = NULL) {
   static $nt = NULL;
   if (!isset($nt)) {
     $nt = array(
-      'title' => t('!name_title', array('!name_title' => t('Title'))),
-      'given' => t('!name_given', array('!name_given' => t('Given'))),
-      'middle' => t('!name_middle', array('!name_middle' => t('Middle name(s)'))),
-      'family' => t('!name_family', array('!name_family' => t('Family'))),
-      'generational' => t('!name_generational', array('!name_generational' => t('Generational'))),
-      'credentials' => t('!name_credentials', array('!name_credentials' => t('Credentials'))),
+      'title' => t('@name_title', array('@name_title' => t('Title'))),
+      'given' => t('@name_given', array('@name_given' => t('Given'))),
+      'middle' => t('@name_middle', array('@name_middle' => t('Middle name(s)'))),
+      'family' => t('@name_family', array('@name_family' => t('Family'))),
+      'generational' => t('@name_generational', array('@name_generational' => t('Generational'))),
+      'credentials' => t('@name_credentials', array('@name_credentials' => t('Credentials'))),
     );
   }
   return empty($intersect) ? $nt : array_intersect_key($nt, $intersect);
@@ -331,7 +331,9 @@ function name_element_render_component($components, $component_key, $base_elemen
     $element['#' . $key] = $component[$key];
   }
 
-  $element['#default_value'] = $base_element['#value'][$component_key];
+  if (isset($base_element['#value'][$component_key])) {
+    $element['#default_value'] = $base_element['#value'][$component_key];
+  }
   if ($component['type'] == 'select') {
     $element['#options'] = $component['options'];
     $element['#size'] = 1;

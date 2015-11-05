@@ -76,24 +76,24 @@ class NameFieldTest extends NameTestBase {
 
     $n = _name_translations();
     $required_messages = array(
-      t('Label for !field field is required.', array('!field' => $n['title'])),
-      t('Label for !field field is required.', array('!field' => $n['given'])),
-      t('Label for !field field is required.', array('!field' => $n['middle'])),
-      t('Label for !field field is required.', array('!field' => $n['family'])),
-      t('Label for !field field is required.', array('!field' => $n['generational'])),
-      t('Label for !field field is required.', array('!field' => $n['credentials'])),
+      t('Label for @field field is required.', array('@field' => $n['title'])),
+      t('Label for @field field is required.', array('@field' => $n['given'])),
+      t('Label for @field field is required.', array('@field' => $n['middle'])),
+      t('Label for @field field is required.', array('@field' => $n['family'])),
+      t('Label for @field field is required.', array('@field' => $n['generational'])),
+      t('Label for @field field is required.', array('@field' => $n['credentials'])),
 
-      t('Maximum length for !field field is required.', array('!field' => $n['title'])),
-      t('Maximum length for !field field is required.', array('!field' => $n['given'])),
-      t('Maximum length for !field field is required.', array('!field' => $n['middle'])),
-      t('Maximum length for !field field is required.', array('!field' => $n['family'])),
-      t('Maximum length for !field field is required.', array('!field' => $n['generational'])),
-      t('Maximum length for !field field is required.', array('!field' => $n['credentials'])),
-      t('!field options are required.', array('!field' => $n['title'])),
-      t('!field options are required.', array('!field' => $n['generational'])),
+      t('Maximum length for @field field is required.', array('@field' => $n['title'])),
+      t('Maximum length for @field field is required.', array('@field' => $n['given'])),
+      t('Maximum length for @field field is required.', array('@field' => $n['middle'])),
+      t('Maximum length for @field field is required.', array('@field' => $n['family'])),
+      t('Maximum length for @field field is required.', array('@field' => $n['generational'])),
+      t('Maximum length for @field field is required.', array('@field' => $n['credentials'])),
+      t('@field options are required.', array('@field' => $n['title'])),
+      t('@field options are required.', array('@field' => $n['generational'])),
 
-      t('!field field is required.', array('!field' => t('Components'))),
-      t('!field must have one of the following components: !components', array('!field' => t('Minimum components'), '!components' => SafeMarkup::checkPlain(implode(', ', array($n['given'], $n['family']))))),
+      t('@field field is required.', array('@field' => t('Components'))),
+      t('@field must have one of the following components: @components', array('@field' => t('Minimum components'), '@components' => SafeMarkup::checkPlain(implode(', ', array($n['given'], $n['family']))))),
     );
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -128,22 +128,22 @@ class NameFieldTest extends NameTestBase {
 
     $required_messages = array(
       /*
-      t('!components can not be selected for !label when they are not selected for !label2.',
+      t('@components can not be selected for !label when they are not selected for !label2.',
               array('!label' => t('Minimum components'), '!label2' => t('Components'),
-              '!components' => SafeMarkup::checkPlain(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
+              '@components' => SafeMarkup::checkPlain(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
       */
 
-      t('!field must be higher than or equal to 1.', array('!field' => $n['title'])),
-      t('!field must be higher than or equal to 1.', array('!field' => $n['given'])),
-      t('!field must be a number.', array('!field' => $n['middle'])),
-      t('!field must be lower than or equal to 255.', array('!field' => $n['family'])),
-      t('!field is not a valid number.', array('!field' => $n['generational'])),
-      t('!field must be a number.', array('!field' => $n['credentials'])),
+      t('@field must be higher than or equal to 1.', array('@field' => $n['title'])),
+      t('@field must be higher than or equal to 1.', array('@field' => $n['given'])),
+      t('@field must be a number.', array('@field' => $n['middle'])),
+      t('@field must be lower than or equal to 255.', array('@field' => $n['family'])),
+      t('@field is not a valid number.', array('@field' => $n['generational'])),
+      t('@field must be a number.', array('@field' => $n['credentials'])),
 
-      t('!field must have one of the following components: !components', array('!field' => t('Minimum components'), '!components' => SafeMarkup::checkPlain(implode(', ', array($n['given'], $n['family']))))),
+      t('@field must have one of the following components: @components', array('@field' => t('Minimum components'), '@components' => SafeMarkup::checkPlain(implode(', ', array($n['given'], $n['family']))))),
 
-      t("The vocabulary 'machine' in !field could not be found.", array('!field' => t('!title options', array('!title' => $n['title'])))),
-      t("The vocabulary '123' in !field could not be found.", array('!field' => t('!generational options', array('!generational' => $n['generational'])))),
+      t("The vocabulary 'machine' in @field could not be found.", array('@field' => t('@title options', array('@title' => $n['title'])))),
+      t("The vocabulary '123' in @field could not be found.", array('@field' => t('@generational options', array('@generational' => $n['generational'])))),
     );
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -159,8 +159,8 @@ class NameFieldTest extends NameTestBase {
     $this->resetAll();
     $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
     $required_messages = array(
-      t('The following options exceed the maximum allowed !field length: Aaaaa., Bbbbbbbb, Ccccc.', array('!field' => t('!title options', array('!title' => $n['title'])))),
-      t('The following options exceed the maximum allowed !field length: AAAA, VIII, BBBB', array('!field' => t('!generational options', array('!generational' => $n['generational'])))),
+      t('The following options exceed the maximum allowed @field length: Aaaaa., Bbbbbbbb, Ccccc.', array('@field' => t('@title options', array('@title' => $n['title'])))),
+      t('The following options exceed the maximum allowed @field length: AAAA, VIII, BBBB', array('@field' => t('@generational options', array('@generational' => $n['generational'])))),
     );
 
     foreach ($required_messages as $message) {
@@ -175,8 +175,8 @@ class NameFieldTest extends NameTestBase {
     $this->resetAll();
     $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
     $required_messages = array(
-      t('!field are required.', array('!field' => t('!title options', array('!title' => $n['title'])))),
-      t('!field are required.', array('!field' => t('!generational options', array('!generational' => $n['generational'])))),
+      t('@field are required.', array('@field' => t('@title options', array('@title' => $n['title'])))),
+      t('@field are required.', array('@field' => t('@generational options', array('@generational' => $n['generational'])))),
     );
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -190,8 +190,8 @@ class NameFieldTest extends NameTestBase {
     $this->resetAll();
     $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
     $required_messages = array(
-      t('!field can only have one blank value assigned to it.', array('!field' => t('!title options', array('!title' => $n['title'])))),
-      t('!field can only have one blank value assigned to it.', array('!field' => t('!generational options', array('!generational' => $n['generational'])))),
+      t('@field can only have one blank value assigned to it.', array('@field' => t('@title options', array('@title' => $n['title'])))),
+      t('@field can only have one blank value assigned to it.', array('@field' => t('@generational options', array('@generational' => $n['generational'])))),
     );
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -236,22 +236,22 @@ class NameFieldTest extends NameTestBase {
 
     $required_messages = array(
       /*
-      t('!components can not be selected for !label when they are not selected for !label2.',
+      t('@components can not be selected for !label when they are not selected for !label2.',
               array('!label' => t('Minimum components'), '!label2' => t('Components'),
-              '!components' => SafeMarkup::checkPlain(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
+              '@components' => SafeMarkup::checkPlain(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
       */
 
-      t('Maximum length for !field must be higher than or equal to 1.', array('!field' => $n['title'])),
-      t('Maximum length for !field must be higher than or equal to 1.', array('!field' => $n['given'])),
-      t('Maximum length for !field must be a number.', array('!field' => $n['middle'])),
-      t('Maximum length for !field must be lower than or equal to 255.', array('!field' => $n['family'])),
-      t('Maximum length for !field is not a valid number.', array('!field' => $n['generational'])),
-      t('Maximum length for !field must be a number.', array('!field' => $n['credentials'])),
+      t('Maximum length for @field must be higher than or equal to 1.', array('@field' => $n['title'])),
+      t('Maximum length for @field must be higher than or equal to 1.', array('@field' => $n['given'])),
+      t('Maximum length for @field must be a number.', array('@field' => $n['middle'])),
+      t('Maximum length for @field must be lower than or equal to 255.', array('@field' => $n['family'])),
+      t('Maximum length for @field is not a valid number.', array('@field' => $n['generational'])),
+      t('Maximum length for @field must be a number.', array('@field' => $n['credentials'])),
 
-      t('!field must have one of the following components: !components', array('!field' => t('Minimum components'), '!components' => SafeMarkup::checkPlain(implode(', ', array($n['given'], $n['family']))))),
+      t('@field must have one of the following components: @components', array('@field' => t('Minimum components'), '@components' => SafeMarkup::checkPlain(implode(', ', array($n['given'], $n['family']))))),
 
-      t("The vocabulary 'machine' in !field could not be found.", array('!field' => t('!title options', array('!title' => $n['title'])))),
-      t("The vocabulary '123' in !field could not be found.", array('!field' => t('!generational options', array('!generational' => $n['generational'])))),
+      t("The vocabulary 'machine' in @field could not be found.", array('@field' => t('@title options', array('@title' => $n['title'])))),
+      t("The vocabulary '123' in @field could not be found.", array('@field' => t('@generational options', array('@generational' => $n['generational'])))),
     );
     foreach ($required_messages as $message) {
       $this->assertText($message);

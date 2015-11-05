@@ -169,8 +169,8 @@ function _name_field_storage_settings_pre_render($form) {
   $extra_max_info = '<div>' . t('This can not be less than the longest value in the database. The minimum values are:') . '</div>';
   $extra_max_items = array();
   foreach (_name_translations() as $key => $title) {
-    $extra_max_items[] = t('!title is !size', array('!title' => $title,
-      '!size' => $form['max_length'][$key]['#min']));
+    $extra_max_items[] = t('@title is @size', array('@title' => $title,
+      '@size' => $form['max_length'][$key]['#min']));
   }
   $item_list = array(
     '#theme' => 'item_list',

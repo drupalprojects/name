@@ -266,7 +266,7 @@ class NameItem extends FieldItemBase {
         '#type' => 'number',
         '#min' => $min_length,
         '#max' => 255,
-        '#title' => t('Maximum length for !title', array('!title' => $title)),
+        '#title' => t('Maximum length for @title', array('@title' => $title)),
         '#default_value' => $settings['max_length'][$key],
         '#required' => TRUE,
         '#size' => 10,
@@ -275,7 +275,7 @@ class NameItem extends FieldItemBase {
       );
       $element['labels'][$key] = array(
         '#type' => 'textfield',
-        '#title' => t('Label for !title', array('!title' => $title)),
+        '#title' => t('Label for @title', array('@title' => $title)),
         '#default_value' => $settings['labels'][$key],
         '#required' => TRUE,
       );
@@ -294,7 +294,7 @@ class NameItem extends FieldItemBase {
       }
       $element['autocomplete_separator'][$key] = array(
         '#type' => 'textfield',
-        '#title' => t('Autocomplete separator for !title', array('!title' => $title)),
+        '#title' => t('Autocomplete separator for @title', array('@title' => $title)),
         '#default_value' => $settings['autocomplete_separator'][$key],
         '#size' => 10,
       );
@@ -311,19 +311,19 @@ class NameItem extends FieldItemBase {
     $title_options = implode("\n", array_filter($settings['title_options']));
     $element['title_options'] = array(
       '#type' => 'textarea',
-      '#title' => t('!title options', array('!title' => $components['title'])),
+      '#title' => t('@title options', array('@title' => $components['title'])),
       '#default_value' => $title_options,
       '#required' => TRUE,
-      '#description' => t("Enter one !title per line. Prefix a line using '--' to specify a blank value text. For example: '--Please select a !title'.", array('!title' => $components['title'])),
+      '#description' => t("Enter one @title per line. Prefix a line using '--' to specify a blank value text. For example: '--Please select a @title'.", array('@title' => $components['title'])),
       '#element_validate' => array(array(get_class($this), 'validateTitleOptions')),
     );
     $generational_options = implode("\n", array_filter($settings['generational_options']));
     $element['generational_options'] = array(
       '#type' => 'textarea',
-      '#title' => t('!generational options', array('!generational' => $components['generational'])),
+      '#title' => t('@generational options', array('@generational' => $components['generational'])),
       '#default_value' => $generational_options,
       '#required' => TRUE,
-      '#description' => t("Enter one !generational suffix option per line. Prefix a line using '--' to specify a blank value text. For example: '----'.", array('!generational' => $components['generational'])),
+      '#description' => t("Enter one @generational suffix option per line. Prefix a line using '--' to specify a blank value text. For example: '----'.", array('@generational' => $components['generational'])),
       '#element_validate' => array(array(get_class($this), 'validateGenerationalOptions')),
     );
     if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
@@ -405,7 +405,7 @@ class NameItem extends FieldItemBase {
     foreach ($components as $key => $title) {
       $element['field_type'][$key] = array(
         '#type' => 'radios',
-        '#title' => t('!title field type', array('!title' => $components['title'])),
+        '#title' => t('@title field type', array('@title' => $components['title'])),
         '#default_value' => $settings['field_type'][$key],
         '#required' => TRUE,
         '#options' => $field_options,
@@ -419,7 +419,7 @@ class NameItem extends FieldItemBase {
         '#type' => 'number',
         '#min' => 1,
         '#max' => 255,
-        '#title' => t('HTML size property for !title', array('!title' => $title)),
+        '#title' => t('HTML size property for @title', array('@title' => $title)),
         '#default_value' => $settings['size'][$key],
         '#required' => FALSE,
         '#size' => 10,
@@ -428,7 +428,7 @@ class NameItem extends FieldItemBase {
 
       $element['title_display'][$key] = array(
         '#type' => 'radios',
-        '#title' => t('Label display for !title', array('!title' => $title)),
+        '#title' => t('Label display for @title', array('@title' => $title)),
         '#default_value' => $settings['title_display'][$key],
         '#options' => array(
           'title' => t('above'),
@@ -440,7 +440,7 @@ class NameItem extends FieldItemBase {
 
       $element['inline_css'][$key] = array(
         '#type' => 'textfield',
-        '#title' => t('Additional inline styles for !title input element.', array('!title' => $title)),
+        '#title' => t('Additional inline styles for @title input element.', array('@title' => $title)),
         '#default_value' => $settings['inline_css'][$key],
         '#size' => 8,
       );

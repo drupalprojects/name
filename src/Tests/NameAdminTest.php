@@ -55,7 +55,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Family'),
         'machine' => 'family',
         'pattern' => 'f',
-        'formatted' => 'Doe DOE  ',
+        'formatted' => 'Doe DOE ',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'family'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'family'])->toString(),
       ),
@@ -95,7 +95,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Title Family'),
         'machine' => 'formal',
         'pattern' => 't+if',
-        'formatted' => 'Mr Doe DOE  ',
+        'formatted' => 'Mr Doe DOE ',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'formal'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'formal'])->toString(),
       ),
@@ -168,8 +168,8 @@ class NameAdminTest extends NameTestBase {
     }
     $values = array('label' => 'given', 'id' => '1234567890abcdefghijklmnopqrstuvwxyz_', 'pattern' => 'a');
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
-    $this->assertNoText(t('!field field is required', array('!field' => t('Format'))));
-    $this->assertNoText(t('!field field is required', array('!field' => t('Machine-readable name'))));
+    $this->assertNoText(t('@field field is required', array('@field' => t('Format'))));
+    $this->assertNoText(t('@field field is required', array('@field' => t('Machine-readable name'))));
 
     $values = array('label' => 'given', 'id' => '%&*(', 'pattern' => 'a');
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
