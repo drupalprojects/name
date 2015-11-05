@@ -134,10 +134,11 @@ function name_user_load(array $users) {
           $users[$uid]->realname = $names[$uid];
         }
         else {
-          if ($account->hasField($field->getName()) && !$account->get($field->getName())->isEmpty())
-          // We still have raw user input here.
-          $names[$uid] = NameFormatParser::parse($account->get($field->getName())->get(0)->getValue(), $format->get('pattern'), array('object' => $account, 'type' => 'user'));
-          $users[$uid]->realname = $names[$uid];
+          if ($account->hasField($field->getName()) && !$account->get($field->getName())->isEmpty()) {
+            // We still have raw user input here.
+            $names[$uid] = NameFormatParser::parse($account->get($field->getName())->get(0)->getValue(), $format->get('pattern'), array('object' => $account, 'type' => 'user'));
+            $users[$uid]->realname = $names[$uid];
+          }
         }
       }
     }
