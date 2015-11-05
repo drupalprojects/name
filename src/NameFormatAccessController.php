@@ -17,7 +17,7 @@ class NameFormatAccessController extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     switch ($operation) {
       case 'create':
       case 'update':
@@ -28,7 +28,7 @@ class NameFormatAccessController extends EntityAccessControlHandler {
         }
         return AccessResult::allowedIfHasPermission($account, 'administer site configuration');
     }
-    return parent::checkAccess($entity, $operation, $langcode, $account);
+    return parent::checkAccess($entity, $operation, $account);
   }
 
 }
