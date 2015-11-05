@@ -13,6 +13,7 @@
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\name\NameFormatParser;
 use Drupal\name\Plugin\Field\FieldType\NameItem;
 
@@ -70,9 +71,9 @@ function name_render_component($value, $component_key, $markup, $modifier = NULL
 /**
  * Implements hook_user_format_name_alter().
  */
-function name_user_format_name_alter(&$name, $account) {
+function name_user_format_name_alter(&$name, AccountInterface $account) {
   // Don't alter anonymous users or objects that do not have any user ID.
-  if (!$account->id()) {
+  if ($account->isAnonymous()) {
     return;
   }
 
