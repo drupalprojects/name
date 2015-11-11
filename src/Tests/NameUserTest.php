@@ -46,6 +46,19 @@ class NameUserTest extends KernelTestBase {
 
   public function testUserHooks() {
     FieldStorageConfig::create(array(
+      'field_name' => 'field_text',
+      'type' => 'string',
+      'entity_type' => 'user',
+    ))->save();
+    FieldConfig::create(array(
+      'field_name' => 'field_text',
+      'type' => 'string',
+      'entity_type' => 'user',
+      'bundle' => 'user',
+    ))->save();
+    $this->assertIdentical('', \Drupal::config('name.settings')->get('user_preferred'));
+
+    FieldStorageConfig::create(array(
       'field_name' => 'field_name_test',
       'type' => 'name',
       'entity_type' => 'user',

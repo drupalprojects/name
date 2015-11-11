@@ -612,8 +612,8 @@ function name_field_storage_settings_pre_render($form) {
  * Implements hook_field_config_create().
  */
 function name_field_config_create(\Drupal\field\FieldConfigInterface $entity) {
-  if (!$entity->isSyncing() && $entity->getTargetEntityTypeId() == 'user' && $entity->getTargetBundle() == 'user' &&
-    Drupal::config('name.settings')->get('user_preferred') == ''
+  if (!$entity->isSyncing() && $entity->getTargetEntityTypeId() == 'user' && $entity->getTargetBundle() == 'user' && $entity->getType() == 'name'
+    && Drupal::config('name.settings')->get('user_preferred') == ''
   ) {
     \Drupal::configFactory()
       ->getEditable('name.settings')
