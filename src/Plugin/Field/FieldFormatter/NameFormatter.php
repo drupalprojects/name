@@ -156,8 +156,7 @@ class NameFormatter extends FormatterBase {
     $settings = $this->getSettings();
     $summary = array();
 
-    $field_name = explode('.', $this->fieldDefinition->id());
-    $field_name = end($field_name);
+    $field_name = $this->fieldDefinition->getName();
 
     $machine_name = isset($settings['format']) ? $settings['format'] : 'default';
     $name_format = entity_load('name_format', $machine_name);
