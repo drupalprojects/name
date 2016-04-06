@@ -286,6 +286,38 @@ class NameFieldTest extends NameTestBase {
     foreach ($widget_settings as $name => $value) {
       $this->assertFieldByName($name, $value);
     }
+
+    // Check help text display
+    $this->drupalGet('admin/structure/types/manage/page/fields/node.page.field_name_test');
+    $edit = [
+      'description' => 'This is a description.'
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Save settings'));
+    $this->drupalGet('admin/structure/types/manage/page/fields/node.page.field_name_test/storage');
+    $edit = [
+      'cardinality' => 'number',
+      'cardinality_number' => 1,
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Save field settings'));
+    $this->drupalGet('node/add/page');
+    $this->assertUniqueText('This is a description.', 'Field description is shown once when field cardinality is 1.');
+
+    $this->drupalGet('admin/structure/types/manage/page/fields/node.page.field_name_test/storage');
+    $edit = [
+      'cardinality' => 'number',
+      'cardinality_number' => 3,
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Save field settings'));
+    $this->drupalGet('node/add/page');
+    $this->assertUniqueText('This is a description.', 'Field description is shown once when field cardinality is 3.');
+
+    $this->drupalGet('admin/structure/types/manage/page/fields/node.page.field_name_test/storage');
+    $edit = [
+      'cardinality' => '-1',
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Save field settings'));
+    $this->drupalGet('node/add/page');
+    $this->assertUniqueText('This is a description.', 'Field description is shown once when field cardinality is unlimited.');
   }
 
   function name_getFieldStorageSettings() {
