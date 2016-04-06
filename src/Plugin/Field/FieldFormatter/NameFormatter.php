@@ -182,9 +182,9 @@ class NameFormatter extends FormatterBase {
       if (empty($formatted)) {
         $formatted = '<em>&lt;&lt;empty&gt;&gt;</em>';
       }
-      $summary[] = t('Example: !example', array(
-        '!example' => $formatted
-      ));
+      $summary[] = t('Example: @example', [
+        '@example' => $formatted
+      ]);
     }
 
     $summary[] = t('Markup: @yesno', array(
