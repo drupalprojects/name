@@ -385,12 +385,15 @@ field.formatter.settings.name_default:
   type: mapping
   label: 'Name format settings'
   mapping:
-    output:
-      type: string
-      label: 'Output'
     format:
       type: string
       label: 'Name format'
+    markup:
+      type: boolean
+      label: 'Markup'
+    output:
+      type: string
+      label: 'Output'
     multiple:
       type: string
       label: 'Multiple format options'

@@ -28,9 +28,6 @@ use Drupal\name\NameFormatParser;
  *   label = @Translation("Default"),
  *   field_types = {
  *     "name",
- *   },
- *   settings = {
-
  *   }
  * )
  */
@@ -39,16 +36,17 @@ class NameFormatter extends FormatterBase {
   public static function defaultSettings() {
     $settings = parent::defaultSettings();
 
-   $settings += array(
-      "output" => "default",
+    $settings += array(
       "format" => "default",
+      "markup" => FALSE,
+      "output" => "default",
       "multiple" => "default",
       "multiple_delimiter" => ", ",
       "multiple_and" => "text",
       "multiple_delimiter_precedes_last" => "never",
       "multiple_el_al_min" => "3",
       "multiple_el_al_first" => "1"
-   );
+    );
 
     return $settings;
   }
