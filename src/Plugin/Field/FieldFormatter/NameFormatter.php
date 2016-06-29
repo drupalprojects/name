@@ -177,12 +177,15 @@ class NameFormatter extends FormatterBase {
     if ($examples && $example = array_shift($examples)) {
       $format = name_get_format_by_machine_name($machine_name);
       $formatted = SafeMarkup::checkPlain(NameFormatParser::parse($example, $format));
+      $formatted = '';
       if (empty($formatted)) {
-        $formatted = '<em>&lt;&lt;empty&gt;&gt;</em>';
+        $summary[] = t('Example: <em>&lt;&lt;empty&gt;&gt;</em>');
       }
-      $summary[] = t('Example: @example', [
-        '@example' => $formatted
-      ]);
+      else {
+        $summary[] = t('Example: @example', [
+          '@example' => $formatted
+        ]);
+      }
     }
 
     $summary[] = t('Markup: @yesno', array(
