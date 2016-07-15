@@ -18,7 +18,7 @@ class NameTestHelper extends DrupalWebTestCase {
 
     // Base set up is done, we can call drupalCreateUser.
     $this->web_user = $this->drupalCreateUser();
-    $this->admin_user = $this->drupalCreateUser(array('administer site configuration', 'administer content types', 'access content', 'access administration pages'));
+    $this->admin_user = $this->drupalCreateUser(array('administer site configuration', 'administer content types', 'access content', 'access administration pages', 'administer fields'));
 
     variable_set('clean_url', 0);
   }
@@ -469,7 +469,7 @@ class Name_FieldTestCase extends NameTestHelper {
     );
   }
 
-    /**
+  /**
    * The most basic test. This should only fail if there is a change to the
    * Drupal API.
    */

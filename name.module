@@ -315,13 +315,29 @@ function name_get_custom_format_options() {
 
 /**
  * Loads a format based on the machine name.
+ *
+ * @param string $machine_name
+ *
+ * @return string
+ *   The name format.
  */
 function name_get_format_by_machine_name($machine_name) {
-  if ($machine_name == 'default') {
-    return name_settings('default_format');
+  static $drupal_static_fast;
+  if (!isset($drupal_static_fast)) {
+    $drupal_static_fast['formats'] = &drupal_static(__FUNCTION__);
   }
-  $sql = "SELECT format FROM {name_custom_format} WHERE machine_name = '%s'";
-  return (string) db_query("SELECT format FROM {name_custom_format} WHERE machine_name = :machine_name", array(':machine_name' => $machine_name))->fetchField();
+
+  $formats = &$drupal_static_fast['formats'];
+  if (!isset($formats[$machine_name])) {
+    if ($machine_name == 'default') {
+      $formats[$machine_name] = name_settings('default_format');
+    }
+    else {
+      $formats[$machine_name] = (string) db_query("SELECT format FROM {name_custom_format} WHERE machine_name = :machine_name", array(':machine_name' => $machine_name))->fetchField();
+    }
+  }
+
+  return $formats[$machine_name];
 }
 
 /**

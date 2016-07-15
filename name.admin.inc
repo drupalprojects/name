@@ -459,6 +459,9 @@ function name_custom_formats_form_submit($form, &$form_state) {
   }
   drupal_set_message(t($message, array('%name' => $values['name'])));
 
+  // Reset the static so the next load will pickup any name changes.
+  drupal_static_reset('name_get_format_by_machine_name');
+
   $form_state['redirect'] = 'admin/config/content/name';
 }
 
