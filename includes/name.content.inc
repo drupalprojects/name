@@ -439,6 +439,9 @@ function _name_field_widget_form(&$form, &$form_state, $field, $instance, $langc
   if (array_filter($ws['minimum_components'])) {
     $fs['minimum_components'] = $ws['minimum_components'];
   }
+
+  $element['#title'] = check_plain($instance['label']);
+  $element['#title_display'] = 'invisible';
   $element += array(
     '#type' => 'name_element',
     '#title' => check_plain($instance['label']),
