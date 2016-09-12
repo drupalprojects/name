@@ -440,8 +440,6 @@ function _name_field_widget_form(&$form, &$form_state, $field, $instance, $langc
     $fs['minimum_components'] = $ws['minimum_components'];
   }
 
-  $element['#title'] = check_plain($instance['label']);
-  $element['#title_display'] = 'invisible';
   $element += array(
     '#type' => 'name_element',
     '#title' => check_plain($instance['label']),
@@ -456,6 +454,12 @@ function _name_field_widget_form(&$form, &$form_state, $field, $instance, $langc
     '#component_layout' => empty($ws['component_layout']) ? 'default' : $ws['component_layout'],
     '#show_component_required_marker' => !empty($ws['show_component_required_marker']),
   );
+
+  // Ensure that we have a title for any validation.
+  if (empty($element['#title'])) {
+    $element['#title'] = check_plain($instance['label']);
+    $element['#title_display'] = 'invisible';
+  }
 
   $components = array_filter($fs['components']);
   foreach (_name_translations() as $key => $title) {
