@@ -54,6 +54,13 @@ function name_settings($key = NULL) {
 }
 
 /**
+ * Helper function to find the components used.
+ */
+function name_get_instance_components($field_components, $instance_components) {
+  return array_filter($instance_components) ? $instance_components : $field_components;
+}
+
+/**
  * Implements hook_menu().
  */
 function name_menu() {
@@ -349,14 +356,17 @@ function name_get_format_by_machine_name($machine_name) {
 function _name_translations($intersect = NULL) {
   static $nt = NULL;
   if (!isset($nt)) {
-    $nt = array(
-      'title' => t('!name_title', array('!name_title' => t('Title'))),
-      'given' => t('!name_given', array('!name_given' => t('Given'))),
-      'middle' => t('!name_middle', array('!name_middle' => t('Middle name(s)'))),
-      'family' => t('!name_family', array('!name_family' => t('Family'))),
-      'generational' => t('!name_generational', array('!name_generational' => t('Generational'))),
-      'credentials' => t('!name_credentials', array('!name_credentials' => t('Credentials'))),
-    );
+    $nt = variable_get('name_field_part_overrides', 0);
+    if (!$nt) {
+      $nt = array(
+        'title' => t('!name_title', array('!name_title' => t('Title'))),
+        'given' => t('!name_given', array('!name_given' => t('Given'))),
+        'middle' => t('!name_middle', array('!name_middle' => t('Middle name(s)'))),
+        'family' => t('!name_family', array('!name_family' => t('Family'))),
+        'generational' => t('!name_generational', array('!name_generational' => t('Generational'))),
+        'credentials' => t('!name_credentials', array('!name_credentials' => t('Credentials'))),
+      );
+    }
   }
   return empty($intersect) ? $nt : array_intersect_key($nt, $intersect);
 }
@@ -998,10 +1008,8 @@ function name_field_load($entity_type, $entities, $field, $instances, $langcode,
   foreach ($entities as $id => $entity) {
     // Use populated overrides if present.
     $instances[$id]['settings'] += array('components' => array());
-    $components = array_filter($instances[$id]['settings']['components']);
-    if (!$components) {
-      $components = $field['settings']['components'];
-    }
+
+    $components = name_get_instance_components($field['settings']['components'], $instances[$id]['settings']['components']);
     foreach ($items[$id] as $delta => $item) {
       foreach (_name_translations() as $key => $title) {
         if (empty($components[$key])) {
@@ -1106,14 +1114,70 @@ function name_field_instance_settings_form($field, $instance) {
   return _name_field_instance_settings_form($field, $instance);
 }
 
+
 /**
- * Implements hook_field_instance_settings_form().
+ * Name autocomplete data sources callback.
+ *
+ * Generates a full listing for title and generational options.
+ *
+ * @param array $field
+ *   The field requesting the data.
+ *
+ * @param array $component
+ *   The key that the data has been requested for.
+ *
+ * @param mixed $arguments
+ *   Additional arguments defined in hook_name_data_sources().
+ *
+ * @return array
+ *   The matches ready to use directly in the autocomplete response.
  */
-function name_field_get_options($field, $key = 'title') {
+function name_field_get_options($field, $component = 'title', $arguments = array()) {
   module_load_include('inc', 'name', 'includes/name.content');
-  return _name_field_get_options($field, $key);
+  return _name_field_get_options($field, $component, $arguments);
 }
 
+/**
+ * Name autocomplete sources query callback.
+ *
+ * Handles the autocomplete for title and generational options.
+ *
+ * @param array $components
+ *   The keys that the autocomplete is active on.
+ *
+ * @param string $base_string
+ *   Autocomplete strings are split and individual pieces are parsed
+ *   sequentially. The base string is the concatanated results of
+ *   previous segment lookups.
+ *
+ * @param string $string
+ *   Current segment of the search string.
+ *
+ * @param array|NULL $field
+ *   If run in the context of the Field API, the field is supplied.
+ *
+ * @param integer $limit
+ *
+ * @param mixed $arguments
+ *   Additional arguments defined in hook_name_data_sources().
+ *
+ * @return array
+ *   The matches ready to use directly in the autocomplete response.
+ */
+function name_field_autocomplete_query($components, $base_string, $string, $field, $limit, $arguments) {
+  $component_key = $arguments;
+  $matches = array();
+  foreach (name_field_get_options($field, $component_key) as $key => $option) {
+    if (strpos(drupal_strtolower($key), $string) === 0 || strpos(drupal_strtolower($option), $string) === 0) {
+      $matches[$base_string . $key] = $key;
+      $limit--;
+    }
+    if (!$limit) {
+      break;
+    }
+  }
+  return $matches;
+}
 
 /* ---------------------------- Formatter Code ------------------------------ */
 
@@ -1488,36 +1552,28 @@ function name_field_delete_instance($instance) {
 /**
  * Implements hook_field_insert().
  *
- * This listens to name field insertions and updates the namedb according.
+ * Triggers a custom hook for name field inserts. Field API only calls the
+ * module that defines the field.
  */
 function name_field_insert($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  if (module_exists('namedb')) {
-    $components = array_filter($field['settings']['components']);
-    foreach ($items as $item) {
-      foreach ($components as $component) {
-        if (!empty($item[$component])) {
-          namedb_update_database($component, $item[$component]);
-        }
-      }
-    }
+  // Ensure that $items are passed by reference.
+  foreach (module_implements('name_field_insert_notification') as $module) {
+    $function = $module . '_name_field_insert_notification';
+    $function($entity_type, $entity, $field, $instance, $langcode, $items);
   }
 }
 
 /**
  * Implements hook_field_update().
  *
- * This listens to name field updates and updates the namedb according.
+ * Triggers a custom hook for name field updates. Field API only calls the
+ * module that defines the field.
  */
 function name_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  if (module_exists('namedb')) {
-    $components = array_filter($field['settings']['components']);
-    foreach ($items as $item) {
-      foreach ($components as $component) {
-        if (!empty($item[$component])) {
-          namedb_update_database($component, $item[$component]);
-        }
-      }
-    }
+  // Ensure that $items are passed by reference.
+  foreach (module_implements('name_field_update_notification') as $module) {
+    $function = $module . '_name_field_insert_notification';
+    $function($entity_type, $entity, $field, $instance, $langcode, $items);
   }
 }
 
@@ -1730,6 +1786,31 @@ function name_features_api() {
       'default_hook' => 'name_default_formats',
       'feature_source' => TRUE,
       'file' => drupal_get_path('module', 'name') . '/includes/name.features.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_name_data_sources().
+ *
+ * @todo
+ * Consider using field data as a source.
+ */
+function name_name_data_sources() {
+  return array(
+    'title' => array(
+      'name' => t('Title options'),
+      'components' => array('title'),
+      'autocomplete callback' => 'name_field_autocomplete_query',
+      'autocomplete arguments' => array('title'),
+      'list callback' => 'name_field_get_options',
+    ),
+    'generational' => array(
+      'name' => t('Generational options'),
+      'components' => array('generational'),
+      'autocomplete callback' => 'name_field_autocomplete_query',
+      'autocomplete arguments' => array('generational'),
+      'list callback' => 'name_field_get_options',
     ),
   );
 }

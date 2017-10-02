@@ -4,7 +4,6 @@ dependencies[] = field
 package = Fields
 version = VERSION
 core = 7.x
-recommends[] = namedb
 configure = admin/config/content/name
 
 files[] = tests/name.test
