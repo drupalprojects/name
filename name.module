@@ -559,7 +559,7 @@ function theme_name_item_list($variables) {
     '!delimiter' => $delimiter,
     '!etal' => $etal,
   );
-  if ($original_count > $settings['multiple_el_al_min']) {
+  if ($settings['multiple_el_al_min'] && ($original_count > $settings['multiple_el_al_min'])) {
     $limit = min(array($settings['multiple_el_al_min'], $settings['multiple_el_al_first']));
     $items = array_slice($items, 0, $limit);
     if (count($items) == 1) {
