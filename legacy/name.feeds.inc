@@ -15,9 +15,9 @@ function name_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_nam
       foreach (_name_translations() as $key => $title) {
         if (array_key_exists($key, $info['columns'])) {
           $targets[$name . ':' . $key] = array(
-            'name' => t('@name !component', array('@name' => $instance['label'], '!component' => $title)),
+            'name' => t('@name @component', array('@name' => $instance['label'], '@component' => $title)),
             'callback' => 'name_feeds_set_target',
-            'description' => t('The !component component of the @label field of the node.', array('@label' => $instance['label'], '!component' => $title)),
+            'description' => t('The @component component of the @label field of the node.', array('@label' => $instance['label'], '@component' => $title)),
           );
         }
       }

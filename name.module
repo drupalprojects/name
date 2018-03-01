@@ -7,7 +7,7 @@
  * TODO: Make sure that all labels are based on the _name_translations()
  * function and use a name:: prefix. This can be parsed out here to allow
  * string overrides to work and to integrate with i18n too.
- * t('!name_given', array('!name_given' => t('Given')))
+ * t('@name_given', array('@name_given' => t('Given')))
  */
 
 use Drupal\Component\Utility\SafeMarkup;
@@ -402,7 +402,7 @@ function name_element_validate($element, &$form_state) {
   }
 
   if (!$empty && (count($minimum_components) != count(array_intersect_key($minimum_components, $item_components)))) {
-    $missing_components = array_diff($minimum_components, array_keys($item_components));
+    $missing_components = array_diff(array_keys($minimum_components), array_keys($item_components));
     $missing_components = array_combine($missing_components, $missing_components);
     $missing_labels = array_intersect_key($labels, $missing_components);
     $label = empty($element['#title']) ? (empty($element['#label']) ? 'Field' : $element['#label']) : $element['#title'];
@@ -410,8 +410,8 @@ function name_element_validate($element, &$form_state) {
     // Note that field_default_form() has already sanitized #title.
 
     // Generate error message for the first missing element.
-    $form_state->setError($element[key($missing_labels)], t('!name also requires the following parts: <em>!components</em>.', array(
-      '!name' => $label, '!components' => implode(', ', $missing_labels)))
+    $form_state->setError($element[key($missing_labels)], t('@name also requires the following parts: <em>@components</em>.', array(
+      '@name' => $label, '@components' => implode(', ', $missing_labels)))
     );
 
     // Mark the other missing elements too, but hide the error message.
@@ -421,7 +421,7 @@ function name_element_validate($element, &$form_state) {
   }
 
   if ($empty && $element['#required']) {
-    $form_state->setError($element, t('<em>!name</em> is required.', array('!name' => $element['#title'])));
+    $form_state->setError($element, t('@name field is required.', array('@name' => $element['#title'])));
   }
   return $element;
 }
@@ -529,8 +529,8 @@ function _name_field_minimal_component_requirements($element, &$form_state) {
   if (empty($value)) {
     $required_fields = array_intersect_key(_name_translations(), $required_field_set);
     form_set_error(implode('][', $element['#parents']) . '][given]',
-        t('!label must have one of the following components: %components',
-        array('!label' => $element['#title'], '%components' => implode(', ', $required_fields))));
+        t('@label must have one of the following components: %components',
+        array('@label' => $element['#title'], '%components' => implode(', ', $required_fields))));
   }
 }
 

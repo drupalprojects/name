@@ -188,7 +188,7 @@ function _webform_edit_name($name) {
         '#default_value' => $name['extra']['components'][$key]['options'],
         '#required' => TRUE,
         '#element_validate' => array('_webform_name_options_validate'),
-        '#description' => t("Enter one @title per line. Prefix a line using '--' to specify a blank value text. For example: '--Please select a !label'.", array('!label' => $label)),
+        '#description' => t("Enter one @title per line. Prefix a line using '--' to specify a blank value text. For example: '--Please select a @label'.", array('@label' => $label)),
       );
       if (module_exists('taxonomy')) {
         // TODO - Make the labels more generic.

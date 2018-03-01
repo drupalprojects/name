@@ -128,8 +128,8 @@ class NameFieldTest extends NameTestBase {
 
     $required_messages = array(
       /*
-      t('@components can not be selected for !label when they are not selected for !label2.',
-              array('!label' => t('Minimum components'), '!label2' => t('Components'),
+      t('@components can not be selected for @label when they are not selected for @label2.',
+              array('@label' => t('Minimum components'), '@label2' => t('Components'),
               '@components' => SafeMarkup::checkPlain(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
       */
 
@@ -236,8 +236,8 @@ class NameFieldTest extends NameTestBase {
 
     $required_messages = array(
       /*
-      t('@components can not be selected for !label when they are not selected for !label2.',
-              array('!label' => t('Minimum components'), '!label2' => t('Components'),
+      t('@components can not be selected for @label when they are not selected for @label2.',
+              array('@label' => t('Minimum components'), '@label2' => t('Components'),
               '@components' => SafeMarkup::checkPlain(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
       */
 

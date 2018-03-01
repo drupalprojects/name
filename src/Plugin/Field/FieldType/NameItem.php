@@ -270,7 +270,7 @@ class NameItem extends FieldItemBase {
         '#default_value' => $settings['max_length'][$key],
         '#required' => TRUE,
         '#size' => 10,
-        '#description' => t('The maximum length of the field in characters. This must be between !min and 255.', array('!min' => $min_length)),
+        '#description' => t('The maximum length of the field in characters. This must be between @min and 255.', array('@min' => $min_length)),
 
       );
       $element['labels'][$key] = array(
