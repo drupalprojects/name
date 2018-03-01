@@ -3,11 +3,14 @@
 namespace Drupal\name\Plugin\Field\FieldType;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 
 /**
  * Plugin implementation of the 'name' field type.
@@ -486,19 +489,38 @@ class NameItem extends FieldItemBase {
 
     // Add the overwrite user name option.
     if ($this->getFieldDefinition()->getTargetEntityTypeId() == 'user') {
+
       $preferred_field = \Drupal::config('name.settings')
         ->get('user_preferred');
+
       $element['name_user_preferred'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Use this field to override the users login name?'),
-        '#default_value' => $preferred_field == $this->getName() ? 1 : 0,
+        '#title' => t("Use this field to override the user's login name?"),
+        '#description' => t('You may need to clear the @cache_link before this change is seen everywhere.',
+          ['@cache_link' => Link::fromTextAndUrl(
+                              'Performance cache',
+                               Url::fromRoute('system.performance_settings')
+                            )->toString(),
+          ]
+        ),
+        '#default_value' => (($preferred_field == $this->getFieldDefinition()->getName()) ? 1 : 0),
       );
+
+      // Store the machine name of the Name field.
+      $element['name_user_preferred_fieldname'] = array(
+        '#type' => 'hidden',
+        '#default_value' => $this->getFieldDefinition()->getName(),
+      );
+
       $element['override_format'] = array(
         '#type' => 'select',
         '#title' => t('User name override format to use'),
         '#default_value' => $this->getSetting('override_format'),
         '#options' => name_get_custom_format_options(),
       );
+
+      $element['#element_validate'] = [[get_class($this), 'validateUserPreferred']];
+
     }
     else {
       // We may extend this feature to Profile2 latter.
@@ -509,6 +531,7 @@ class NameItem extends FieldItemBase {
     }
 
     $element['#pre_render'][] = 'name_field_settings_pre_render';
+
     return $element;
   }
 
@@ -633,6 +656,42 @@ class NameItem extends FieldItemBase {
     }
 
     $form_state->setValueForElement($element, array_merge($default_options, $valid_options));
+  }
+
+  /**
+   * Manage whether the name field should override a user's login name.
+   */
+  public static function validateUserPreferred(&$element, FormStateInterface $form_state, &$complete_form) {
+
+    $value = NULL;
+    $config = \Drupal::configFactory()->getEditable('name.settings');
+
+    // Ensure the name field value should override a user's login name.
+    if ((!empty($element['name_user_preferred'])) && ($element['name_user_preferred']['#value'] == 1)) {
+      // Retrieve the name field's machine name.
+      $value = $element['name_user_preferred_fieldname']['#default_value'];
+    }
+
+    // Ensure that the login-name-override configuration has changed.
+    if ($config->get('user_preferred') != $value) {
+
+      // Update the configuration with the new value.
+      $config->set('user_preferred', $value)->save();
+
+      // Retrieve the ID of all existing users.
+      $query = \Drupal::entityQuery('user');
+      $uids = $query->execute();
+
+      foreach ($uids as $uid) {
+        // Invalidate the cache for each user so that
+        // the appropriate login name will be displayed.
+        Cache::invalidateTags(array('user:' . $uid));
+      }
+
+      \Drupal::logger('name')->notice('Cache cleared for data tagged as %tag.', ['%tag' => 'user:{$uid}']);
+
+    }
+
   }
 
   protected static function extractAllowedValues($string) {
