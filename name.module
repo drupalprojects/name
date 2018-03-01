@@ -83,6 +83,15 @@ function name_user_format_name_alter(&$name, AccountInterface $account) {
     name_user_format_name_alter_preload($account);
   }
 
+  // Since $account may not be the real User entity object, check the name
+  // lookup cache for results too.
+  if (!isset($account->realname) || !Unicode::strlen($account->realname)) {
+    $names = &drupal_static('name_user_realname_cache', array());
+    if (isset($names[$account->id()])) {
+      $account->realname = $names[$account->id()];
+    }
+  }
+
   if (isset($account->realname) && Unicode::strlen($account->realname)) {
     $name = $account->realname;
   }
