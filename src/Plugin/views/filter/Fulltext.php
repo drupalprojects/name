@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Plugin\views\filter\Fulltext.
- */
-
 namespace Drupal\name\Plugin\views\filter;
 
 use Drupal\Component\Utility\Unicode;

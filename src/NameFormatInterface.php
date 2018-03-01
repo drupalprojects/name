@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\NameFormatInterface.
- */
-
 namespace Drupal\name;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;

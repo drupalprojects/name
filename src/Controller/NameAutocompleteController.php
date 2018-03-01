@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Controller\NameAutocompleteController.
- */
-
 namespace Drupal\name\Controller;
 
 use Drupal\Core\Entity\EntityManagerInterface;

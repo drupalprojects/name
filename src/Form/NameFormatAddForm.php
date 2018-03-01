@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Form\NameFormatAddForm.
- */
-
 namespace Drupal\name\Form;
 
 use Drupal\Core\Form\FormStateInterface;

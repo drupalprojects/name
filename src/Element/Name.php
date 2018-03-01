@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Element\Name.
- */
-
 namespace Drupal\name\Element;
 
 use Drupal\Core\Render\Element\RenderElement;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Tests\NameOptionsProviderTest.
- */
-
 namespace Drupal\name\Tests;
 
 use Drupal\name\NameOptionsProvider;

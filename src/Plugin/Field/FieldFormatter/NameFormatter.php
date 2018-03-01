@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
-   * Contains \Drupal\name\Plugin\Field\FieldFormatter\NameFormatter.
- */
-
 namespace Drupal\name\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\SafeMarkup;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Test\NameFormatParserTest.
- */
-
 namespace Drupal\name\Tests;
 
 use Drupal\name\NameFormatParser;

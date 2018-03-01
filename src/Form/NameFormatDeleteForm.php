@@ -1,11 +1,7 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Form\NameFormatDeleteForm.
- */
-
 namespace Drupal\name\Form;
+
 use Drupal\Core\Entity\EntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Tests\NameFieldTest.
- *
- * Tests for the name module.
- */
-
 namespace Drupal\name\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;

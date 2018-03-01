@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Drupal \Drupal\name\NameFormatListBuilder.php
- */
-
 namespace Drupal\name;
 
 use Drupal\Component\Utility\SafeMarkup;

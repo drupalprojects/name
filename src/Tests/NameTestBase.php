@@ -1,12 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\NameTestBase.
- *
- * Tests for the name module.
- */
-
 namespace Drupal\name\Tests;
 
 use Drupal\simpletest\WebTestBase;

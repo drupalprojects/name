@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Form\NameFormatEditForm.
- */
-
 namespace Drupal\name\Form;
 
 /**

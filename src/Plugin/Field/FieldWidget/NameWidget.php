@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Plugin\Field\FieldWidget\NameWidget.
- */
-
 namespace Drupal\name\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Utility\SafeMarkup;

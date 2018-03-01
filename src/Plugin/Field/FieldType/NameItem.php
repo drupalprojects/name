@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Plugin\Field\FieldType\NameItem.
- */
-
 namespace Drupal\name\Plugin\Field\FieldType;
 
 use Drupal\Component\Utility\Unicode;

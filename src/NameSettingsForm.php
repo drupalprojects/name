@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\NameSettingsForm.
- */
-
 namespace Drupal\name;
 
 use Drupal\Core\Form\ConfigFormBase;

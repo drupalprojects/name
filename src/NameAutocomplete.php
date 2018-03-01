@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\NameAutocomplete.
- */
-
 namespace Drupal\name;
 
 use Drupal\Component\Utility\Unicode;

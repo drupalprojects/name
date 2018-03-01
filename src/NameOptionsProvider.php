@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\NameOptionsProvider.
- */
-
 namespace Drupal\name;
 
 use Drupal\Component\Utility\Unicode;

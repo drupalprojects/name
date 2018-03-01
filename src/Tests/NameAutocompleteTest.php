@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Tests\NameAutocompleteTest.
- */
-
 namespace Drupal\name\Tests;
 
 use Drupal\Core\Field\FieldDefinitionInterface;

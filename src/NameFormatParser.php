@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\NameFormatParser.
- */
-
 namespace Drupal\name;
 
 use Drupal\Component\Utility\SafeMarkup;

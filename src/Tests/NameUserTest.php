@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Tests\NameUserTest.
- */
-
 namespace Drupal\name\Tests;
 
 use Drupal\Core\Entity\EntityManagerInterface;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\name\Form\NameFormatFormBase.
- */
-
 namespace Drupal\name\Form;
 
 use Drupal\Core\Ajax\AjaxResponse;

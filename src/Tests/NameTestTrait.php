@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\name\Tests\NameTestTrait.
- */
 
 namespace Drupal\name\Tests;
 
