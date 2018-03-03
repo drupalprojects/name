@@ -17,9 +17,6 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\name\NameFormatParser;
 use Drupal\name\Plugin\Field\FieldType\NameItem;
 
-// Field and Field UI
-require_once __DIR__ . '/name.field.inc';
-
 // @todo: Move the code from name.content.inc to the main module.
 require_once __DIR__ . '/includes/name.parser.inc';
 
@@ -415,8 +412,6 @@ function name_element_validate($element, &$form_state) {
     $missing_components = array_combine($missing_components, $missing_components);
     $missing_labels = array_intersect_key($labels, $missing_components);
     $label = empty($element['#title']) ? (empty($element['#label']) ? 'Field' : $element['#label']) : $element['#title'];
-
-    // Note that field_default_form() has already sanitized #title.
 
     // Generate error message for the first missing element.
     $form_state->setError($element[key($missing_labels)], t('@name also requires the following parts: <em>@components</em>.', array(
