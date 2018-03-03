@@ -2,14 +2,15 @@
 
 namespace Drupal\name\Plugin\Field\FieldWidget;
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\name\NameOptionsProvider;
-
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'name' widget.
@@ -23,16 +24,30 @@ use Drupal\name\NameOptionsProvider;
  *   }
  * )
  */
-class NameWidget extends WidgetBase {
+class NameWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**
    * @var NameOptionsProvider
    */
   protected $optionsProvider;
 
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, NameOptionsProvider $options_provider) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-    $this->optionsProvider = \Drupal::service('name.options_provider');
+    $this->optionsProvider = $options_provider;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('name.options_provider')
+    );
   }
 
   /**
@@ -41,12 +56,9 @@ class NameWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     module_load_include('inc', 'name', 'includes/name.content');
     $field_settings = $this->getFieldSettings();
-    $instance['label'] = 'instance label';
-
     $element += array(
       '#type' => 'name',
-      '#title' => SafeMarkup::checkPlain($instance['label']),
-      '#label' => $instance['label'],
+      '#title' => $this->fieldDefinition->getLabel(),
       '#components' => array(),
       '#minimum_components' => array_filter($field_settings['minimum_components']),
       '#allow_family_or_given' => !empty($field_settings['allow_family_or_given']),
@@ -66,7 +78,7 @@ class NameWidget extends WidgetBase {
         $size = !empty($field_settings['size'][$key]) ? $field_settings['size'][$key] : 60;
         $title_display = isset($field_settings['title_display'][$key]) ? $field_settings['title_display'][$key] : 'description';
 
-        $element['#components'][$key]['title'] = SafeMarkup::checkPlain($field_settings['labels'][$key]);
+        $element['#components'][$key]['title'] = Html::escape($field_settings['labels'][$key]);
         $element['#components'][$key]['title_display'] = $title_display;
 
         $element['#components'][$key]['size'] = $size;
@@ -76,7 +88,6 @@ class NameWidget extends WidgetBase {
         $field_type = ($key == 'title' || $key == 'generational') ? 'select' : 'text';
         $field_type = isset($field_settings['field_type'][$key])
             ? $field_settings['field_type'][$key]
-            // Provides .
             : (isset($field_settings[$key . '_field']) ? $field_settings[$key . '_field'] : $field_type);
 
         if ($field_type == 'select') {
