@@ -158,22 +158,22 @@ field.storage_settings.name:
       label: 'Labels'
       mapping:
         title:
-          type: string
+          type: label
           label: 'Title'
         given:
-          type: string
+          type: label
           label: 'Given'
         middle:
-          type: string
+          type: label
           label: 'Middle'
         family:
-          type: string
+          type: label
           label: 'Family'
         generational:
-          type: string
+          type: label
           label: 'Generational'
         credentials:
-          type: string
+          type: label
           label: 'Credentials'
     allow_family_or_given:
       label: 'Allow family or given'
