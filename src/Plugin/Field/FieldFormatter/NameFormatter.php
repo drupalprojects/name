@@ -2,12 +2,17 @@
 
 namespace Drupal\name\Plugin\Field\FieldFormatter;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Drupal\name\NameFormatParser;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'name' formatter.
@@ -25,7 +30,56 @@ use Drupal\name\NameFormatParser;
  *   }
  * )
  */
-class NameFormatter extends FormatterBase {
+class NameFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The entity manager to load name_format entities.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
+   * Constructs a NameFormatter instance.
+   *
+   * @param string $plugin_id
+   *   The plugin_id for the formatter.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The definition of the field to which the formatter is associated.
+   * @param array $settings
+   *   The formatter settings.
+   * @param string $label
+   *   The formatter label display setting.
+   * @param string $view_mode
+   *   The view mode.
+   * @param array $third_party_settings
+   *   Any third party settings settings.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
+   */
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityManagerInterface $entity_manager) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+
+    $this->entityManager = $entity_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['label'],
+      $configuration['view_mode'],
+      $configuration['third_party_settings'],
+      $container->get('entity.manager')
+    );
+  }
 
   public static function defaultSettings() {
     $settings = parent::defaultSettings();
@@ -151,7 +205,7 @@ class NameFormatter extends FormatterBase {
     $field_name = $this->fieldDefinition->getName();
 
     $machine_name = isset($settings['format']) ? $settings['format'] : 'default';
-    $name_format = entity_load('name_format', $machine_name);
+    $name_format = $this->entityManager->getStorage('name_format')->load($machine_name);
     if ($name_format) {
       $summary[] = $this->t('Format: %format (@machine_name)', array(
         '%format' => $name_format->label(),
@@ -170,8 +224,7 @@ class NameFormatter extends FormatterBase {
     $examples = name_example_names($excluded_components, $field_name);
     if ($examples && $example = array_shift($examples)) {
       $format = name_get_format_by_machine_name($machine_name);
-      $formatted = SafeMarkup::checkPlain(NameFormatParser::parse($example, $format));
-      $formatted = '';
+      $formatted = Html::escape(NameFormatParser::parse($example, $format));
       if (empty($formatted)) {
         $summary[] = $this->t('Example: <em>&lt;&lt;empty&gt;&gt;</em>');
       }
@@ -212,19 +265,18 @@ class NameFormatter extends FormatterBase {
 
     foreach ($items as $delta => $item) {
       // We still have raw user input here unless the markup flag has been used.
-      $value = NameFormatParser::parse($item->toArray(), $format, array(
+      $value = NameFormatParser::parse($item->toArray(), $format, [
         'object' => $entity,
         'type' => $entity->getEntityTypeId(),
-        'markup' => !empty($display['settings']['markup']
-        )
-      ));
-      if (empty($display['settings']['markup'])) {
+        'markup' => $this->useMarkup(),
+      ]);
+      if ($this->useMarkup()) {
+        $elements[$delta] = array('#markup' => $value);
+      }
+      else {
         $elements[$delta] = array(
           '#markup' => _name_value_sanitize($value, NULL, $type)
         );
-      }
-      else {
-        $elements[$delta] = array('#markup' => $value);
       }
     }
 
@@ -247,6 +299,15 @@ class NameFormatter extends FormatterBase {
     }
 
     return $elements;
+  }
+
+  /**
+   * Determines with markup should be added to the results.
+   *
+   * @return boolean
+   */
+  protected function useMarkup() {
+    return $this->settings['markup'];
   }
 
 }
