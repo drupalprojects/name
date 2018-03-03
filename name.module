@@ -413,6 +413,8 @@ function name_element_validate($element, &$form_state) {
     $missing_labels = array_intersect_key($labels, $missing_components);
     $label = empty($element['#title']) ? (empty($element['#label']) ? 'Field' : $element['#label']) : $element['#title'];
 
+    // Note that field_default_form() has already sanitized #title.
+
     // Generate error message for the first missing element.
     $form_state->setError($element[key($missing_labels)], t('@name also requires the following parts: <em>@components</em>.', array(
       '@name' => $label, '@components' => implode(', ', $missing_labels)))

@@ -35,24 +35,24 @@ class NameSettingsForm extends ConfigFormBase {
     $form['name_settings'] = array('#tree' => TRUE);
     $form['name_settings']['default_format'] = array(
       '#type' => 'textfield',
-      '#title' => t('Default format'),
+      '#title' => $this->t('Default format'),
       '#default_value' => $config->get('default_format'),
-      '#description' => t('See help on drupal.org for more info.'),
+      '#description' => $this->t('See help on drupal.org for more info.'),
       '#required' => TRUE,
     );
     $form['name_settings']['sep1'] = array(
       '#type' => 'textfield',
-      '#title' => t('Separator 1 replacement token'),
+      '#title' => $this->t('Separator 1 replacement token'),
       '#default_value' => $config->get('sep1'),
     );
     $form['name_settings']['sep2'] = array(
       '#type' => 'textfield',
-      '#title' => t('Separator 2 replacement token'),
+      '#title' => $this->t('Separator 2 replacement token'),
       '#default_value' => $config->get('sep2'),
     );
     $form['name_settings']['sep3'] = array(
       '#type' => 'textfield',
-      '#title' => t('Separator 3 replacement token'),
+      '#title' => $this->t('Separator 3 replacement token'),
       '#default_value' => $config->get('sep3'),
     );
     // As the fieldset does not have the #input flag, this is not saved.
@@ -67,7 +67,7 @@ class NameSettingsForm extends ConfigFormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $default_format = trim($form_state->getValue(['name_settings', 'default_format']));
     if (empty($default_format) && !strlen($default_format)) {
-      $form_state->setErrorByName('name_settings][default_format', t('%title field is required.', array('%title' => $form['name_settings']['default_format']['#title'])));
+      $form_state->setErrorByName('name_settings][default_format', $this->t('%title field is required.', array('%title' => $form['name_settings']['default_format']['#title'])));
     }
     parent::validateForm($form, $form_state);
   }

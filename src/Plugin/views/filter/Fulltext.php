@@ -23,20 +23,20 @@ class Fulltext extends FilterPluginBase {
   protected function operators() {
     return array(
       'contains' => array(
-        'title' => t('Contains'),
-        'short' => t('contains'),
+        'title' => $this->t('Contains'),
+        'short' => $this->t('contains'),
         'method' => 'op_contains',
         'values' => 1,
       ),
       'word' => array(
-        'title' => t('Contains any word'),
-        'short' => t('has word'),
+        'title' => $this->t('Contains any word'),
+        'short' => $this->t('has word'),
         'method' => 'op_word',
         'values' => 1,
       ),
       'allwords' => array(
-        'title' => t('Contains all words'),
-        'short' => t('has all'),
+        'title' => $this->t('Contains all words'),
+        'short' => $this->t('has all'),
         'method' => 'op_word',
         'values' => 1,
       ),
@@ -64,8 +64,8 @@ class Fulltext extends FilterPluginBase {
       '#type' => 'textfield',
       '#size' => 15,
       '#default_value' => $this->value,
-      '#attributes' => array('title' => t('Enter the name you wish to search for.')),
-      '#title' => $this->isExposed() ? '' : t('Value'),
+      '#attributes' => array('title' => $this->t('Enter the name you wish to search for.')),
+      '#title' => $this->isExposed() ? '' : $this->t('Value'),
     );
   }
 

@@ -3,7 +3,6 @@
 namespace Drupal\name\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\SafeMarkup;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -55,7 +54,7 @@ class NameFormatter extends FormatterBase {
 
     $elements['format'] = array(
       '#type' => 'select',
-      '#title' => t('Name format'),
+      '#title' => $this->t('Name format'),
       '#default_value' => $this->getSetting('format'),
       '#options' => name_get_custom_format_options(),
       '#required' => TRUE,
@@ -63,23 +62,23 @@ class NameFormatter extends FormatterBase {
 
     $elements['markup'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Markup'),
+      '#title' => $this->t('Markup'),
       '#default_value' => $this->getSetting('markup'),
-      '#description' => t('This option wraps the individual components of the name in SPAN elements with corresponding classes to the component.'),
+      '#description' => $this->t('This option wraps the individual components of the name in SPAN elements with corresponding classes to the component.'),
     );
 
     $elements['output'] = array(
       '#type' => 'radios',
-      '#title' => t('Output'),
+      '#title' => $this->t('Output'),
       '#default_value' => $this->getSetting('output'),
       '#options' => _name_formatter_output_options(),
-      '#description' => t('This option provides additional options for rendering the field. <strong>Normally, using the "Raw value" option would be a security risk.</strong>'),
+      '#description' => $this->t('This option provides additional options for rendering the field. <strong>Normally, using the "Raw value" option would be a security risk.</strong>'),
       '#required' => TRUE,
     );
 
     $elements['multiple'] = array(
       '#type' => 'radios',
-      '#title' => t('Multiple format options'),
+      '#title' => $this->t('Multiple format options'),
       '#default_value' => $this->getSetting('multiple'),
       '#options' => _name_formatter_multiple_options(),
       '#required' => TRUE,
@@ -98,43 +97,43 @@ class NameFormatter extends FormatterBase {
     // to provide context.
     $elements['multiple_delimiter'] = $base + array(
       '#type' => 'textfield',
-      '#title' => t('Delimiter'),
+      '#title' => $this->t('Delimiter'),
       '#default_value' => $this->getSetting('multiple_delimiter'),
-      '#description' => t('This specifies the delimiter between the second to last and the last name.'),
+      '#description' => $this->t('This specifies the delimiter between the second to last and the last name.'),
     );
     $elements['multiple_and'] = $base + array(
       '#type' => 'radios',
-      '#title' => t('Last delimiter type'),
+      '#title' => $this->t('Last delimiter type'),
       '#options' => array(
-        'text' => t('Textual (and)'),
-        'symbol' => t('Ampersand (&amp;)'),
+        'text' => $this->t('Textual (and)'),
+        'symbol' => $this->t('Ampersand (&amp;)'),
       ),
       '#default_value' => $this->getSetting('multiple_and'),
-      '#description' => t('This specifies the delimiter between the second to last and the last name.'),
+      '#description' => $this->t('This specifies the delimiter between the second to last and the last name.'),
     );
     $elements['multiple_delimiter_precedes_last'] = $base + array(
       '#type' => 'radios',
-      '#title' => t('Standard delimiter precedes last delimiter'),
+      '#title' => $this->t('Standard delimiter precedes last delimiter'),
       '#options' => array(
-        'never' => t('Never (i.e. "J. Doe and T. Williams")'),
-        'always' => t('Always (i.e. "J. Doe<strong>,</strong> and T. Williams")'),
-        'contextual' => t('Contextual (i.e. "J. Doe and T. Williams" <em>or</em> "J. Doe, S. Smith<strong>,</strong> and T. Williams")'),
+        'never' => $this->t('Never (i.e. "J. Doe and T. Williams")'),
+        'always' => $this->t('Always (i.e. "J. Doe<strong>,</strong> and T. Williams")'),
+        'contextual' => $this->t('Contextual (i.e. "J. Doe and T. Williams" <em>or</em> "J. Doe, S. Smith<strong>,</strong> and T. Williams")'),
       ),
       '#default_value' => $this->getSetting('multiple_delimiter_precedes_last'),
-      '#description' => t('This specifies the delimiter between the second to last and the last name. Contextual means that the delimiter is only included for lists with three or more names.'),
+      '#description' => $this->t('This specifies the delimiter between the second to last and the last name. Contextual means that the delimiter is only included for lists with three or more names.'),
     );
     $options = range(1, 20);
     $options = array_combine($options, $options);
     $elements['multiple_el_al_min'] = $base + array(
       '#type' => 'select',
-      '#title' => t('Reduce list and append <em>el al</em>'),
-      '#options' => array(0 => t('Never reduce')) + $options,
+      '#title' => $this->t('Reduce list and append <em>el al</em>'),
+      '#options' => array(0 => $this->t('Never reduce')) + $options,
       '#default_value' => $this->getSetting('multiple_el_al_min'),
-      '#description' => t('This specifies a limit on the number of names to display. After this limit, names are removed and the abbrivation <em>et al</em> is appended. This Latin abbrivation of <em>et alii</em> means "and others".'),
+      '#description' => $this->t('This specifies a limit on the number of names to display. After this limit, names are removed and the abbrivation <em>et al</em> is appended. This Latin abbrivation of <em>et alii</em> means "and others".'),
     );
     $elements['multiple_el_al_first'] = $base + array(
       '#type' => 'select',
-      '#title' => t('Number of names to display when using <em>el al</em>'),
+      '#title' => $this->t('Number of names to display when using <em>el al</em>'),
       '#options' => $options,
       '#default_value' => $this->getSetting('multiple_el_al_first'),
     );
@@ -154,13 +153,13 @@ class NameFormatter extends FormatterBase {
     $machine_name = isset($settings['format']) ? $settings['format'] : 'default';
     $name_format = entity_load('name_format', $machine_name);
     if ($name_format) {
-      $summary[] = t('Format: %format (@machine_name)', array(
+      $summary[] = $this->t('Format: %format (@machine_name)', array(
         '%format' => $name_format->label(),
         '@machine_name' => $name_format->id()
       ));
     }
     else {
-      $summary[] = t('Format: <strong>Missing format.</strong><br/>This field will be displayed using the Default format.');
+      $summary[] = $this->t('Format: <strong>Missing format.</strong><br/>This field will be displayed using the Default format.');
       $machine_name = 'default';
     }
 
@@ -174,21 +173,21 @@ class NameFormatter extends FormatterBase {
       $formatted = SafeMarkup::checkPlain(NameFormatParser::parse($example, $format));
       $formatted = '';
       if (empty($formatted)) {
-        $summary[] = t('Example: <em>&lt;&lt;empty&gt;&gt;</em>');
+        $summary[] = $this->t('Example: <em>&lt;&lt;empty&gt;&gt;</em>');
       }
       else {
-        $summary[] = t('Example: @example', [
+        $summary[] = $this->t('Example: @example', [
           '@example' => $formatted
         ]);
       }
     }
 
-    $summary[] = t('Markup: @yesno', array(
-      '@yesno' => empty($settings['markup']) ? t('no') : t('yes')
+    $summary[] = $this->t('Markup: @yesno', array(
+      '@yesno' => empty($settings['markup']) ? $this->t('no') : $this->t('yes')
     ));
     $output_options = _name_formatter_output_options();
     $output = empty($settings['output']) ? 'default' : $settings['output'];
-    $summary[] = t('Output: @format', array(
+    $summary[] = $this->t('Output: @format', array(
       '@format' => $output_options[$output],
     ));
 

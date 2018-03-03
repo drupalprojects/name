@@ -212,19 +212,19 @@ class NameItem extends FieldItemBase {
     $components = _name_translations();
     $element['components'] = array(
       '#type' => 'checkboxes',
-      '#title' => t('Components'),
+      '#title' => $this->t('Components'),
       '#default_value' => array_keys(array_filter($settings['components'])),
       '#required' => TRUE,
-      '#description' => t('Only selected components will be activated on this field. All non-selected components / component settings will be ignored.'),
+      '#description' => $this->t('Only selected components will be activated on this field. All non-selected components / component settings will be ignored.'),
       '#options' => $components,
     );
 
     $element['minimum_components'] = array(
       '#type' => 'checkboxes',
-      '#title' => t('Minimum components'),
+      '#title' => $this->t('Minimum components'),
       '#default_value' => array_keys(array_filter($settings['minimum_components'])),
       '#required' => TRUE,
-      '#description' => t('The minimal set of components required before the field is considered completed enough to save.'),
+      '#description' => $this->t('The minimal set of components required before the field is considered completed enough to save.'),
       '#options' => $components,
       '#element_validate' => array(array(get_class($this), 'validateMinimumComponents')),
     );
@@ -233,12 +233,12 @@ class NameItem extends FieldItemBase {
     $element['autocomplete_sources'] = array();
     $autocomplete_sources_options = array();
     if   (\Drupal::moduleHandler()->moduleExists('namedb')) {
-      $autocomplete_sources_options['namedb'] = t('Names DB');
+      $autocomplete_sources_options['namedb'] = $this->t('Names DB');
     }
-    $autocomplete_sources_options['title'] = t('Title options');
-    $autocomplete_sources_options['generational'] = t('Generational options');
+    $autocomplete_sources_options['title'] = $this->t('Title options');
+    $autocomplete_sources_options['generational'] = $this->t('Generational options');
     // TODO: Placing in the to hard basket for the time being!
-    //$autocomplete_sources_options['data'] = t('Data');
+    //$autocomplete_sources_options['data'] = $this->t('Data');
 
     foreach ($components as $key => $title) {
       $min_length = 1;
@@ -264,24 +264,24 @@ class NameItem extends FieldItemBase {
         '#type' => 'number',
         '#min' => $min_length,
         '#max' => 255,
-        '#title' => t('Maximum length for @title', array('@title' => $title)),
+        '#title' => $this->t('Maximum length for @title', array('@title' => $title)),
         '#default_value' => $settings['max_length'][$key],
         '#required' => TRUE,
         '#size' => 10,
-        '#description' => t('The maximum length of the field in characters. This must be between @min and 255.', array('@min' => $min_length)),
+        '#description' => $this->t('The maximum length of the field in characters. This must be between @min and 255.', array('@min' => $min_length)),
 
       );
       $element['labels'][$key] = array(
         '#type' => 'textfield',
-        '#title' => t('Label for @title', array('@title' => $title)),
+        '#title' => $this->t('Label for @title', array('@title' => $title)),
         '#default_value' => $settings['labels'][$key],
         '#required' => TRUE,
       );
       $element['autocomplete_source'][$key] = array(
         '#type' => 'checkboxes',
-        '#title' => t('Autocomplete options'),
+        '#title' => $this->t('Autocomplete options'),
         '#default_value' => $settings['autocomplete_source'][$key],
-        '#description' => t("This defines what autocomplete sources are available to the field."),
+        '#description' => $this->t("This defines what autocomplete sources are available to the field."),
         '#options' => $autocomplete_sources_options,
       );
       if ($key != 'title') {
@@ -292,7 +292,7 @@ class NameItem extends FieldItemBase {
       }
       $element['autocomplete_separator'][$key] = array(
         '#type' => 'textfield',
-        '#title' => t('Autocomplete separator for @title', array('@title' => $title)),
+        '#title' => $this->t('Autocomplete separator for @title', array('@title' => $title)),
         '#default_value' => $settings['autocomplete_separator'][$key],
         '#size' => 10,
       );
@@ -300,7 +300,7 @@ class NameItem extends FieldItemBase {
 
     $element['allow_family_or_given'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Allow a single valid given or family value to fulfill the minimum component requirements for both given and family components.'),
+      '#title' => $this->t('Allow a single valid given or family value to fulfill the minimum component requirements for both given and family components.'),
       '#default_value' => !empty($settings['allow_family_or_given']),
     );
 
@@ -309,19 +309,19 @@ class NameItem extends FieldItemBase {
     $title_options = implode("\n", array_filter($settings['title_options']));
     $element['title_options'] = array(
       '#type' => 'textarea',
-      '#title' => t('@title options', array('@title' => $components['title'])),
+      '#title' => $this->t('@title options', array('@title' => $components['title'])),
       '#default_value' => $title_options,
       '#required' => TRUE,
-      '#description' => t("Enter one @title per line. Prefix a line using '--' to specify a blank value text. For example: '--Please select a @title'.", array('@title' => $components['title'])),
+      '#description' => $this->t("Enter one @title per line. Prefix a line using '--' to specify a blank value text. For example: '--Please select a @title'.", array('@title' => $components['title'])),
       '#element_validate' => array(array(get_class($this), 'validateTitleOptions')),
     );
     $generational_options = implode("\n", array_filter($settings['generational_options']));
     $element['generational_options'] = array(
       '#type' => 'textarea',
-      '#title' => t('@generational options', array('@generational' => $components['generational'])),
+      '#title' => $this->t('@generational options', array('@generational' => $components['generational'])),
       '#default_value' => $generational_options,
       '#required' => TRUE,
-      '#description' => t("Enter one @generational suffix option per line. Prefix a line using '--' to specify a blank value text. For example: '----'.", array('@generational' => $components['generational'])),
+      '#description' => $this->t("Enter one @generational suffix option per line. Prefix a line using '--' to specify a blank value text. For example: '----'.", array('@generational' => $components['generational'])),
       '#element_validate' => array(array(get_class($this), 'validateGenerationalOptions')),
     );
     if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
@@ -330,12 +330,12 @@ class NameItem extends FieldItemBase {
       // using the tag '[vocabulary:xxx]', where xxx is the vocabulary id. Terms
       // that exceed the maximum length of the generational suffix are not added
       // to the options list.
-      $element['title_options']['#description'] .= ' ' . t("%label_plural may be also imported from one or more vocabularies using the tag '[vocabulary:xxx]', where xxx is the vocabulary machine-name or id. Terms that exceed the maximum length of the %label are not added to the options list.",
-          array('%label_plural' => t('Titles'), '%label' => t('Title')));
-      $element['generational_options']['#description'] .= ' ' . t("%label_plural may be also imported from one or more vocabularies using the tag '[vocabulary:xxx]', where xxx is the vocabulary machine-name or id. Terms that exceed the maximum length of the %label are not added to the options list.",
+      $element['title_options']['#description'] .= ' ' . $this->t("%label_plural may be also imported from one or more vocabularies using the tag '[vocabulary:xxx]', where xxx is the vocabulary machine-name or id. Terms that exceed the maximum length of the %label are not added to the options list.",
+          array('%label_plural' => $this->t('Titles'), '%label' => $this->t('Title')));
+      $element['generational_options']['#description'] .= ' ' . $this->t("%label_plural may be also imported from one or more vocabularies using the tag '[vocabulary:xxx]', where xxx is the vocabulary machine-name or id. Terms that exceed the maximum length of the %label are not added to the options list.",
           array(
-            '%label_plural' => t('Generational suffixes'),
-            '%label' => t('Generational suffix')
+            '%label_plural' => $this->t('Generational suffixes'),
+            '%label' => $this->t('Generational suffix')
           ));
     }
     $sort_options = is_array($settings['sort_options']) ? $settings['sort_options'] : array(
@@ -344,9 +344,9 @@ class NameItem extends FieldItemBase {
     );
     $element['sort_options'] = array(
       '#type' => 'checkboxes',
-      '#title' => t('Select field sort options'),
+      '#title' => $this->t('Select field sort options'),
       '#default_value' => $sort_options,
-      '#description' => t("This enables sorting on the options after the vocabulary terms are added and duplicate values are removed."),
+      '#description' => $this->t("This enables sorting on the options after the vocabulary terms are added and duplicate values are removed."),
       '#options' => _name_translations(array(
         'title' => '',
         'generational' => ''
@@ -395,15 +395,15 @@ class NameItem extends FieldItemBase {
     );
 
     $field_options = array(
-      'select' => t('Drop-down'),
-      'text' => t('Text field'),
-      'autocomplete' => t('Autocomplete')
+      'select' => $this->t('Drop-down'),
+      'text' => $this->t('Text field'),
+      'autocomplete' => $this->t('Autocomplete')
     );
 
     foreach ($components as $key => $title) {
       $element['field_type'][$key] = array(
         '#type' => 'radios',
-        '#title' => t('@title field type', array('@title' => $components['title'])),
+        '#title' => $this->t('@title field type', array('@title' => $components['title'])),
         '#default_value' => $settings['field_type'][$key],
         '#required' => TRUE,
         '#options' => $field_options,
@@ -417,28 +417,28 @@ class NameItem extends FieldItemBase {
         '#type' => 'number',
         '#min' => 1,
         '#max' => 255,
-        '#title' => t('HTML size property for @title', array('@title' => $title)),
+        '#title' => $this->t('HTML size property for @title', array('@title' => $title)),
         '#default_value' => $settings['size'][$key],
         '#required' => FALSE,
         '#size' => 10,
-        '#description' => t('The maximum length of the field in characters. This must be between 1 and 255.'),
+        '#description' => $this->t('The maximum length of the field in characters. This must be between 1 and 255.'),
       );
 
       $element['title_display'][$key] = array(
         '#type' => 'radios',
-        '#title' => t('Label display for @title', array('@title' => $title)),
+        '#title' => $this->t('Label display for @title', array('@title' => $title)),
         '#default_value' => $settings['title_display'][$key],
         '#options' => array(
-          'title' => t('above'),
-          'description' => t('below'),
-          'none' => t('hidden'),
+          'title' => $this->t('above'),
+          'description' => $this->t('below'),
+          'none' => $this->t('hidden'),
         ),
-        '#description' => t('This controls how the label of the component is displayed in the form.'),
+        '#description' => $this->t('This controls how the label of the component is displayed in the form.'),
       );
 
       $element['inline_css'][$key] = array(
         '#type' => 'textfield',
-        '#title' => t('Additional inline styles for @title input element.', array('@title' => $title)),
+        '#title' => $this->t('Additional inline styles for @title input element.', array('@title' => $title)),
         '#default_value' => $settings['inline_css'][$key],
         '#size' => 8,
       );
@@ -446,45 +446,45 @@ class NameItem extends FieldItemBase {
 
     $element['component_css'] = array(
       '#type' => 'textfield',
-      '#title' => t('Component separator CSS'),
+      '#title' => $this->t('Component separator CSS'),
       '#default_value' => $this->getSetting('component_css'),
-      '#description' => t('Use this to override the default CSS used when rendering each component. Use "&lt;none&gt;" to prevent the use of inline CSS.'),
+      '#description' => $this->t('Use this to override the default CSS used when rendering each component. Use "&lt;none&gt;" to prevent the use of inline CSS.'),
     );
 
     $items = array(
-      t('The order for Asian names is Family Middle Given Title'),
-      t('The order for Eastern names is Title Family Given Middle'),
-      t('The order for Western names is Title First Middle Surname'),
+      $this->t('The order for Asian names is Family Middle Given Title'),
+      $this->t('The order for Eastern names is Title Family Given Middle'),
+      $this->t('The order for Western names is Title First Middle Surname'),
     );
     $item_list = array(
       '#theme' => 'item_list',
       '#items' => $items,
     );
-    $layout_description = t('<p>This controls the order of the widgets that are displayed in the form.</p>')
+    $layout_description = $this->t('<p>This controls the order of the widgets that are displayed in the form.</p>')
       . drupal_render($item_list)
-      . t('<p>Note that when you select the Asian names format, the Generational field is hidden and defaults to an empty string.</p>');
+      . $this->t('<p>Note that when you select the Asian names format, the Generational field is hidden and defaults to an empty string.</p>');
     $element['component_layout'] = array(
       '#type' => 'radios',
-      '#title' => t('Language layout'),
+      '#title' => $this->t('Language layout'),
       '#default_value' => $this->getSetting('component_layout'),
       '#options' => array(
-        'default' => t('Western names'),
-        'asian' => t('Asian names'),
-        'eastern' => t('Eastern names'),
+        'default' => $this->t('Western names'),
+        'asian' => $this->t('Asian names'),
+        'eastern' => $this->t('Eastern names'),
       ),
       '#description' => $layout_description,
     );
     $element['show_component_required_marker'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Show component required marker'),
+      '#title' => $this->t('Show component required marker'),
       '#default_value' => $this->getSetting('show_component_required_marker'),
-      '#description' => t('Appends an asterisk after the component title if the component is required as part of a complete name.'),
+      '#description' => $this->t('Appends an asterisk after the component title if the component is required as part of a complete name.'),
     );
     $element['credentials_inline'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Show the credentials inline'),
+      '#title' => $this->t('Show the credentials inline'),
       '#default_value' => $this->getSetting('credentials_inline'),
-      '#description' => t('The default position is to show the credentials on a line by themselves. This option overrides this to render the component inline.'),
+      '#description' => $this->t('The default position is to show the credentials on a line by themselves. This option overrides this to render the component inline.'),
     );
 
     // Add the overwrite user name option.
@@ -495,8 +495,8 @@ class NameItem extends FieldItemBase {
 
       $element['name_user_preferred'] = array(
         '#type' => 'checkbox',
-        '#title' => t("Use this field to override the user's login name?"),
-        '#description' => t('You may need to clear the @cache_link before this change is seen everywhere.',
+        '#title' => $this->t("Use this field to override the user's login name?"),
+        '#description' => $this->t('You may need to clear the @cache_link before this change is seen everywhere.',
           ['@cache_link' => Link::fromTextAndUrl(
                               'Performance cache',
                                Url::fromRoute('system.performance_settings')
@@ -514,7 +514,7 @@ class NameItem extends FieldItemBase {
 
       $element['override_format'] = array(
         '#type' => 'select',
-        '#title' => t('User name override format to use'),
+        '#title' => $this->t('User name override format to use'),
         '#default_value' => $this->getSetting('override_format'),
         '#options' => name_get_custom_format_options(),
       );

@@ -39,7 +39,7 @@ class NameAutocomplete {
    * @param FieldDefinitionInterface $field
    *   The field definition.
    *
-   * @param $target
+   * @param string $target
    *   The name field component.
    *
    * @param string $string

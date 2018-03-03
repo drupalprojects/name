@@ -2,16 +2,9 @@
 
 namespace Drupal\name\Form;
 
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\ReplaceCommand;
-use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\name\Entity\NameFormat;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\Query\QueryFactory;
-use Drupal\Core\Entity\EntityFormController;
 
 /**
  * Provides a base form controller for date formats.
@@ -33,7 +26,7 @@ abstract class NameFormatFormBase extends EntityForm {
 
     $element['label'] = array(
       '#type' => 'textfield',
-      '#title' => t('Name'),
+      '#title' => $this->t('Name'),
       '#default_value' => $this->entity->label(),
       '#maxlength' => 255,
       '#required' => TRUE,
@@ -41,8 +34,8 @@ abstract class NameFormatFormBase extends EntityForm {
 
     $element['id'] = array(
       '#type' => 'machine_name',
-      '#title' => t('Machine-readable name'),
-      '#description' => t('A unique machine-readable name. Can only contain lowercase letters, numbers, and underscores.'),
+      '#title' => $this->t('Machine-readable name'),
+      '#description' => $this->t('A unique machine-readable name. Can only contain lowercase letters, numbers, and underscores.'),
       '#disabled' => !$this->entity->isNew(),
       '#default_value' => $this->entity->id(),
       '#machine_name' => array(
@@ -52,7 +45,7 @@ abstract class NameFormatFormBase extends EntityForm {
 
     $element['pattern'] = array(
       '#type' => 'textfield',
-      '#title' => t('Format'),
+      '#title' => $this->t('Format'),
       '#default_value' => $this->entity->get('pattern'),
       '#maxlength' => 255,
       '#required' => TRUE,

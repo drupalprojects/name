@@ -12,11 +12,11 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $row['label'] = t('Label');
-    $row['id'] = t('Machine name');
-    $row['format'] = t('Format');
-    $row['examples'] = t('Examples');
-    $row['operations'] = t('Operations');
+    $row['label'] = $this->t('Label');
+    $row['id'] = $this->t('Machine name');
+    $row['format'] = $this->t('Format');
+    $row['examples'] = $this->t('Examples');
+    $row['operations'] = $this->t('Operations');
     return $row;
   }
 
