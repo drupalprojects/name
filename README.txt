@@ -1,65 +1,68 @@
--- SUMMARY --
+INTRODUCTION
+------------
 
-Name is a module that provides a number of name fields and a FAPI name element.
+Name is a module that provides a multi-component name element / field.
 
-Multiple values are supported via the core fields engine.
+Refer to the project page for an up to date list of features:
 
--- REQUIREMENTS --
+https://www.drupal.org/project/name
 
-* None.
+REQUIREMENTS
+------------
+
+* Field module.
 
 You will require the Field UI module to add fields to content.
 
--- INSTALLATION --
+INSTALLATION
+------------
 
-* Standard installation, see http://drupal.org/node/70151 for further information.
+* Standard installation with no dependencies.
+  See http://drupal.org/node/70151 for further information.
 
--- UPGRADING --
+UPGRADING
+---------
 
-* There is no upgrade path from Drupal 6 to Drupal 7 yet.
+* Drupal 6
+  There is no upgrade path.
 
--- RELATED MODULES --
+* Drupal 7
+  Data migration is supported.
 
-* Fullname field for CCK
-  A similar module for Drupal 5 CCK, but with support for two concurrent name
-  field sets for each entry. A legal and preferred set of:
-  
-  prefix, firstname, middlename, lastname, and suffix
-   
-  http://drupal.org/project/cck_fullname
-  
-  The Drupal 6 version is a very light-weight version of this module.
-  
-* Namefield
-  An "experiment" Drupal 5 development module.
+RELATED MODULES
+---------------
 
-  http://drupal.org/project/namefield
+No directly comparable modules exist in Drupal 8.
 
--- CONFIGURATION --
+* Paragraphs module can be used for composite fields
+
+* Real Name module can also control the display of the alternative fields other
+  than the users login name
+
+
+CONFIGURATION
+-------------
 
 * There are lots of configurable options. If anything is not clear, submit a
 support request.
 
--- REFERENCES --
 
-For details about Drupal 7 Fields API:
-  http://drupal.org/node/443536
-For details about Drupal 7 FAPI:
-  http://api.drupal.org/api/drupal/developer--topics--forms_api.html/7
-  http://api.drupal.org/api/drupal/developer--topics--forms_api_reference.html/7
-  
--- CONTACT --
+MAINTAINERS
+-----------
 
 Current maintainers:
 
-* Alan D. - http://drupal.org/user/54136
+* Florian Weber (webflo) - https://www.drupal.org/u/webflo
+
+* Alan D. - https://www.drupal.org/u/alan-d
 
 If you want to help or be involved please contact me.
 
 If you find any issues please lodge an issue after checking that the issue
 is not a duplicate of an existing issue.
 
--- ADDITIONAL TITLES --
+RESOURCES
+---------
 
 Here is a great list of Titles if you feel that the standard list of 6 or so
 items is not enough:
