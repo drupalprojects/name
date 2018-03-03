@@ -228,8 +228,22 @@ class NameAdminTest extends NameTestBase {
         else {
           $results = current($raw_xpath);
         }
-        $this->assertEqual($results, $value, "Testing {$cell_code} on row {$id} using '{$xpath}' and expecting '" . SafeMarkup::checkPlain($value) . "', got '" . SafeMarkup::checkPlain($results) . "'.");
+
+        // Check URLs with or without the ?destination= query parameter.
+        $message = "Testing {$cell_code} on row {$id} using '{$xpath}' and expecting '" . SafeMarkup::checkPlain($value) . "', got '" . SafeMarkup::checkPlain($results) . "'.";
+        if (strpos($row_template[$cell_code], '/a/@href')) {
+          if ($results == $value || strpos($results, $value . '?destination=') === 0) {
+            $this->pass($message);
+          }
+          else {
+            $this->fail($message);
+          }
+        }
+        else {
+          $this->assertEqual($results, $value, $message);
+        }
       }
     }
   }
+
 }
