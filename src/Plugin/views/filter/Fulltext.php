@@ -78,6 +78,10 @@ class Fulltext extends FilterPluginBase {
    */
   function query() {
     $this->ensureMyTable();
+    // Don't filter on empty strings.
+    if (empty($this->value[0])) {
+      return;
+    }
     $field = "$this->tableAlias.$this->realField";
     $fulltext_field = "LOWER(CONCAT(' ', COALESCE({$field}_title, ''), ' ', COALESCE({$field}_given, ''), ' ', COALESCE({$field}_middle, ''), ' ', COALESCE({$field}_family, ''), ' ', COALESCE({$field}_generational, ''), ' ', COALESCE({$field}_credentials, '')))";
 
@@ -96,11 +100,6 @@ class Fulltext extends FilterPluginBase {
 
   function op_word($fulltext_field) {
     $where = $this->operator == 'word' ? db_or() : db_and();
-    // Don't filter on empty strings.
-    if (empty($this->value[0])) {
-      return;
-    }
-
     $value = Unicode::strtolower($this->value[0]);
 
     $words = preg_split('/ /', $value, -1, PREG_SPLIT_NO_EMPTY);
