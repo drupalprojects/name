@@ -137,13 +137,6 @@ class NameAdminTest extends NameTestBase {
       $this->assertField($name, $value);
     }
 
-    // The default installed formats and the updated default format.
-    $this->drupalGet('admin/config/regional/name');
-
-    // @todo: Remove of fix.
-    // $xpath = '//tr[@id="name-0"]/td[3]';
-    // $this->assertEqual(current($this->xpath($xpath)), 'c+ks+if+im+ig+t', 'Default is equal to set default.');
-
     // Delete all existing formats.
     $formats = NameFormat::loadMultiple();
     array_walk($formats, function (NameFormatInterface $format) {
@@ -174,7 +167,7 @@ class NameAdminTest extends NameTestBase {
 
     $values = array('label' => 'Test', 'id' => 'test', 'pattern' => 'abc');
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
-    $this->assertText(t('Custom name format added.'));
+    $this->assertText(t('Name format Test added.'));
 
     $row = array(
       'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'test'])->toString(),
@@ -189,7 +182,7 @@ class NameAdminTest extends NameTestBase {
 
     $values = array('label' => 'new name', 'pattern' => 'f+g');
     $this->drupalPostForm('admin/config/regional/name/manage/test', $values, t('Save'));
-    // $this->assertText(t('Custom format new name has been updated.'));
+    $this->assertText(t('Name format new name has been updated.'));
 
     $row = array(
       'label' => $values['label'],
@@ -208,7 +201,7 @@ class NameAdminTest extends NameTestBase {
     $this->assertText(t('Are you sure you want to delete the custom format @title?', array('@title' => $values['label'])));
 
     $this->drupalPostForm(NULL, array('confirm' => 1), t('Delete'));
-    $this->assertText(t('The custom name format @title has been deleted.', array('@title' => $values['label'])));
+    $this->assertText(t('The name format @title has been deleted.', array('@title' => $values['label'])));
   }
 
   /**

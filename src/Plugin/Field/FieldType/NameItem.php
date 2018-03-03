@@ -237,8 +237,7 @@ class NameItem extends FieldItemBase {
     }
     $autocomplete_sources_options['title'] = $this->t('Title options');
     $autocomplete_sources_options['generational'] = $this->t('Generational options');
-    // TODO: Placing in the to hard basket for the time being!
-    //$autocomplete_sources_options['data'] = $this->t('Data');
+    // @todo: Optionally add existing data as an autocomplete source.
 
     foreach ($components as $key => $title) {
       $min_length = 1;

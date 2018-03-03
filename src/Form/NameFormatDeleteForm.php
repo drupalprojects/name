@@ -38,7 +38,7 @@ class NameFormatDeleteForm extends EntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
     $this->entity->delete();
-    drupal_set_message($this->t('The custom name format %label has been deleted.', array('%label' => $this->entity->label())));
+    drupal_set_message($this->t('The name format %label has been deleted.', array('%label' => $this->entity->label())));
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 
