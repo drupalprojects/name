@@ -2,7 +2,7 @@
 
 namespace Drupal\name\Tests;
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 
 /**
  * Tests for the admin settings and custom format page.
@@ -86,7 +86,7 @@ class NameFieldTest extends NameTestBase {
       t('@field options are required.', array('@field' => $n['generational'])),
 
       t('@field field is required.', array('@field' => t('Components'))),
-      t('@field must have one of the following components: @components', array('@field' => t('Minimum components'), '@components' => SafeMarkup::checkPlain(implode(', ', array($n['given'], $n['family']))))),
+      t('@field must have one of the following components: @components', array('@field' => t('Minimum components'), '@components' => Html::escape(implode(', ', array($n['given'], $n['family']))))),
     );
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -123,7 +123,7 @@ class NameFieldTest extends NameTestBase {
       /*
       t('@components can not be selected for @label when they are not selected for @label2.',
               array('@label' => t('Minimum components'), '@label2' => t('Components'),
-              '@components' => SafeMarkup::checkPlain(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
+              '@components' => Html::escape(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
       */
 
       t('@field must be higher than or equal to 1.', array('@field' => $n['title'])),
@@ -133,7 +133,7 @@ class NameFieldTest extends NameTestBase {
       t('@field is not a valid number.', array('@field' => $n['generational'])),
       t('@field must be a number.', array('@field' => $n['credentials'])),
 
-      t('@field must have one of the following components: @components', array('@field' => t('Minimum components'), '@components' => SafeMarkup::checkPlain(implode(', ', array($n['given'], $n['family']))))),
+      t('@field must have one of the following components: @components', array('@field' => t('Minimum components'), '@components' => Html::escape(implode(', ', array($n['given'], $n['family']))))),
 
       t("The vocabulary 'machine' in @field could not be found.", array('@field' => t('@title options', array('@title' => $n['title'])))),
       t("The vocabulary '123' in @field could not be found.", array('@field' => t('@generational options', array('@generational' => $n['generational'])))),
@@ -231,7 +231,7 @@ class NameFieldTest extends NameTestBase {
       /*
       t('@components can not be selected for @label when they are not selected for @label2.',
               array('@label' => t('Minimum components'), '@label2' => t('Components'),
-              '@components' => SafeMarkup::checkPlain(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
+              '@components' => Html::escape(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
       */
 
       t('Maximum length for @field must be higher than or equal to 1.', array('@field' => $n['title'])),
@@ -241,7 +241,7 @@ class NameFieldTest extends NameTestBase {
       t('Maximum length for @field is not a valid number.', array('@field' => $n['generational'])),
       t('Maximum length for @field must be a number.', array('@field' => $n['credentials'])),
 
-      t('@field must have one of the following components: @components', array('@field' => t('Minimum components'), '@components' => SafeMarkup::checkPlain(implode(', ', array($n['given'], $n['family']))))),
+      t('@field must have one of the following components: @components', array('@field' => t('Minimum components'), '@components' => Html::escape(implode(', ', array($n['given'], $n['family']))))),
 
       t("The vocabulary 'machine' in @field could not be found.", array('@field' => t('@title options', array('@title' => $n['title'])))),
       t("The vocabulary '123' in @field could not be found.", array('@field' => t('@generational options', array('@generational' => $n['generational'])))),

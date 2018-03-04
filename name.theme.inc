@@ -5,7 +5,7 @@
  * Theme functions for name module.
  */
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\name\NameFormatParser;
 
 /**
@@ -48,7 +48,7 @@ function theme_name_item_list($variables) {
   $delimiter = $settings['multiple_delimiter'];
   if ($settings['output'] == 'default') {
     $etal = t('<em>et al</em>', array(), array('context' => 'name'));
-    $delimiter = SafeMarkup::checkPlain($delimiter);
+    $delimiter = Html::escape($delimiter);
   }
   else {
     $etal = t('et al', array(), array('context' => 'name'));

@@ -10,7 +10,7 @@
  * t('@name_given', array('@name_given' => t('Given')))
  */
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
@@ -249,7 +249,7 @@ function _name_formatter_output_types() {
       $inline_css = '';
     }
     else {
-      $inline_css = ' style="' . SafeMarkup::checkPlain($element['#component_css']) . '"';
+      $inline_css = ' style="' . Html::escape($element['#component_css']) . '"';
     }
   }
   else {
@@ -588,7 +588,7 @@ function _name_value_sanitize($item, $column = NULL, $type = 'default') {
     case 'raw':
       return $value;
     default:
-      return SafeMarkup::checkPlain($value);
+      return Html::escape($value);
   }
 }
 

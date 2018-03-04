@@ -2,7 +2,7 @@
 
 namespace Drupal\name;
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 
 /**
@@ -217,7 +217,7 @@ class NameFormatParser {
               $string = trim($string);
               break;
             case 'S':
-              $string = SafeMarkup::checkPlain($string);
+              $string = Html::escape($string);
               break;
           }
         }
@@ -312,7 +312,7 @@ class NameFormatParser {
 
     }
     if ($markup) {
-      return '<span class="' . SafeMarkup::checkPlain($component_key) . '">' . SafeMarkup::checkPlain($value) . '</span>';
+      return '<span class="' . Html::escape($component_key) . '">' . Html::escape($value) . '</span>';
     }
     return $value;
   }

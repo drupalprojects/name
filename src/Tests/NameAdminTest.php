@@ -2,7 +2,7 @@
 
 namespace Drupal\name\Tests;
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\name\Entity\NameFormat;
 use Drupal\name\NameFormatInterface;
@@ -41,14 +41,14 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Default'),
         'machine' => 'default',
         'pattern' => '((((t+ig)+im)+if)+is)+jc',
-        'formatted' => 'Mr Joe John Peter Mark Doe Jnr., B.Sc., Ph.D. JOAN SUE DOE Prince ',
+        'formatted' => 'Mr Joe John Peter Mark Doe Jnr., B.Sc., Ph.D. JOAN SUE DOE Prince',
       ),
       2 => array(
         'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'family'])->toString(),
         'title' => t('Family'),
         'machine' => 'family',
         'pattern' => 'f',
-        'formatted' => 'Doe DOE ',
+        'formatted' => 'Doe DOE',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'family'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'family'])->toString(),
       ),
@@ -57,7 +57,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Full'),
         'machine' => 'full',
         'pattern' => '((((t+ig)+im)+if)+is)+jc',
-        'formatted' => 'Mr Joe John Peter Mark Doe Jnr., B.Sc., Ph.D. JOAN SUE DOE Prince ',
+        'formatted' => 'Mr Joe John Peter Mark Doe Jnr., B.Sc., Ph.D. JOAN SUE DOE Prince',
         'edit' => t('Edit'),
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'full'])->toString(),
         'delete' => t('Delete'),
@@ -68,7 +68,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Given'),
         'machine' => 'given',
         'pattern' => 'g',
-        'formatted' => 'Joe JOAN Prince ',
+        'formatted' => 'Joe JOAN Prince',
         'edit' => t('Edit'),
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'given'])->toString(),
         'delete' => t('Delete'),
@@ -79,7 +79,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Given Family'),
         'machine' => 'short_full',
         'pattern' => 'g+if',
-        'formatted' => 'Joe Doe JOAN DOE Prince ',
+        'formatted' => 'Joe Doe JOAN DOE Prince',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'short_full'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'short_full'])->toString(),
       ),
@@ -88,7 +88,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Title Family'),
         'machine' => 'formal',
         'pattern' => 't+if',
-        'formatted' => 'Mr Doe DOE ',
+        'formatted' => 'Mr Doe DOE',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'formal'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'formal'])->toString(),
       ),
@@ -174,7 +174,7 @@ class NameAdminTest extends NameTestBase {
       'title' => 'Test',
       'machine' => 'test',
       'pattern' => 'abc',
-      'formatted' => 'abB.Sc., Ph.D. ab ab ',
+      'formatted' => 'abB.Sc., Ph.D. ab ab',
       'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'test'])->toString(),
       'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'test'])->toString(),
     );
@@ -219,11 +219,11 @@ class NameAdminTest extends NameTestBase {
           $results = '__MISSING__';
         }
         else {
-          $results = current($raw_xpath);
+          $results = (string) current($raw_xpath);
         }
-
+        $results = trim($results);
         // Check URLs with or without the ?destination= query parameter.
-        $message = "Testing {$cell_code} on row {$id} using '{$xpath}' and expecting '" . SafeMarkup::checkPlain($value) . "', got '" . SafeMarkup::checkPlain($results) . "'.";
+        $message = "Testing {$cell_code} on row {$id} using '{$xpath}' and expecting '" . Html::escape($value) . "', got '" . Html::escape($results) . "'.";
         if (strpos($row_template[$cell_code], '/a/@href')) {
           if ($results == $value || strpos($results, $value . '?destination=') === 0) {
             $this->pass($message);
