@@ -688,9 +688,63 @@ class NameItem extends FieldItemBase {
       }
 
       \Drupal::logger('name')->notice('Cache cleared for data tagged as %tag.', ['%tag' => 'user:{$uid}']);
-
     }
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
+    $names = &drupal_static(__FUNCTION__, array());
+
+    // Generate 50 random names based off the field settings. These are stored
+    // for future use to prevent the need to regenerate these.
+    if (empty($names)) {
+      // Only use the enabled components.
+      $settings = $field_definition->getSettings();
+      $components_used = array_filter($settings['components']);
+
+      // Parse the settings to find the field title and generational options.
+      $titles = \Drupal::service('name.options_provider')->getOptions($field_definition, 'title');
+      unset($titles['']);
+      $generational = \Drupal::service('name.options_provider')->getOptions($field_definition, 'generational');
+      unset($generational['']);
+
+      $given = array('John', 'William', 'James', 'George', 'Charles', 'Frank', 'Joseph', 'Henry', 'Robert', 'Thomas', 'Edward', 'Harry', 'Walter', 'Arthur', 'Fred', 'Albert', 'Samuel', 'Clarence', 'Louis', 'David', 'Joe', 'Charlie', 'Richard', 'Ernest', 'Roy', 'Will', 'Andrew', 'Jesse', 'Oscar', 'Willie', 'Daniel', 'Benjamin', 'Carl', 'Sam', 'Alfred', 'Earl', 'Peter', 'Elmer', 'Frederick', 'Howard', 'Lewis', 'Ralph', 'Herbert', 'Paul', 'Lee', 'Tom', 'Herman', 'Martin', 'Jacob', 'Michael', 'Mary', 'Anna', 'Emma', 'Elizabeth', 'Margaret', 'Minnie', 'Ida', 'Bertha', 'Clara', 'Alice', 'Annie', 'Florence', 'Bessie', 'Grace', 'Ethel', 'Sarah', 'Ella', 'Martha', 'Nellie', 'Mabel', 'Laura', 'Carrie', 'Cora', 'Helen', 'Maude', 'Lillian', 'Gertrude', 'Rose', 'Edna', 'Pearl', 'Edith', 'Jennie', 'Hattie', 'Mattie', 'Eva', 'Julia', 'Myrtle', 'Louise', 'Lillie', 'Jessie', 'Frances', 'Catherine', 'Lula', 'Lena', 'Marie', 'Ada', 'Josephine', 'Fanny', 'Lucy', 'Dora');
+      $middle = array('Aaron', 'Bailey', 'Carson', 'Damon', 'Edwin', 'Francis', 'Garrett', 'Holden', 'Ivan', 'Jace', 'Keaton', 'Layne', 'Malcolm', 'Noah', 'Owen', 'Payton', 'Quinn', 'Randall', 'Sawyer', 'Tilton', 'Tanner', 'Vernon', 'Wade', 'Zachariah', 'Aiden', 'Bennett', 'Chance', 'Dante', 'Ellis', 'Glenn', 'Houston', 'Jackson', 'Kelton', 'Layton', 'Marshall', 'Noel', 'Peyton', 'Quintin', 'Reese', 'Sean', 'Stewart', 'Taylor', 'Warren', 'Anton', 'Blair', 'Charles', 'Denver', 'Emmett', 'Grant', 'Jade', 'Adele', 'Bailee', 'Camden', 'Dawn', 'Elein', 'Fawn', 'Haiden', 'Jacklyn', 'Kae', 'Lane', 'Madisen', 'Nadeen', 'Ocean', 'Payten', 'Raine', 'Selene', 'Taye', 'Zion', 'Alice', 'Berlynn', 'Candice', 'Debree', 'Ellen', 'Faye', 'Hollyn', 'Jae', 'Kaitlin', 'Lashon', 'Mae', 'Naveen', 'Raven', 'Sharon', 'Taylore', 'Zoe', 'Anise', 'Bernice', 'Carelyn', 'Debree', 'Erin', 'Faye', 'Hollyn', 'Jane', 'Kalan', 'Lee', 'Merle', 'Olive', 'Reagan', 'Sue', 'Ann', 'Bree');
+      $family = array('Smith', 'Johnson', 'Williams', 'James', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Tompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Rodrigez', 'Lewis', 'Lee', 'Walker', 'Hall', 'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez', 'Hill', 'Scott', 'Green', 'Adams', 'Baker', 'Gonzales', 'Nelson', 'Carter', 'Mitchell', 'Perez', 'Roberts', 'Turner', 'Phillips', 'Campbell', 'Parker', 'Evans', 'Edwards', 'Collins', 'Stewart', 'Sanches', 'Morris', 'Rogers', 'Reed', 'Cook', 'Morgan', 'Bell', 'Murphy', 'Bailey', 'Rivera', 'Cooper', 'Richardson', 'Cox', 'Howard', 'Ward', 'Torez', 'Peterson', 'Gray', 'Ramirez', 'James', 'Watson', 'Brooks', 'Kelly', 'Sanders', 'Price', 'Bennett', 'Wood', 'Barness', 'Ross', 'Henderson', 'Coleman', 'Jenkins', 'Perry', 'Powel', 'Long', 'Patterson', 'Hughes', 'Flores', 'Washington', 'Butler', 'Simpson', 'Foster', 'Gonzales', 'Bryant', 'Alexander', 'Russel', 'Griffin', 'Diaz', 'Hayes');
+      $credentials = ['BA', 'EdD', 'MA', 'BAppSc', 'KBE', 'CCISO', 'J.P.', 'MD', 'CEH'];
+      // Random use the components to create truly random names.
+      for ($i = 0; $i < 50; $i++) {
+        $name = [
+          'title' => '',
+          'given' => $given[array_rand($given)],
+          'middle' => '',
+          'family' => $family[array_rand($family)],
+          'generational' => '',
+          'credentials' => '',
+        ];
+        // Mix up the titles, middle, creds & generational.
+        if (rand(1,2) == 1) {
+          $name['title'] = $titles[array_rand($titles)];
+        }
+        if (rand(1,2) == 1) {
+          $name['middle'] = $middle[array_rand($middle)];
+        }
+        if (rand(1,2) == 1) {
+          $creds = [];
+          for ($j = 0, $limit = rand(1, 4); $j <= $limit; $j++) {
+            $creds[] = $credentials[array_rand($credentials)];
+          }
+          $name['credentials'] = implode(', ', $creds);
+        }
+        if (rand(1,3) == 1) {
+          $name['generational'] = $generational[array_rand($generational)];
+        }
+        $names[] = array_intersect_key($name, $components_used);
+      }
+    }
+    return $names[array_rand($names)];
   }
 
   protected static function extractAllowedValues($string) {
