@@ -18,6 +18,9 @@ class NameFormatAddForm extends NameFormatFormBase {
     return $actions;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     parent::save($form, $form_state);
     drupal_set_message($this->t('Name format %label added.', ['%label' => $this->entity->label()]));

@@ -24,32 +24,32 @@ abstract class NameFormatFormBase extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $element = parent::form($form, $form_state);
 
-    $element['label'] = array(
+    $element['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name'),
       '#default_value' => $this->entity->label(),
       '#maxlength' => 255,
       '#required' => TRUE,
-    );
+    ];
 
-    $element['id'] = array(
+    $element['id'] = [
       '#type' => 'machine_name',
       '#title' => $this->t('Machine-readable name'),
       '#description' => $this->t('A unique machine-readable name. Can only contain lowercase letters, numbers, and underscores.'),
       '#disabled' => !$this->entity->isNew(),
       '#default_value' => $this->entity->id(),
-      '#machine_name' => array(
-        'exists' => array($this, 'exists'),
-      ),
-    );
+      '#machine_name' => [
+        'exists' => [$this, 'exists'],
+      ],
+    ];
 
-    $element['pattern'] = array(
+    $element['pattern'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Format'),
       '#default_value' => $this->entity->get('pattern'),
       '#maxlength' => 255,
       '#required' => TRUE,
-    );
+    ];
 
     $element['help'] = $this->nameFormatHelp();
 

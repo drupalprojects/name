@@ -33,17 +33,17 @@ function name_example_names($excluded_components = [], $field_name = NULL) {
  * A helper function to generate the format string parameter help fieldset.
  */
 function _name_get_name_format_help_form() {
-  $parameter = array('#theme' => 'name_format_parameter_help');
-  $form = array(
+  $parameter = ['#theme' => 'name_format_parameter_help'];
+  $form = [
     '#type' => 'details',
     '#title' => t('Format string help'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#parents' => [],
-    'format_parameters' => array(
+    'format_parameters' => [
       '#markup' => \Drupal::service('renderer')->render($parameter),
-    ),
-  );
+    ],
+  ];
   return $form;
 }
 
@@ -52,53 +52,57 @@ function _name_get_name_format_help_form() {
  * than a long list of individual elements.
  */
 function _name_field_settings_pre_render($form) {
-  $form['styled_settings'] = array(
+  $form['styled_settings'] = [
     '#prefix' => '<table>',
     '#suffix' => '</table>',
     '#weight' => 1,
-    'thead' => array(
+    'thead' => [
       '#prefix' => '<thead><tr><th>' . t('Field') . '</th>',
       '#suffix' => '</tr></thead>',
       '#weight' => 0,
-    ),
-    'tbody' => array(
+    ],
+    'tbody' => [
       '#prefix' => '<tbody>',
       '#suffix' => '</tbody>',
       '#weight' => 1,
-      'title_display' => array(
+      'title_display' => [
         '#prefix' => '<tr><td><strong>' . t('Title display') . '<sup>1</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 1,
-      ),
-      'field_type' => array(
+      ],
+      'field_type' => [
         '#prefix' => '<tr><td><strong>' . t('Field type') . '<sup>2</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 2,
-      ),
-      'size' => array(
+      ],
+      'size' => [
         '#prefix' => '<tr><td><strong>' . t('HTML size') . '<sup>3</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 3,
-      ),
-      'inline_css' => array(
+      ],
+      'inline_css' => [
         '#prefix' => '<tr><td><strong>' . t('Inline styles') . '<sup>4</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 4,
-      ),
-    ),
-    'tfoot' => array(
+      ],
+    ],
+    'tfoot' => [
       '#markup' => '<tfoot><tr><td colspan="7"><ol>'
-      . '<li>' . t('The title display controls how the label of the name component is displayed in the form. "%above" is the standard title; "%below" is the standard description; "%hidden" removes the label.', array('%above' => t('above'), '%below' => t('below'), '%hidden' => t('hidden'))) . '</li>'
+      . '<li>' . t('The title display controls how the label of the name component is displayed in the form. "%above" is the standard title; "%below" is the standard description; "%hidden" removes the label.', [
+          '%above' => t('above'),
+          '%below' => t('below'),
+          '%hidden' => t('hidden'),
+        ]) . '</li>'
       . '<li>' . t('The Field type controls how the field is rendered. Autocomplete is a text field with autocomplete, and the behaviour of this is controlled by the field settings.') . '</li>'
       . '<li>' . t('The HTML size property tells the browser what the width of the field should be when it is rendered. This gets overriden by the themes CSS properties. This must be between 1 and 255.') . '</li>'
       . '<li>' . t('Additional inline styles for the input element. For example, "width: 45px; background-color: #f3f3f3"') . '</li>'
       . '</ol></td></tr></tfoot>',
       '#weight' => 2,
-    ),
-    'extra_fields' => array(
+    ],
+    'extra_fields' => [
       '#weight' => 3,
-    ),
-  );
+    ],
+  ];
 
   $i = 0;
   foreach (_name_translations() as $key => $title) {
@@ -167,69 +171,71 @@ function _name_field_storage_settings_pre_render($form) {
   $extra_max_info = '<div>' . t('This can not be less than the longest value in the database. The minimum values are:') . '</div>';
   $extra_max_items = [];
   foreach (_name_translations() as $key => $title) {
-    $extra_max_items[] = t('@title is @size', array('@title' => $title,
-      '@size' => $form['max_length'][$key]['#min']));
+    $extra_max_items[] = t('@title is @size', [
+      '@title' => $title,
+      '@size' => $form['max_length'][$key]['#min'],
+    ]);
   }
-  $item_list = array(
+  $item_list = [
     '#theme' => 'item_list',
     '#items' => $extra_max_items,
-  );
+  ];
   $extra_max_info .= drupal_render($item_list);
-  $form['field_properties'] = array(
+  $form['field_properties'] = [
     '#prefix' => '<table>',
     '#suffix' => '</table>',
     '#weight' => 1,
-    'thead' => array(
+    'thead' => [
       '#prefix' => '<thead><tr><th>' . t('Field') . '</th>',
       '#suffix' => '</tr></thead>',
       '#weight' => 0,
-    ),
-    'tbody' => array(
+    ],
+    'tbody' => [
       '#prefix' => '<tbody>',
       '#suffix' => '</tbody>',
       '#weight' => 1,
-      'components' => array(
+      'components' => [
         '#prefix' => '<tr><td><strong>' . t('Components') . '<sup>1</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 1,
-      ),
-      'minimum_components' => array(
+      ],
+      'minimum_components' => [
         '#prefix' => '<tr><td><strong>' . t('Minimum components') . '<sup>2</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 2,
-      ),
-      'allow_family_or_given' => array(
+      ],
+      'allow_family_or_given' => [
         '#prefix' => '<tr><td>&nbsp;</td><td colspan="6">',
         '#suffix' => '</td></tr>',
         '#weight' => 2.1,
-      ),
-      'max_length' => array(
+      ],
+      'max_length' => [
         '#prefix' => '<tr><td><strong>' . t('Maximum length') . '<sup>3</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 3,
-      ),
-      'labels' => array(
+      ],
+      'labels' => [
         '#prefix' => '<tr><td><strong>' . t('Labels') . '<sup>4</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 4,
-      ),
-      'sort_options' => array(
+      ],
+      'sort_options' => [
         '#prefix' => '<tr><td><strong>' . t('Sort options') . '<sup>5</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 5,
-      ),
-      'autocomplete_source' => array(
+      ],
+      'autocomplete_source' => [
         '#prefix' => '<tr><td><strong>' . t('Autocomplete sources') . '<sup>6</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 6,
-      ),
-      'autocomplete_separator' => array(
+      ],
+      'autocomplete_separator' => [
         '#prefix' => '<tr><td><strong>' . t('Autocomplete separator') . '<sup>7</sup></strong></td>',
         '#suffix' => '</tr>',
         '#weight' => 7,
-      ),
-    ),
-    'tfoot' => array(
+      ],
+    ],
+    'tfoot' => [
       '#markup' => '<tfoot><tr><td colspan="7"><ol>'
       . '<li>' . t('Only selected components will be activated on this field. All non-selected components / component settings will be ignored.') . '</li>'
       . '<li>' . t('The minimal set of components required before the field is considered completed enough to save.') . '</li>'
@@ -241,8 +247,8 @@ function _name_field_storage_settings_pre_render($form) {
       . '<li>' . t('This allows you to override the default handling that the autocomplete uses to handle separations between components. If empty, this defaults to a single space.')
       . '</ol></td></tr></tfoot>',
       '#weight' => 2,
-    ),
-  );
+    ],
+  ];
 
   $form['field_properties']['tbody']['allow_family_or_given']['checkbox'] = $form['allow_family_or_given'];
   unset($form['allow_family_or_given']);
@@ -304,7 +310,7 @@ function _name_field_storage_settings_pre_render($form) {
       $form['field_properties']['tbody']['sort_options'][$key] = $form['sort_options'][$key];
     }
     else {
-      $form['field_properties']['tbody']['sort_options'][$key] = array('#markup' => '&nbsp;');
+      $form['field_properties']['tbody']['sort_options'][$key] = ['#markup' => '&nbsp;'];
     }
 
     $form['field_properties']['tbody']['sort_options'][$key]['#prefix'] = '<td>';
@@ -347,9 +353,9 @@ function _name_field_storage_settings_pre_render($form) {
   }
 
   // Move the additional options under the table.
-  $form['extra_fields'] = array(
+  $form['extra_fields'] = [
     '#weight' => 2,
-  );
+  ];
   $form['title_options']['#weight'] = 0;
   $form['generational_options']['#weight'] = 1;
   $form['extra_fields']['title_options'] = $form['title_options'];

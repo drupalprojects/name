@@ -233,7 +233,7 @@ class NameItem extends FieldItemBase {
     $element['max_length'] = [];
     $element['autocomplete_sources'] = [];
     $autocomplete_sources_options = [];
-    if   (\Drupal::moduleHandler()->moduleExists('namedb')) {
+    if (\Drupal::moduleHandler()->moduleExists('namedb')) {
       $autocomplete_sources_options['namedb'] = $this->t('Names DB');
     }
     // @todo: Optionally add existing data as an autocomplete source.
@@ -255,7 +255,8 @@ class NameItem extends FieldItemBase {
             if ($min_length < 1) {
               $min_length = 1;
             }
-          } catch (Exception $e) {
+          }
+          catch (Exception $e) {
           }
         }
         */
@@ -329,7 +330,7 @@ class NameItem extends FieldItemBase {
     ];
     if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
       // TODO - Make the labels more generic.
-      // Generational suffixes may be also imported from one or more vocabularies
+      // Generational suffixes may be imported from one or more vocabularies
       // using the tag '[vocabulary:xxx]', where xxx is the vocabulary id. Terms
       // that exceed the maximum length of the generational suffix are not added
       // to the options list.
@@ -391,7 +392,6 @@ class NameItem extends FieldItemBase {
   public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
     $settings = $this->getSettings();
     $components = _name_translations();
-
 
     $element = [
       'size' => [],
@@ -626,7 +626,7 @@ class NameItem extends FieldItemBase {
           else {
             $form_state->setError($element, t("The vocabulary '%tag' in %label could not be found.", [
               '%tag' => $matches[1],
-              '%label' => $label
+              '%label' => $label,
             ]));
           }
         }
@@ -726,20 +726,20 @@ class NameItem extends FieldItemBase {
           'credentials' => '',
         ];
         // Mix up the titles, middle, creds & generational.
-        if (rand(1,2) == 1) {
+        if (rand(1, 2) == 1) {
           $name['title'] = $titles[array_rand($titles)];
         }
-        if (rand(1,2) == 1) {
+        if (rand(1, 2) == 1) {
           $name['middle'] = $middle[array_rand($middle)];
         }
-        if (rand(1,2) == 1) {
+        if (rand(1, 2) == 1) {
           $creds = [];
           for ($j = 0, $limit = rand(1, 4); $j <= $limit; $j++) {
             $creds[] = $credentials[array_rand($credentials)];
           }
           $name['credentials'] = implode(', ', $creds);
         }
-        if (rand(1,3) == 1) {
+        if (rand(1, 3) == 1) {
           $name['generational'] = $generational[array_rand($generational)];
         }
         $names[] = array_intersect_key($name, $components_used);

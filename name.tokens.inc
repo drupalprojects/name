@@ -194,13 +194,13 @@ function _name_tokens($type, $tokens, array $data = [], array $options = []) {
         $replacements[$original] = $sanitize ? check_plain($default) : $default;
       }
       elseif (strpos($key, 'formatter-') === 0) {
-        list(,$machine_name) = explode('-', $key, 2);
+        list(, $machine_name) = explode('-', $key, 2);
         $format = name_get_format_by_machine_name($machine_name);
         $formated_name = NameFormatParser::parse($name_components, $format);
         $replacements[$original] = $sanitize ? check_plain($formated_name) : $formated_name;
       }
       elseif (strpos($key, 'component-') === 0) {
-        list(,$component) = explode('-', $key, 2);
+        list(, $component) = explode('-', $key, 2);
         $replacements[$original] = $sanitize ? check_plain($name_components[$component]) : $name_components[$component];
       }
     }

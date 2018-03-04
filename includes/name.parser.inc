@@ -2,14 +2,13 @@
 
 /**
  * @file
- * Provides the functionality and information about the
- * Name module name parsing engine.
+ * Provides the functionality and information about the name parsing engine.
  */
 
 /**
  * Prepares variables for name-format-parameter-help template.
  *
- * @param $variables
+ * @param array $variables
  */
 function template_preprocess_name_format_parameter_help(&$variables) {
   $variables['tokens'] = name_replacement_tokens();
@@ -18,7 +17,7 @@ function template_preprocess_name_format_parameter_help(&$variables) {
 /**
  * Provides the tokens that the name parse can handle.
  *
- * Todo:: make the labels generic
+ * Todo:: make the labels generic.
  */
 function name_replacement_tokens() {
   $tokens = array(
@@ -52,19 +51,17 @@ function name_replacement_tokens() {
     '(' => t('Group: Start of token grouping.'),
     ')' => t('Group: End of token grouping.'),
     /*
-
- // Placeholders for token support insertion on the [object / key | entity / bundle].
- '1' => t('Token placeholder 1'),
- '2' => t('Token placeholder 2'),
- '3' => t('Token placeholder 3'),
- '4' => t('Token placeholder 4'),
- '5' => t('Token placeholder 5'),
- '6' => t('Token placeholder 6'),
- '7' => t('Token placeholder 7'),
- '8' => t('Token placeholder 8'),
- '9' => t('Token placeholder 9'),
-
- */
+      // Placeholders for token support insertion on the [object / key | entity / bundle].
+      '1' => t('Token placeholder 1'),
+      '2' => t('Token placeholder 2'),
+      '3' => t('Token placeholder 3'),
+      '4' => t('Token placeholder 4'),
+      '5' => t('Token placeholder 5'),
+      '6' => t('Token placeholder 6'),
+      '7' => t('Token placeholder 7'),
+      '8' => t('Token placeholder 8'),
+      '9' => t('Token placeholder 9'),
+    */
   );
 
   return $tokens;

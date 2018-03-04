@@ -30,7 +30,7 @@ class NameFieldTest extends NameTestBase {
   public static function getInfo() {
     return [
       'name' => 'Node Name Field',
-      'description' => 'Various tests on creating a name field on a node.' ,
+      'description' => 'Various tests on creating a name field on a node.',
       'group' => 'Name',
     ];
   }
@@ -47,8 +47,7 @@ class NameFieldTest extends NameTestBase {
   }
 
   /**
-   * The most basic test. This should only fail if there is a change to the
-   * Drupal API.
+   * The most basic test.
    */
   public function testFieldEntry() {
     $this->drupalLogin($this->admin_user);
@@ -203,7 +202,7 @@ class NameFieldTest extends NameTestBase {
     $this->assertText(t('Updated field Test name field settings.'));
 
     // Now the widget settings...
-    // First, check that field validation is working... cut n paste from above test.
+    // First, check that field validation is working.
     $field_settings = [
       'settings[components][title]' => FALSE,
       'settings[components][given]' => TRUE,

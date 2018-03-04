@@ -16,11 +16,11 @@ class NameFormatParserTest extends UnitTestCase {
    * {@inheritDoc}
    */
   public static function getInfo() {
-    return array(
+    return [
       'name' => 'NameFormatterParser Test',
       'description' => 'Test NameFormatParser',
       'group' => 'Name',
-    );
+    ];
   }
 
   /**
@@ -29,10 +29,10 @@ class NameFormatParserTest extends UnitTestCase {
    * @return array
    */
   public function names() {
-    return array(
-      'given' => array(
-        'components' => array('given' => 'John'),
-        'tests' => array(
+    return [
+      'given' => [
+        'components' => ['given' => 'John'],
+        'tests' => [
           // Test that only the given name creates a entry
           't' => '', // Title
           'g' => 'John', // Given name
@@ -83,19 +83,19 @@ class NameFormatParserTest extends UnitTestCase {
           'TS(LF(t= g= m= f= s)=,(= c))' => 'john', // Full name with a comma-space before credentials. ucfirst does not work on a whitespace
           'L(t+ g+ m+ f+ s+,(= c))' => 'john', // Full name with a comma-space before credentials
           'TS(LF(t+ g+ m+ f+ s)+,(= c))' => 'John', // Full name with a comma-space before credentials
-        ),
-      ),
-      'full' => array(
-        'components' => array(
+        ],
+      ],
+      'full' => [
+        'components' => [
           'title' => 'MR.',
           'given' => 'JoHn',
           'middle' => 'pEter',
           'family' => 'dOE',
           'generational' => 'sR',
           'credentials' => 'b.Sc, pHd',
-        ),
+        ],
         //MR. JoHn pEter dOE sR b.Sc, pHd
-        'tests' => array(
+        'tests' => [
           // Test that only the given name creates a entry
           't' => 'MR.', // Title
           'g' => 'JoHn', // Given name
@@ -140,9 +140,9 @@ class NameFormatParserTest extends UnitTestCase {
           // Real world examples
           'L(t= g= m= f= s=,(= c))' => 'mr. john peter doe sr, b.sc, phd', // Full name with a comma-space before credentials
           'TS(LG(t= g= m= f= s)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.sc, Phd', // Full name with a comma-space before credentials
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
   }
 
   /**
@@ -155,11 +155,11 @@ class NameFormatParserTest extends UnitTestCase {
 
     foreach ($this->names() as $dataSet) {
       foreach ($dataSet['tests'] as $pattern => $expected) {
-       $data[] = array(
-         $dataSet['components'],
-         $pattern,
-         $expected,
-       );
+        $data[] = [
+          $dataSet['components'],
+          $pattern,
+          $expected,
+        ];
       }
     }
 
@@ -172,11 +172,11 @@ class NameFormatParserTest extends UnitTestCase {
    * @dataProvider patternDataProvider
    */
   public function testParser($components, $pattern, $expected) {
-    $settings = array(
+    $settings = [
       'sep1' => ' ',
       'sep2' => ', ',
       'sep3' => '',
-    );
+    ];
     $formatted = NameFormatParser::parse($components, $pattern, $settings);
     $this->assertEquals($expected, $formatted);
   }

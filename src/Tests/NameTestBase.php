@@ -63,14 +63,14 @@ abstract class NameTestBase extends WebTestBase {
   /**
    * Helper function.
    */
-  function assertNameFormat($name_components, $type, $object, $format, $expected, array $options = []) {
+  protected function assertNameFormat($name_components, $type, $object, $format, $expected, array $options = []) {
     $this->assertNameFormats($name_components, $type, $object, [$format => $expected], $options);
   }
 
   /**
    * Helper function.
    */
-  function assertNameFormats($name_components, $type, $object, array $names, array $options = []) {
+  protected function assertNameFormats($name_components, $type, $object, array $names, array $options = []) {
     foreach ($names as $format => $expected) {
       $value = NameFormatParser::parse($name_components, $format, ['object' => $object, 'type' => $type]);
       $this->assertIdentical($value, $expected, t("Name value for '@name' was '@actual', expected value '@expected'. Components were: %components", [

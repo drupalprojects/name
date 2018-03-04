@@ -102,7 +102,7 @@ class NameOptionsProviderTest extends KernelTestBase {
     foreach (['foo', 'bar', 'baz'] as $name) {
       $term = Term::create([
         'name' => $name,
-        'vid' => $vocabulary->id()
+        'vid' => $vocabulary->id(),
       ]);
       $term->save();
     }

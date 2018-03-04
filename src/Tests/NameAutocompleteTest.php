@@ -23,7 +23,7 @@ class NameAutocompleteTest extends KernelTestBase {
     'field',
     'entity_test',
     'system',
-    'user'
+    'user',
   ];
 
   /**
