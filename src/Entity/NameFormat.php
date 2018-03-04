@@ -75,13 +75,13 @@ class NameFormat extends ConfigEntityBase implements NameFormatInterface {
    * {@inheritdoc}
    */
   public function uri() {
-    return array(
+    return [
       'path' => 'admin/config/regional/name/manage/' . $this->id(),
-      'options' => array(
+      'options' => [
         'entity_type' => $this->getEntityType(),
         'entity' => $this,
-      ),
-    );
+      ],
+    ];
   }
 
   /**

@@ -116,8 +116,6 @@ function name_user_format_name_alter_preload($account) {
 
 /**
  * Implements hook_user_load().
- *
- * @param \Drupal\user\UserInterface[] $users
  */
 function name_user_load(array $users) {
   // In the event there are a lot of user_load() calls, cache the results.
@@ -126,9 +124,6 @@ function name_user_load(array $users) {
 
   if (!isset($field)) {
     $field_name = Drupal::config('name.settings')->get('user_preferred');
-    /**
-     * @var \Drupal\Core\Field\FieldConfigInterface $field;
-     */
     $field = FieldConfig::loadByName('user', 'user', $field_name);
   }
 
@@ -206,8 +201,7 @@ function _name_translations($intersect = NULL) {
 }
 
 /**
- * Private helper function to define the formatter types that are available for
- * the CCK and Token modules.
+ * Private helper function to define the formatter rendering methods.
  */
 function _name_formatter_output_types() {
   static $ot = NULL;
@@ -221,15 +215,10 @@ function _name_formatter_output_types() {
   return $ot;
 }
 
-/* ------------------------- FAPI Element Code ------------------------------ */
-
 /**
  * The #process callback to create the element.
  */
 function name_element_expand($element, &$form_state, $complete_form) {
-  /**
-   * @var \Drupal\Core\Language\Language $language
-   */
   $language = Drupal::languageManager()->getCurrentLanguage();
 
   $element['#tree'] = TRUE;
@@ -528,8 +517,7 @@ function name_element_validate_is_empty($item) {
 }
 
 /**
- * Checks that a component is not selected as a minimal component when the
- * component is not selected.
+ * Validates if an unused component is selected as a minimal component.
  */
 function _name_field_minimal_component_requirements($element, &$form_state) {
   $required_field_set = array_flip(['given', 'family']);
@@ -541,8 +529,6 @@ function _name_field_minimal_component_requirements($element, &$form_state) {
         ['@label' => $element['#title'], '%components' => implode(', ', $required_fields)]));
   }
 }
-
-/* ---------------------------- Formatter Code ------------------------------ */
 
 /**
  * Helper function to define the available output formatter options.
@@ -568,7 +554,6 @@ function _name_formatter_multiple_options() {
 /**
  * Helper function to sanitize a name component or name string.
  *
- * @param string $langcode
  * @param mixed $item
  *   If this is a string, then the processing happens on this.
  *   If this is an array, the processing happens on the column index.

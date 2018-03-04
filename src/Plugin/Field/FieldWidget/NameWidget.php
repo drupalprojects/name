@@ -27,10 +27,28 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class NameWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**
-   * @var NameOptionsProvider
+   * Name options provider service.
+   *
+   * @var \Drupal\name\NameOptionsProvider
    */
   protected $optionsProvider;
 
+  /**
+   * Constructs a NameWidget object.
+   *
+   * @param string $plugin_id
+   *   The plugin_id for the widget.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The definition of the field to which the widget is associated.
+   * @param array $settings
+   *   The widget settings.
+   * @param array $third_party_settings
+   *   Any third party settings.
+   * @param \Drupal\name\NameOptionsProvider $options_provider
+   *   Name options provider service.
+   */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, NameOptionsProvider $options_provider) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->optionsProvider = $options_provider;
@@ -56,10 +74,10 @@ class NameWidget extends WidgetBase implements ContainerFactoryPluginInterface {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     module_load_include('inc', 'name', 'includes/name.content');
     $field_settings = $this->getFieldSettings();
-    $element += array(
+    $element += [
       '#type' => 'name',
       '#title' => $this->fieldDefinition->getLabel(),
-      '#components' => array(),
+      '#components' => [],
       '#minimum_components' => array_filter($field_settings['minimum_components']),
       '#allow_family_or_given' => !empty($field_settings['allow_family_or_given']),
       '#default_value' => isset($items[$delta]) ? $items[$delta]->getValue() : NULL,
@@ -68,7 +86,7 @@ class NameWidget extends WidgetBase implements ContainerFactoryPluginInterface {
       '#component_css' => empty($field_settings['component_css']) ? '' : $field_settings['component_css'],
       '#component_layout' => empty($field_settings['component_layout']) ? 'default' : $field_settings['component_layout'],
       '#show_component_required_marker' => !empty($field_settings['show_component_required_marker']),
-    );
+    ];
 
     $components = array_filter($field_settings['components']);
     foreach (_name_translations() as $key => $title) {
@@ -99,23 +117,23 @@ class NameWidget extends WidgetBase implements ContainerFactoryPluginInterface {
           if ($sources = $field_settings['autocomplete_source'][$key]) {
             $sources = array_filter($sources);
             if (!empty($sources)) {
-              $element['#components'][$key]['autocomplete'] = array(
+              $element['#components'][$key]['autocomplete'] = [
                 '#autocomplete_route_name' => 'name.autocomplete',
-                '#autocomplete_route_parameters' => array(
+                '#autocomplete_route_parameters' => [
                   'field_name' => $this->fieldDefinition->getName(),
                   'entity_type' => $this->fieldDefinition->getTargetEntityTypeId(),
                   'bundle' => $this->fieldDefinition->getTargetBundle(),
                   'component' => $key,
-                ),
-              );
+                ],
+              ];
             }
           }
         }
 
         if (isset($field_settings['inline_css'][$key]) && Unicode::strlen($field_settings['inline_css'][$key])) {
-          $element['#components'][$key]['attributes'] = array(
+          $element['#components'][$key]['attributes'] = [
             'style' => $field_settings['inline_css'][$key],
-          );
+          ];
         }
       }
       else {

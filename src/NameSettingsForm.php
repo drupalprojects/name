@@ -32,29 +32,30 @@ class NameSettingsForm extends ConfigFormBase {
 
     $config = $this->configFactory->get('name.settings');
 
-    $form['name_settings'] = array('#tree' => TRUE);
-    $form['name_settings']['default_format'] = array(
+    $form['name_settings'] = ['#tree' => TRUE];
+    $form['name_settings']['default_format'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Default format'),
       '#default_value' => $config->get('default_format'),
       '#description' => $this->t('See help on drupal.org for more info.'),
       '#required' => TRUE,
-    );
-    $form['name_settings']['sep1'] = array(
+    ];
+    $form['name_settings']['sep1'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Separator 1 replacement token'),
       '#default_value' => $config->get('sep1'),
-    );
-    $form['name_settings']['sep2'] = array(
+    ];
+    $form['name_settings']['sep2'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Separator 2 replacement token'),
       '#default_value' => $config->get('sep2'),
-    );
-    $form['name_settings']['sep3'] = array(
+    ];
+    $form['name_settings']['sep3'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Separator 3 replacement token'),
       '#default_value' => $config->get('sep3'),
-    );
+    ];
+
     // As the fieldset does not have the #input flag, this is not saved.
     $form['name_format_help'] = _name_get_name_format_help_form();
 

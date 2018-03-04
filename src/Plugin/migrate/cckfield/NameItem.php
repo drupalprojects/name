@@ -6,6 +6,8 @@ use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate_drupal\Plugin\migrate\cckfield\CckFieldPluginBase;
 
 /**
+ * Name migrate plugin.
+ *
  * @MigrateCckField(
  *   id = "name",
  *   core = {7}

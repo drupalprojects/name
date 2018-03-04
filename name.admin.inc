@@ -11,7 +11,7 @@
  * @param array $excluded_components
  *   This will empty (set to "") any specified values.
  */
-function name_example_names($excluded_components = array(), $field_name = NULL) {
+function name_example_names($excluded_components = [], $field_name = NULL) {
   $example_names = [];
   if (isset($field_name)) {
     $example_names = \Drupal::config('name.examples.' . $field_name)->get('examples');
@@ -39,7 +39,7 @@ function _name_get_name_format_help_form() {
     '#title' => t('Format string help'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    '#parents' => array(),
+    '#parents' => [],
     'format_parameters' => array(
       '#markup' => \Drupal::service('renderer')->render($parameter),
     ),
@@ -165,7 +165,7 @@ function _name_field_settings_pre_render($form) {
 function _name_field_storage_settings_pre_render($form) {
   // $warning = t('<strong>Warning! Changing this setting after data has been created could result in the loss of data!</strong>');
   $extra_max_info = '<div>' . t('This can not be less than the longest value in the database. The minimum values are:') . '</div>';
-  $extra_max_items = array();
+  $extra_max_items = [];
   foreach (_name_translations() as $key => $title) {
     $extra_max_items[] = t('@title is @size', array('@title' => $title,
       '@size' => $form['max_length'][$key]['#min']));

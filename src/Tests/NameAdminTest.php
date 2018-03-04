@@ -15,8 +15,7 @@ use Drupal\name\NameFormatInterface;
 class NameAdminTest extends NameTestBase {
 
   /**
-   * The most basic test. This should only fail if there is a change to the
-   * Drupal API.
+   * The most basic test.
    */
   public function testAdminSettings() {
     // Default settings and system settings.
@@ -152,7 +151,11 @@ class NameAdminTest extends NameTestBase {
     foreach ([t('Name'), t('Machine-readable name'), t('Format')] as $title) {
       $this->assertText(t('@field field is required', ['@field' => $title]));
     }
-    $values = ['label' => 'given', 'id' => '1234567890abcdefghijklmnopqrstuvwxyz_', 'pattern' => 'a'];
+    $values = [
+      'label' => 'given',
+      'id' => '1234567890abcdefghijklmnopqrstuvwxyz_',
+      'pattern' => 'a',
+    ];
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
     $this->assertNoText(t('@field field is required', ['@field' => t('Format')]));
     $this->assertNoText(t('@field field is required', ['@field' => t('Machine-readable name')]));
@@ -205,10 +208,11 @@ class NameAdminTest extends NameTestBase {
   }
 
   /**
-   * @param $row
-   * @param $row_template
-   * @param $id
-   * @return array
+   * Helper function to test a table cell via it's expected value.
+   *
+   * @param array $row
+   * @param array $row_template
+   * @param integer $id
    */
   public function assertRow($row, $row_template, $id) {
     foreach ($row as $cell_code => $value) {

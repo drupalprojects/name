@@ -10,26 +10,40 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 class NameOptionsProvider {
 
   /**
+   * The entity manager.
+   *
    * @var EntityManagerInterface
    */
   protected $entityManger;
 
   /**
+   * The module handler.
+   *
    * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
+   * The term storage manager.
+   *
    * @var \Drupal\taxonomy\TermStorageInterface
    */
   protected $termStorage;
 
   /**
+   * The vocab storage manager.
+   *
    * @var \Drupal\taxonomy\VocabularyStorageInterface
    */
   protected $vocabularyStorage;
 
-  function __construct(EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
+  /**
+   * Contructs the service.
+   *
+   * @param EntityManagerInterface $entity_manager
+   * @param ModuleHandlerInterface $module_handler
+   */
+  public function __construct(EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
     $this->entityManger = $entity_manager;
     $this->moduleHandler = $module_handler;
 
@@ -39,6 +53,9 @@ class NameOptionsProvider {
     }
   }
 
+  /**
+   * Options for a name component.
+   */
   public function getOptions(FieldDefinitionInterface $field, $component) {
     $fs = $field->getFieldStorageDefinition()->getSettings();
     $options = $fs[$component . '_options'];
@@ -75,7 +92,7 @@ class NameOptionsProvider {
     $options = array_map('trim', $options);
     $options = array_combine($options, $options);
     if ($default !== FALSE) {
-      $options = array('' => $default) + $options;
+      $options = ['' => $default] + $options;
     }
     return $options;
   }

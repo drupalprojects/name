@@ -16,24 +16,31 @@ class NameOptionsProviderTest extends KernelTestBase {
 
   use NameTestTrait;
 
-  public static $modules = array(
+  public static $modules = [
     'field',
     'name',
     'taxonomy',
     'entity_test',
-    'text'
-  );
+    'text',
+  ];
 
   /**
+   * The entity manager.
+   *
    * @var \Drupal\Core\Entity\EntityManagerInterface
    */
   protected $entityManager;
 
   /**
-   * @var NameOptionsProvider
+   * The name options provider.
+   *
+   * @var \Drupal\name\NameOptionsProvider
    */
   protected $optionsProvider;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -44,79 +51,78 @@ class NameOptionsProviderTest extends KernelTestBase {
     $this->optionsProvider = \Drupal::service('name.options_provider');
   }
 
+  /**
+   * Tests the field options.
+   */
   public function testTitleOptionsFromField() {
     $field = $this->createNameField('field_name_test', 'entity_test', 'entity_test');
-
-    /**
-     * @var \Drupal\field\Entity\FieldStorageConfig $field_storage
-     */
     $field_storage = $field->getFieldStorageDefinition();
     $settings = $field_storage->getSettings();
-    $settings['title_options'] = array(
+    $settings['title_options'] = [
       '-- --',
       'b',
       'a',
-      'c'
-    );
+      'c',
+    ];
     $field_storage->set('settings', $settings);
     $field_storage->save();
 
-    $expected = array(
+    $expected = [
       '' => '--',
       'b' => 'b',
       'a' => 'a',
-      'c' => 'c'
-    );
+      'c' => 'c',
+    ];
     $this->assertEqual($expected, $this->optionsProvider->getOptions($field, 'title'));
 
     // Enable sorting.
     $settings['sort_options']['title'] = TRUE;
     $field_storage->set('settings', $settings)->save();
-    $expected = array(
+    $expected = [
       '' => '--',
       'a' => 'a',
       'b' => 'b',
-      'c' => 'c'
-    );
+      'c' => 'c',
+    ];
     $this->assertEqual($expected, $this->optionsProvider->getOptions($field, 'title'));
   }
 
+  /**
+   * Tests the taxonomy options source.
+   */
   public function testTitleOptionsFromTaxonomy() {
     $field = $this->createNameField('field_name_test', 'entity_test', 'entity_test');
 
-    $vocabulary = Vocabulary::create(array(
+    $vocabulary = Vocabulary::create([
       'vid' => 'title_options',
-      'name' => 'Title options'
-    ));
+      'name' => 'Title options',
+    ]);
     $vocabulary->save();
 
-    foreach (array('foo', 'bar', 'baz') as $name) {
-      $term = Term::create(array(
+    foreach (['foo', 'bar', 'baz'] as $name) {
+      $term = Term::create([
         'name' => $name,
         'vid' => $vocabulary->id()
-      ));
+      ]);
       $term->save();
     }
 
-    /**
-     * @var \Drupal\field\Entity\FieldStorageConfig $field_storage
-     */
     $field_storage = $field->getFieldStorageDefinition();
     $settings = $field_storage->getSettings();
-    $settings['title_options'] = array(
+    $settings['title_options'] = [
       '-- --',
-      '[vocabulary:title_options]'
-    );
+      '[vocabulary:title_options]',
+    ];
     $settings['sort_options']['title'] = TRUE;
     $field_storage->set('settings', $settings);
     $field_storage->save();
 
-    $expected = array (
+    $expected = [
       '' => '--',
       'bar' => 'bar',
       'baz' => 'baz',
       'foo' => 'foo',
-    );
+    ];
     $this->assertEqual($expected, $this->optionsProvider->getOptions($field, 'title'));
   }
 

@@ -25,10 +25,12 @@ use Drupal\Component\Utility\Unicode;
 class NameFormatParser {
 
   /**
-   * TODO: Look at replacing the raw string functions with the Drupal equivalent
+   * Parses an array of name components into the supplied format.
+   *
+   * @todo: Look at replacing the raw string functions with the Drupal equivalent
    * functions. Will need to test this carefully...
    *
-   * Move this parser to a proper service.
+   * @todo: Move this parser to a proper service.
    */
   public static function parse($name_components, $format = '', $settings = [], $tokens = NULL) {
     foreach (['sep1', 'sep2', 'sep3'] as $key) {
@@ -42,9 +44,9 @@ class NameFormatParser {
   }
 
   /**
-   *
+   * Formats an array of name components into the supplied format.
    */
-  public function format($name_components, $format = '', $settings = [], $tokens = NULL) {
+  public function format($name_components, $format = '', array $settings = [], $tokens = NULL) {
     if (empty($format)) {
       return '';
     }
@@ -60,11 +62,9 @@ class NameFormatParser {
     $len = strlen($format);
     $modifiers = '';
     $conditions = '';
-    $depth = 0;
     for ($i = 0; $i < strlen($format); $i++) {
       $char = $format{$i};
       $last_char = ($i > 0) ? $format{$i - 1} : FALSE;
-      $next_char = ($i < $len - 2) ? $format{$i + 1} : FALSE;
 
       // Handle escaped letters.
       if ($char == '\\') {
@@ -131,17 +131,20 @@ class NameFormatParser {
         $parsed_pieces[$i] = $component;
       }
       else {
-        // Modifier: Conditional insertion. Insert if both the surrounding tokens are not empty.
+        // Modifier: Conditional insertion. Insert if both the surrounding
+        // tokens are not empty.
         if (strpos($conditions, '+') !== FALSE && !empty($last_component) && !empty($next_component)) {
           $parsed_pieces[$i] = $component;
         }
 
-        // Modifier: Conditional insertion. Insert if the previous token is not empty.
+        // Modifier: Conditional insertion. Insert if the previous token is
+        // not empty.
         if (strpos($conditions, '-') !== FALSE && !empty($last_component)) {
           $parsed_pieces[$i] = $component;
         }
 
-        // Modifier: Conditional insertion. Insert if the previous token is empty.
+        // Modifier: Conditional insertion. Insert if the previous token is
+        // empty.
         if (strpos($conditions, '~') !== FALSE && empty($last_component)) {
           $parsed_pieces[$i] = $component;
         }
@@ -157,7 +160,8 @@ class NameFormatParser {
           $parsed_pieces[$i] = $component;
         }
 
-        // Modifier: Conditional insertion. Uses the previous token unless empty, otherwise insert this token.
+        // Modifier: Conditional insertion. Uses the previous token unless
+        // empty, otherwise insert this token.
         if (strpos($conditions, '|') !== FALSE) {
           if (empty($last_component)) {
             $parsed_pieces[$i] = $component;
@@ -173,7 +177,7 @@ class NameFormatParser {
   }
 
   /**
-   *
+   * Adds a component.
    */
   protected function addComponent($string, &$modifiers = '', &$conditions = '') {
     $string = $this->applyModifiers($string, $modifiers);
@@ -187,12 +191,11 @@ class NameFormatParser {
   }
 
   /**
-   *
+   * Applies the specified modifiers to the string.
    */
   protected function applyModifiers($string, $modifiers) {
     if (!is_null($string) || strlen($string)) {
       if ($modifiers) {
-        $original_string = $string;
         $prefix = '';
         $suffix = '';
         if (preg_match('/^(<span[^>]*>)(.*)(<\/span>)$/i', $string, $matches)) {
@@ -267,7 +270,7 @@ class NameFormatParser {
   }
 
   /**
-   *
+   * Generates the tokens from the name item.
    */
   protected function generateTokens($name_components, array $settings = []) {
     $name_components = (array) $name_components;
@@ -315,7 +318,7 @@ class NameFormatParser {
    * Renders a name component value.
    *
    * This function does not by default sanitize the output unless the markup
-   * flag is set. If this is set, it runs the component through check_plain() and
+   * flag is set. If set, it runs the component through Html::escape() and
    * wraps the component in a span with the component name set as the class.
    */
   public static function renderComponent($value, $component_key, $markup, $modifier = NULL) {

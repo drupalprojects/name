@@ -12,38 +12,38 @@ use Drupal\name\NameFormatParser;
  */
 function _name_token_info() {
   // The basic generic user real name token.
-  $user_tokens['realname'] = array(
+  $user_tokens['realname'] = [
     'name' => t('Real name'),
     'description' => t('The real name of the user account, from the RealName or Name modules.'),
-  );
+  ];
 
   // New field integration.
-  $types['name-field'] = array(
+  $types['name-field'] = [
     'name' => t('Name field values'),
     'description' => t('Name field in the default format.'),
     'needs-data' => 'name-field',
-  );
+  ];
   foreach (name_get_custom_format_options() as $machine_name => $formatter_title) {
-    $tokens['formatter-' . $machine_name] = array(
-      'name' => t('Formatted name: %formatter', array('%formatter' => $formatter_title)),
-      'description' => t('Uses the %formatter format.', array('%formatter' => $formatter_title)),
-    );
+    $tokens['formatter-' . $machine_name] = [
+      'name' => t('Formatted name: %formatter', ['%formatter' => $formatter_title]),
+      'description' => t('Uses the %formatter format.', ['%formatter' => $formatter_title]),
+    ];
   }
   foreach (_name_translations() as $component => $component_label) {
-    $tokens['component-' . $component] = array(
-      'name' => t('Component: %component', array('%component' => $component_label)),
-      'description' => t('The name component %component.', array('%component' => $component_label)),
-    );
+    $tokens['component-' . $component] = [
+      'name' => t('Component: %component', ['%component' => $component_label]),
+      'description' => t('The name component %component.', ['%component' => $component_label]),
+    ];
   }
 
-  $token_info = array(
+  $token_info = [
     'types' => $types,
-    'tokens' => array(
+    'tokens' => [
       'name' => $old_tokens,
       'name-field' => $tokens,
       'user' => $user_tokens,
-    ),
-  );
+    ],
+  ];
 
   foreach (name_token_types_chained(NULL, TRUE) as $token_type => $tokens) {
     $token_info['tokens'][$token_type] = $tokens;
@@ -55,9 +55,9 @@ function _name_token_info() {
 /**
  * Implements hook_tokens().
  */
-function _name_tokens($type, $tokens, array $data = array(), array $options = array()) {
+function _name_tokens($type, $tokens, array $data = [], array $options = []) {
   $sanitize = !empty($options['sanitize']);
-  $replacements = array();
+  $replacements = [];
 
   // This handles the field tokens.
   if (isset($data[$type]) && $known_tokens = name_token_types_chained($type)) {
@@ -129,14 +129,14 @@ function _name_tokens($type, $tokens, array $data = array(), array $options = ar
             $action = 'formatter';
           }
 
-          $names = array();
+          $names = [];
           if ($action == 'formatter') {
             $format = name_get_format_by_machine_name($action_key);
             if (empty($format)) {
               $format = name_get_format_by_machine_name('default');
             }
             if ($delta != 'all') {
-              $items = array($items[$delta]);
+              $items = [$items[$delta]];
             }
 
             foreach ($items as $item) {
@@ -145,7 +145,7 @@ function _name_tokens($type, $tokens, array $data = array(), array $options = ar
           }
           else {
             if ($delta != 'all') {
-              $items = array($items[$delta]);
+              $items = [$items[$delta]];
             }
             foreach ($items as $item) {
               if (isset($item[$action_key])) {
@@ -177,7 +177,7 @@ function _name_tokens($type, $tokens, array $data = array(), array $options = ar
 
   if ($type == 'name' && !empty($data['name'])) {
     $name = $data['name'];
-    $name_components = array();
+    $name_components = [];
     foreach (_name_translations() as $key => $title) {
       if (!empty($name[$key])) {
         $name_components[$key] = $name[$key];
@@ -234,12 +234,12 @@ function name_token_types_chained($type = NULL, $reset = FALSE) {
     }
 
     if (!$types) {
-      $types = array();
+      $types = [];
       foreach (field_info_fields() as $field_name => $info) {
         if ($info->type == 'name') {
           foreach ($info['bundles'] as $entity_type => $bundles) {
             // Name field. Also known as Client.
-            $labels = array();
+            $labels = [];
             foreach ($bundles as $bundle) {
               $instance = field_info_instance($entity_type, $field_name, $bundle);
               $labels[$instance['label']] = $instance['label'];
@@ -247,21 +247,22 @@ function name_token_types_chained($type = NULL, $reset = FALSE) {
             $label = array_shift($labels);
             $clean = str_replace('_', '-', $field_name);
             if (empty($labels)) {
-              $description = t('Name field in the default format. To specify a delta value, use "@token:0". Append the other chained options after the delta value like this, "@token:0:component-given". Replace the delta value with all to obtain all items in the field like this "@token:all".',
-                array('@token' => $clean));
+              $description = t('Name field in the default format. To specify a delta value, use "@token:0". Append the other chained options after the delta value like this, "@token:0:component-given". Replace the delta value with all to obtain all items in the field like this "@token:all".', [
+                '@token' => $clean,
+              ]);
             }
             else {
-              $description = t('Name field in the default format. Also known as %labels', array('%labels' => implode(', ', $labels)));
+              $description = t('Name field in the default format. Also known as %labels', ['%labels' => implode(', ', $labels)]);
             }
 
             // Make sure we get the correct token type.
             $entity_info = Drupal::entityManager()->getDefinition($entity_type);
             $token_type = isset($entity_info['token type']) ? $entity_info['token type'] : $entity_type;
-            $types[$token_type]['name-' . $clean] = array(
+            $types[$token_type]['name-' . $clean] = [
               'name' => check_plain($label),
               'description' => $description,
               'type' => 'name-field',
-            );
+            ];
           }
         }
       }

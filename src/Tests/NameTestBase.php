@@ -14,49 +14,72 @@ abstract class NameTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array(
+  public static $modules = [
     'field',
     'field_ui',
     'node',
-    'name'
-  );
+    'name',
+  ];
 
   protected $instance;
   protected $web_user;
   protected $admin_user;
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
     parent::setUp();
-
-    // Base set up is done, we can call drupalCreateUser.
-    $this->web_user = $this->drupalCreateUser(array());
-    $this->admin_user = $this->drupalCreateUser(array('administer site configuration', 'administer content types', 'access content', 'access administration pages', 'administer node fields'));
+    $this->web_user = $this->drupalCreateUser([]);
+    $this->admin_user = $this->drupalCreateUser([
+      'administer site configuration',
+      'administer content types',
+      'access content',
+      'access administration pages',
+      'administer node fields',
+    ]);
   }
 
+  /**
+   * Helper function.
+   */
   protected function assertNoFieldCheckedByName($name, $message = '') {
-    $elements = $this->xpath('//input[@name=:name]', array(':name' => $name));
-    return $this->assertTrue(isset($elements[0]) && empty($elements[0]['checked']), $message ? $message : t('Checkbox field @name is not checked.', array('@name' => $name)), t('Browser'));
+    $elements = $this->xpath('//input[@name=:name]', [':name' => $name]);
+    return $this->assertTrue(isset($elements[0]) && empty($elements[0]['checked']), $message ? $message : t('Checkbox field @name is not checked.', [
+      '@name' => $name,
+    ]), t('Browser'));
   }
 
+  /**
+   * Helper function.
+   */
   protected function assertFieldCheckedByName($name, $message = '') {
-    $elements = $this->xpath('//input[@name=:name]', array(':name' => $name));
-    return $this->assertTrue(isset($elements[0]) && !empty($elements[0]['checked']), $message ? $message : t('Checkbox field @name is checked.', array('@name' => $name)), t('Browser'));
+    $elements = $this->xpath('//input[@name=:name]', [':name' => $name]);
+    return $this->assertTrue(isset($elements[0]) && !empty($elements[0]['checked']), $message ? $message : t('Checkbox field @name is checked.', [
+      '@name' => $name,
+    ]), t('Browser'));
   }
 
-  function assertNameFormat($name_components, $type, $object, $format, $expected, array $options = array()) {
-    $this->assertNameFormats($name_components, $type, $object, array($format => $expected), $options);
+  /**
+   * Helper function.
+   */
+  function assertNameFormat($name_components, $type, $object, $format, $expected, array $options = []) {
+    $this->assertNameFormats($name_components, $type, $object, [$format => $expected], $options);
   }
 
-  function assertNameFormats($name_components, $type, $object, array $names, array $options = array()) {
+  /**
+   * Helper function.
+   */
+  function assertNameFormats($name_components, $type, $object, array $names, array $options = []) {
     foreach ($names as $format => $expected) {
-      $value = NameFormatParser::parse($name_components, $format, array('object' => $object, 'type' => $type));
-      $this->assertIdentical($value, $expected,
-        t("Name value for '@name' was '@actual', expected value '@expected'. Components were: %components",
-        array('@name' => $format, '@actual' => $value, '@expected' => $expected, '%components' => implode(' ', $name_components))));
+      $value = NameFormatParser::parse($name_components, $format, ['object' => $object, 'type' => $type]);
+      $this->assertIdentical($value, $expected, t("Name value for '@name' was '@actual', expected value '@expected'. Components were: %components", [
+        '@name' => $format,
+        '@actual' => $value,
+        '@expected' => $expected,
+        '%components' => implode(' ', $name_components),
+      ]));
     }
   }
 
 }
-
-
-

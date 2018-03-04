@@ -81,7 +81,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public static function defaultSettings() {
     $settings = parent::defaultSettings();
@@ -307,6 +307,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
    * Determines with markup should be added to the results.
    *
    * @return bool
+   *   Returns TRUE if markup should be applied.
    */
   protected function useMarkup() {
     return $this->settings['markup'];

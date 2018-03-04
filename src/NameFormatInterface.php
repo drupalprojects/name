@@ -9,8 +9,22 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface NameFormatInterface extends ConfigEntityInterface {
 
+  /**
+   * Getter for the pattern.
+   *
+   * @return string
+   *   The pattern or an empty string.
+   */
   public function getPattern($type);
 
+  /**
+   * Setter for the pattern.
+   *
+   * @param string $pattern
+   *   The pattern.
+   * @param string $type
+   *   The format type.
+   */
   public function setPattern($pattern, $type);
 
   /**

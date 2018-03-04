@@ -27,6 +27,8 @@ class NameAutocompleteController implements ContainerInjectionInterface {
    *
    * @param \Drupal\name\NameAutocomplete $name_autocomplete
    *   The name autocomplete helper class to find matching name values.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
    */
   public function __construct(NameAutocomplete $name_autocomplete, EntityManagerInterface $entity_manager) {
     $this->nameAutocomplete = $name_autocomplete;
@@ -48,8 +50,17 @@ class NameAutocompleteController implements ContainerInjectionInterface {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request object containing the search string.
+   * @param string $field_name
+   *   The field name.
+   * @param string $entity_type
+   *   The entity type.
+   * @param string $bundle
+   *   The bundle.
+   * @param string $component
+   *   The name component.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the autocomplete suggestions.
@@ -72,4 +83,5 @@ class NameAutocompleteController implements ContainerInjectionInterface {
     $matches = $this->nameAutocomplete->getMatches($field_definition, $component, $request->query->get('q'));
     return new JsonResponse($matches);
   }
+
 }

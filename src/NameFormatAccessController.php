@@ -20,11 +20,13 @@ class NameFormatAccessController extends EntityAccessControlHandler {
       case 'create':
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'administer site configuration');
+
       case 'delete':
         if ($entity->isLocked()) {
           return AccessResult::forbidden();
         }
         return AccessResult::allowedIfHasPermission($account, 'administer site configuration');
+
     }
     return parent::checkAccess($entity, $operation, $account);
   }

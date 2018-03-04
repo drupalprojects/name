@@ -7,7 +7,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- *
+ * Name format list builder for the admin page.
  */
 class NameFormatListBuilder extends ConfigEntityListBuilder {
 
@@ -44,6 +44,9 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
 
   /**
    * Provides some example based on names with various components set.
+   *
+   * @return array
+   *   An array of example names with formatting applied.
    */
   public function examples(EntityInterface $entity) {
     $examples = [];
@@ -71,6 +74,7 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
    * Help box.
    *
    * @return array
+   *   The Details help FAPI array.
    */
   public function nameFormatHelp() {
     module_load_include('inc', 'name', 'name.admin');
@@ -81,6 +85,7 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
    * Example names.
    *
    * @return array
+   *   Array of fields sourced from the config files.
    */
   public function nameExamples() {
     module_load_include('inc', 'name', 'name.admin');

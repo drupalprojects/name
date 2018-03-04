@@ -5,7 +5,9 @@
  * Standard installation functions for name.
  */
 
-// Updates for core.
+/**
+ * Implements hook_update_last_removed().
+ */
 function name_update_last_removed() {
   return 7002;
 }
@@ -24,12 +26,12 @@ function name_update_8001() {
       ->save();
   }
 
-  $settings = update_variable_get('name_settings', array(
+  $settings = update_variable_get('name_settings', [
     'default_format' => '((((t+ig)+im)+if)+is)+jc',
     'sep1' => ' ',
     'sep2' => ', ',
     'sep3' => '',
-  ));
+  ]);
 
   \Drupal::config('name_format.default')
     ->set('id', 'default')
@@ -45,11 +47,7 @@ function name_update_8001() {
     ->set('sep3', $settings['sep3'])
     ->save();
 
-
-  /**
-   * @todo:
-   * Migration for this variables.
-   */
+  // @todo: migrate these.
   variable_del('name_settings');
   variable_del('name_user_preferred');
   // There is no UI for this setting.

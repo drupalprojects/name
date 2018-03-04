@@ -11,6 +11,8 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 class NameAutocomplete {
 
   /**
+   * Name options provider.
+   *
    * @var NameOptionsProvider
    */
   protected $optionsProvider;
@@ -20,16 +22,21 @@ class NameAutocomplete {
    *
    * @var array
    */
-  protected $allComponents = array(
+  protected $allComponents = [
     'given',
     'middle',
     'family',
     'title',
     'credentials',
-    'generational'
-  );
+    'generational',
+  ];
 
-  function __construct(NameOptionsProvider $options_provider) {
+  /**
+   * Constructor for the NameAutocomplete class.
+   *
+   * @param NameOptionsProvider $options_provider
+   */
+  public function __construct(NameOptionsProvider $options_provider) {
     $this->optionsProvider = $options_provider;
   }
 
@@ -38,10 +45,8 @@ class NameAutocomplete {
    *
    * @param FieldDefinitionInterface $field
    *   The field definition.
-   *
    * @param string $target
    *   The name field component.
-   *
    * @param string $string
    *   The string to match for the name field component.
    *
@@ -49,7 +54,7 @@ class NameAutocomplete {
    *   An array containing the matching values.
    */
   public function getMatches(FieldDefinitionInterface $field, $target, $string) {
-    $matches = array();
+    $matches = [];
     $limit = 10;
 
     if (empty($string)) {
@@ -59,15 +64,15 @@ class NameAutocomplete {
     $settings = $field->getFieldStorageDefinition()->getSettings();
     foreach ($this->allComponents as $component) {
       if (!isset($settings['autocomplete_source'][$component])) {
-        $settings['autocomplete_source'][$component] = array();
+        $settings['autocomplete_source'][$component] = [];
       }
       $settings['autocomplete_source'][$component] = array_filter($settings['autocomplete_source'][$component]);
     }
 
-    $action = array();
+    $action = [];
     switch ($target) {
       case 'name':
-        $action['components'] = $this->mapAssoc(array('given', 'middle', 'family'));
+        $action['components'] = $this->mapAssoc(['given', 'middle', 'family']);
         break;
 
       case 'name-all':
@@ -80,13 +85,13 @@ class NameAutocomplete {
       case 'family':
       case 'credentials':
       case 'generational':
-        $action['components'] = array($target => $target);
+        $action['components'] = [$target => $target];
         break;
 
       default:
-        $action['components'] = array();
+        $action['components'] = [];
         foreach (explode('-', $target) as $component) {
-          if (in_array($component, array('title', 'given', 'middle', 'family', 'credentials', 'generational'))) {
+          if (in_array($component, ['title', 'given', 'middle', 'family', 'credentials', 'generational'])) {
             $action['components'][$component] = $component;
           }
         }
@@ -94,10 +99,10 @@ class NameAutocomplete {
 
     }
 
-    $action['source'] = array(
-      'title' => array(),
-      'generational' => array(),
-    );
+    $action['source'] = [
+      'title' => [],
+      'generational' => [],
+    ];
 
     $action['separater'] = '';
 
@@ -106,7 +111,7 @@ class NameAutocomplete {
         unset($action['components'][$component]);
       }
       else {
-        $sep = (string)$settings['autocomplete_separator'][$component];
+        $sep = (string) $settings['autocomplete_separator'][$component];
         if (empty($sep)) {
           $sep = ' ';
         }
@@ -136,9 +141,7 @@ class NameAutocomplete {
       }
     }
 
-    /**
-     * @todo: preg_split fails with a notice if $action['separater'] == ' '.
-     */
+    // @todo: preg_split fails with a notice if $action['separater'] == ' '.
     @$pieces = preg_split('/[' . preg_quote($action['separater']) . ']+/', $string);
 
     // We should have nice clean parameters to query.
@@ -170,6 +173,13 @@ class NameAutocomplete {
     return $matches;
   }
 
+  /**
+   * Helper function to combine values.
+   *
+   * @param array $values
+   *
+   * @return array
+   */
   public function mapAssoc($values) {
     return array_combine($values, $values);
   }

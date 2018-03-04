@@ -151,7 +151,7 @@ class NameFormatParserTest extends UnitTestCase {
    * @return array
    */
   public function patternDataProvider() {
-    $data = array();
+    $data = [];
 
     foreach ($this->names() as $dataSet) {
       foreach ($dataSet['tests'] as $pattern => $expected) {

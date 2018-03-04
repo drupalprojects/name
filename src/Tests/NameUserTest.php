@@ -15,15 +15,17 @@ use Drupal\user\Entity\User;
  */
 class NameUserTest extends KernelTestBase {
 
-  public static $modules = array(
+  public static $modules = [
     'field',
     'name',
     'user',
-    'system'
-  );
+    'system',
+  ];
 
   /**
-   * @var EntityManagerInterface
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
    */
   protected $entityManager;
 
@@ -33,52 +35,55 @@ class NameUserTest extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installConfig(self::$modules);
-    $this->installSchema('system', array('sequences'));
+    $this->installSchema('system', ['sequences']);
 
     $this->entityManager = \Drupal::entityManager();
     $this->entityManager->onEntityTypeCreate(\Drupal::entityManager()->getDefinition('user'));
   }
 
+  /**
+   * Tests the user hooks.
+   */
   public function testUserHooks() {
-    FieldStorageConfig::create(array(
+    FieldStorageConfig::create([
       'field_name' => 'field_text',
       'type' => 'string',
       'entity_type' => 'user',
-    ))->save();
-    FieldConfig::create(array(
+    ])->save();
+    FieldConfig::create([
       'field_name' => 'field_text',
       'type' => 'string',
       'entity_type' => 'user',
       'bundle' => 'user',
-    ))->save();
+    ])->save();
     $this->assertIdentical('', \Drupal::config('name.settings')->get('user_preferred'));
 
-    FieldStorageConfig::create(array(
+    FieldStorageConfig::create([
       'field_name' => 'field_name_test',
       'type' => 'name',
       'entity_type' => 'user',
-    ))->save();
+    ])->save();
 
-    FieldStorageConfig::create(array(
+    FieldStorageConfig::create([
       'field_name' => 'field_name_test2',
       'type' => 'name',
       'entity_type' => 'user',
-    ))->save();
+    ])->save();
 
-    $field = FieldConfig::create(array(
+    $field = FieldConfig::create([
       'field_name' => 'field_name_test',
       'type' => 'name',
       'entity_type' => 'user',
       'bundle' => 'user',
-    ));
+    ]);
     $field->save();
 
-    $field2 = FieldConfig::create(array(
+    $field2 = FieldConfig::create([
       'field_name' => 'field_name_test2',
       'type' => 'name',
       'entity_type' => 'user',
       'bundle' => 'user',
-    ));
+    ]);
     $field2->save();
 
     $this->assertEqual($field->getName(), \Drupal::config('name.settings')->get('user_preferred'));
@@ -96,13 +101,13 @@ class NameUserTest extends KernelTestBase {
       ->set('user_preferred', $field->getName())
       ->save();
 
-    $account = User::create(array(
+    $account = User::create([
       'name' => 'test',
-    ));
-    $account->field_name_test[0] = array(
+    ]);
+    $account->field_name_test[0] = [
       'given' => 'Max',
-      'family' => 'Mustermann'
-    );
+      'family' => 'Mustermann',
+    ];
     $account->save();
 
     $account = User::load($account->id());

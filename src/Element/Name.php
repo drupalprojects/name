@@ -25,25 +25,25 @@ class Name extends RenderElement {
     $field_settings = \Drupal::service('plugin.manager.field.field_type')->getDefaultStorageSettings('name');
     $instance_settings = \Drupal::service('plugin.manager.field.field_type')->getDefaultFieldSettings('name');
 
-    return array(
+    return [
       '#input' => TRUE,
-      '#process' => array('name_element_expand'),
-      '#pre_render' =>  array('name_element_pre_render'),
-      '#element_validate' => array('name_element_validate'),
-      '#theme_wrappers' => array('form_element'),
+      '#process' => ['name_element_expand'],
+      '#pre_render' => ['name_element_pre_render'],
+      '#element_validate' => ['name_element_validate'],
+      '#theme_wrappers' => ['form_element'],
       '#show_component_required_marker' => 0,
-      '#default_value' => array(
+      '#default_value' => [
         'title' => '',
         'given' => '',
         'middle' => '',
         'family' => '',
         'generational' => '',
         'credentials' => '',
-      ),
+      ],
       '#minimum_components' => $field_settings['minimum_components'],
       '#allow_family_or_given' => $field_settings['allow_family_or_given'],
-      '#components' => array(
-        'title' => array(
+      '#components' => [
+        'title' => [
           'type' => $instance_settings['field_type']['title'],
           'title' => $parts['title'],
           'title_display' => 'description',
@@ -52,8 +52,8 @@ class Name extends RenderElement {
           'maxlength' => $field_settings['max_length']['title'],
           'options' => $field_settings['title_options'],
           'autocomplete' => FALSE,
-        ),
-        'given' => array(
+        ],
+        'given' => [
           'type' => 'textfield',
           'title' => $parts['given'],
           'title_display' => 'description',
@@ -61,8 +61,8 @@ class Name extends RenderElement {
           'size' => $instance_settings['size']['given'],
           'maxlength' => $field_settings['max_length']['given'],
           'autocomplete' => FALSE,
-        ),
-        'middle' => array(
+        ],
+        'middle' => [
           'type' => 'textfield',
           'title' => $parts['middle'],
           'title_display' => 'description',
@@ -70,8 +70,8 @@ class Name extends RenderElement {
           'size' => $instance_settings['size']['middle'],
           'maxlength' => $field_settings['max_length']['middle'],
           'autocomplete' => FALSE,
-        ),
-        'family' => array(
+        ],
+        'family' => [
           'type' => 'textfield',
           'title' => $parts['family'],
           'title_display' => 'description',
@@ -79,8 +79,8 @@ class Name extends RenderElement {
           'size' => $instance_settings['size']['family'],
           'maxlength' => $field_settings['max_length']['family'],
           'autocomplete' => FALSE,
-        ),
-        'generational' => array(
+        ],
+        'generational' => [
           'type' => $instance_settings['field_type']['generational'],
           'title' => $parts['generational'],
           'title_display' => 'description',
@@ -89,8 +89,8 @@ class Name extends RenderElement {
           'maxlength' => $field_settings['max_length']['generational'],
           'options' => $field_settings['generational_options'],
           'autocomplete' => FALSE,
-        ),
-        'credentials' => array(
+        ],
+        'credentials' => [
           'type' => 'textfield',
           'title' => $parts['credentials'],
           'title_display' => 'description',
@@ -98,9 +98,9 @@ class Name extends RenderElement {
           'size' => $instance_settings['size']['credentials'],
           'maxlength' => $field_settings['max_length']['credentials'],
           'autocomplete' => FALSE,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
   }
 
 }
