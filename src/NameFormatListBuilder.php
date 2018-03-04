@@ -6,12 +6,16 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
+/**
+ *
+ */
 class NameFormatListBuilder extends ConfigEntityListBuilder {
 
   /**
    * {@inheritdoc}
    */
   public function buildHeader() {
+    $row = [];
     $row['label'] = $this->t('Label');
     $row['id'] = $this->t('Machine name');
     $row['format'] = $this->t('Format');
@@ -24,24 +28,25 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    $row = [];
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
     $row['format'] = $entity->get('pattern');
-    $row['examples'] = array(
-      'data' => array(
-        '#markup' => implode('<br/>', $this->examples($entity))
-      )
-    );
+    $row['examples'] = [
+      'data' => [
+        '#markup' => implode('<br/>', $this->examples($entity)),
+      ],
+    ];
     $operations = $this->buildOperations($entity);
     $row['operations']['data'] = $operations;
     return $row;
   }
 
   /**
-   * {@inheritdoc}
+   * Provides some example based on names with various components set.
    */
   public function examples(EntityInterface $entity) {
-    $examples = array();
+    $examples = [];
     foreach ($this->nameExamples() as $index => $example_name) {
       $formatted = Html::escape(NameFormatParser::parse($example_name, $entity->get('pattern')));
       if (empty($formatted)) {
@@ -56,9 +61,10 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function render() {
-    $render['list'] = parent::render();
-    $render['help'] = $this->nameFormatHelp();
-    return $render;
+    return [
+      'list' => parent::render(),
+      'help' => $this->nameFormatHelp(),
+    ];
   }
 
   /**
@@ -74,7 +80,7 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
   /**
    * Example names.
    *
-   * @return null
+   * @return array
    */
   public function nameExamples() {
     module_load_include('inc', 'name', 'name.admin');

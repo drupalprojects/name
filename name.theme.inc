@@ -12,9 +12,9 @@ use Drupal\name\NameFormatParser;
  * Wrapper theming function for name_format().
  */
 function theme_name_item($variables) {
-  $variables['settings'] += array(
+  $variables['settings'] += [
     'markup' => 0,
-  );
+  ];
   $format = name_get_format_by_machine_name($variables['format']);
   if (empty($format)) {
     $format = name_get_format_by_machine_name('default');
@@ -37,31 +37,34 @@ function theme_name_item_list($variables) {
     return array_pop($items);
   }
   $settings = $variables['settings'];
-  $settings += array(
-    'output' => 'default', // default, plain, or raw
+  $settings += [
+    // default, plain, or raw.
+    'output' => 'default',
     'multiple_delimiter' => ', ',
-    'multiple_and' => 'text', // and or symbol
-    'multiple_delimiter_precedes_last' => 'never', // contextual, always, never
+    // And or symbol.
+    'multiple_and' => 'text',
+    // contextual, always, never.
+    'multiple_delimiter_precedes_last' => 'never',
     'multiple_el_al_min' => 3,
     'multiple_el_al_first' => 1,
-  );
+  ];
   $delimiter = $settings['multiple_delimiter'];
   if ($settings['output'] == 'default') {
-    $etal = t('<em>et al</em>', array(), array('context' => 'name'));
+    $etal = t('<em>et al</em>', [], ['context' => 'name']);
     $delimiter = Html::escape($delimiter);
   }
   else {
-    $etal = t('et al', array(), array('context' => 'name'));
+    $etal = t('et al', [], ['context' => 'name']);
     if ($settings['output'] == 'plain') {
       $delimiter = strip_tags($delimiter);
     }
   }
-  $t_args = array(
+  $t_args = [
     '@delimiter' => $delimiter,
     '@etal' => $etal,
-  );
+  ];
   if ($original_count > $settings['multiple_el_al_min']) {
-    $limit = min(array($settings['multiple_el_al_min'], $settings['multiple_el_al_first']));
+    $limit = min([$settings['multiple_el_al_min'], $settings['multiple_el_al_first']]);
     $items = array_slice($items, 0, $limit);
     if (count($items) == 1) {
       $t_args['@name'] = $items[0];
@@ -76,7 +79,7 @@ function theme_name_item_list($variables) {
     $t_args['@lastname'] = array_pop($items);
     $t_args['@names'] = implode($delimiter . ' ', $items);
     if ($settings['multiple_and'] == 'text') {
-      $t_args['@and'] = t('and', array(), array('context' => 'name'));
+      $t_args['@and'] = t('and', [], ['context' => 'name']);
     }
     else {
       $t_args['@and'] = $settings['output'] == 'default' ? '&amp' : '&';
@@ -92,4 +95,3 @@ function theme_name_item_list($variables) {
     }
   }
 }
-

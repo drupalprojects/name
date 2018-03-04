@@ -212,7 +212,7 @@ function _name_tokens($type, $tokens, array $data = array(), array $options = ar
 /**
  * Defines a list of token types that can be chained with the name field.
  *
- * @return
+ * @return array
  *   If an entity (token) type is given, returns the chained sub-list.
  */
 function name_token_types_chained($type = NULL, $reset = FALSE) {

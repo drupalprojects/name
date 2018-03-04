@@ -4,8 +4,6 @@
  * @file
  * General administration functions.
  */
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Helper function to provide a list of example name components.
@@ -14,11 +12,11 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  *   This will empty (set to "") any specified values.
  */
 function name_example_names($excluded_components = array(), $field_name = NULL) {
-  $example_names = array();
+  $example_names = [];
   if (isset($field_name)) {
     $example_names = \Drupal::config('name.examples.' . $field_name)->get('examples');
   }
-  if (empty($example_name)) {
+  if (empty($example_names)) {
     $example_names = \Drupal::config('name.examples.default')->get('examples');
   }
   foreach ($example_names as $delta => $example_name) {

@@ -80,10 +80,13 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
     );
   }
 
+  /**
+   *
+   */
   public static function defaultSettings() {
     $settings = parent::defaultSettings();
 
-    $settings += array(
+    $settings += [
       "format" => "default",
       "markup" => FALSE,
       "output" => "default",
@@ -92,8 +95,8 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       "multiple_and" => "text",
       "multiple_delimiter_precedes_last" => "never",
       "multiple_el_al_min" => "3",
-      "multiple_el_al_first" => "1"
-    );
+      "multiple_el_al_first" => "1",
+    ];
 
     return $settings;
   }
@@ -105,91 +108,91 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
     $elements = parent::settingsForm($form, $form_state);
     $field_name = $this->fieldDefinition->getName();
 
-    $elements['format'] = array(
+    $elements['format'] = [
       '#type' => 'select',
       '#title' => $this->t('Name format'),
       '#default_value' => $this->getSetting('format'),
       '#options' => name_get_custom_format_options(),
       '#required' => TRUE,
-    );
+    ];
 
-    $elements['markup'] = array(
+    $elements['markup'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Markup'),
       '#default_value' => $this->getSetting('markup'),
       '#description' => $this->t('This option wraps the individual components of the name in SPAN elements with corresponding classes to the component.'),
-    );
+    ];
 
-    $elements['output'] = array(
+    $elements['output'] = [
       '#type' => 'radios',
       '#title' => $this->t('Output'),
       '#default_value' => $this->getSetting('output'),
       '#options' => _name_formatter_output_options(),
       '#description' => $this->t('This option provides additional options for rendering the field. <strong>Normally, using the "Raw value" option would be a security risk.</strong>'),
       '#required' => TRUE,
-    );
+    ];
 
-    $elements['multiple'] = array(
+    $elements['multiple'] = [
       '#type' => 'radios',
       '#title' => $this->t('Multiple format options'),
       '#default_value' => $this->getSetting('multiple'),
       '#options' => _name_formatter_multiple_options(),
       '#required' => TRUE,
-    );
+    ];
 
-    $base = array(
-      '#states' => array(
-        'visible' => array(
-          ':input[name="fields[' . $field_name . '][settings_edit_form][settings][multiple]"]' => array('value' => 'inline_list'),
-        ),
-      ),
+    $base = [
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $field_name . '][settings_edit_form][settings][multiple]"]' => ['value' => 'inline_list'],
+        ],
+      ],
       '#prefix' => '<div style="padding: 0 2em;">',
       '#suffix' => '</div>',
-    );
+    ];
     // We can not nest this field, so use a prefix / suffix with padding to help
     // to provide context.
-    $elements['multiple_delimiter'] = $base + array(
+    $elements['multiple_delimiter'] = $base + [
       '#type' => 'textfield',
       '#title' => $this->t('Delimiter'),
       '#default_value' => $this->getSetting('multiple_delimiter'),
       '#description' => $this->t('This specifies the delimiter between the second to last and the last name.'),
-    );
-    $elements['multiple_and'] = $base + array(
+    ];
+    $elements['multiple_and'] = $base + [
       '#type' => 'radios',
       '#title' => $this->t('Last delimiter type'),
-      '#options' => array(
+      '#options' => [
         'text' => $this->t('Textual (and)'),
         'symbol' => $this->t('Ampersand (&amp;)'),
-      ),
+      ],
       '#default_value' => $this->getSetting('multiple_and'),
       '#description' => $this->t('This specifies the delimiter between the second to last and the last name.'),
-    );
-    $elements['multiple_delimiter_precedes_last'] = $base + array(
+    ];
+    $elements['multiple_delimiter_precedes_last'] = $base + [
       '#type' => 'radios',
       '#title' => $this->t('Standard delimiter precedes last delimiter'),
-      '#options' => array(
+      '#options' => [
         'never' => $this->t('Never (i.e. "J. Doe and T. Williams")'),
         'always' => $this->t('Always (i.e. "J. Doe<strong>,</strong> and T. Williams")'),
         'contextual' => $this->t('Contextual (i.e. "J. Doe and T. Williams" <em>or</em> "J. Doe, S. Smith<strong>,</strong> and T. Williams")'),
-      ),
+      ],
       '#default_value' => $this->getSetting('multiple_delimiter_precedes_last'),
       '#description' => $this->t('This specifies the delimiter between the second to last and the last name. Contextual means that the delimiter is only included for lists with three or more names.'),
-    );
+    ];
     $options = range(1, 20);
     $options = array_combine($options, $options);
-    $elements['multiple_el_al_min'] = $base + array(
+    $elements['multiple_el_al_min'] = $base + [
       '#type' => 'select',
       '#title' => $this->t('Reduce list and append <em>el al</em>'),
-      '#options' => array(0 => $this->t('Never reduce')) + $options,
+      '#options' => [0 => $this->t('Never reduce')] + $options,
       '#default_value' => $this->getSetting('multiple_el_al_min'),
       '#description' => $this->t('This specifies a limit on the number of names to display. After this limit, names are removed and the abbrivation <em>et al</em> is appended. This Latin abbrivation of <em>et alii</em> means "and others".'),
-    );
-    $elements['multiple_el_al_first'] = $base + array(
+    ];
+    $elements['multiple_el_al_first'] = $base + [
       '#type' => 'select',
       '#title' => $this->t('Number of names to display when using <em>el al</em>'),
       '#options' => $options,
       '#default_value' => $this->getSetting('multiple_el_al_first'),
-    );
+    ];
 
     return $elements;
   }
@@ -199,17 +202,17 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
    */
   public function settingsSummary() {
     $settings = $this->getSettings();
-    $summary = array();
+    $summary = [];
 
     $field_name = $this->fieldDefinition->getName();
 
     $machine_name = isset($settings['format']) ? $settings['format'] : 'default';
     $name_format = $this->entityManager->getStorage('name_format')->load($machine_name);
     if ($name_format) {
-      $summary[] = $this->t('Format: %format (@machine_name)', array(
+      $summary[] = $this->t('Format: %format (@machine_name)', [
         '%format' => $name_format->label(),
-        '@machine_name' => $name_format->id()
-      ));
+        '@machine_name' => $name_format->id(),
+      ]);
     }
     else {
       $summary[] = $this->t('Format: <strong>Missing format.</strong><br/>This field will be displayed using the Default format.');
@@ -229,19 +232,19 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       }
       else {
         $summary[] = $this->t('Example: @example', [
-          '@example' => $formatted
+          '@example' => $formatted,
         ]);
       }
     }
 
-    $summary[] = $this->t('Markup: @yesno', array(
-      '@yesno' => empty($settings['markup']) ? $this->t('no') : $this->t('yes')
-    ));
+    $summary[] = $this->t('Markup: @yesno', [
+      '@yesno' => empty($settings['markup']) ? $this->t('no') : $this->t('yes'),
+    ]);
     $output_options = _name_formatter_output_options();
     $output = empty($settings['output']) ? 'default' : $settings['output'];
-    $summary[] = $this->t('Output: @format', array(
+    $summary[] = $this->t('Output: @format', [
       '@format' => $output_options[$output],
-    ));
+    ]);
 
     return $summary;
   }
@@ -250,7 +253,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = array();
+    $elements = [];
     $entity = $items->getEntity();
 
     $settings = $this->settings;
@@ -270,17 +273,17 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
         'markup' => $this->useMarkup(),
       ]);
       if ($this->useMarkup()) {
-        $elements[$delta] = array('#markup' => $value);
+        $elements[$delta] = ['#markup' => $value];
       }
       else {
-        $elements[$delta] = array(
-          '#markup' => _name_value_sanitize($value, NULL, $type)
-        );
+        $elements[$delta] = [
+          '#markup' => _name_value_sanitize($value, NULL, $type),
+        ];
       }
     }
 
     if (isset($settings['multiple']) && $settings['multiple'] == 'inline_list') {
-      $items = array();
+      $items = [];
       foreach (Element::children($elements) as $delta) {
         if (!empty($elements[$delta]['#markup'])) {
           $items[] = $elements[$delta]['#markup'];
@@ -292,7 +295,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
         $elements[0] = [
           '#theme' => 'name_item_list',
           '#items' => $items,
-          '#settings' => $settings
+          '#settings' => $settings,
         ];
       }
     }
@@ -303,7 +306,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
   /**
    * Determines with markup should be added to the results.
    *
-   * @return boolean
+   * @return bool
    */
   protected function useMarkup() {
     return $this->settings['markup'];

@@ -18,14 +18,14 @@ class NameAdminTest extends NameTestBase {
    * The most basic test. This should only fail if there is a change to the
    * Drupal API.
    */
-  function testAdminSettings() {
+  public function testAdminSettings() {
     // Default settings and system settings.
     $this->drupalLogin($this->admin_user);
 
     // The default installed formats.
     $this->drupalGet('admin/config/regional/name');
 
-    $row_template = array(
+    $row_template = [
       'title'       => '//tbody/tr[{row}]/td[1]',
       'machine'     => '//tbody/tr[{row}]/td[2]',
       'pattern'     => '//tbody/tr[{row}]/td[3]',
@@ -34,16 +34,16 @@ class NameAdminTest extends NameTestBase {
       'edit link'   => '//tbody/tr[{row}]/td[5]//li[contains(@class, "edit")]/a/@href',
       'delete'      => '//tbody/tr[{row}]/td[5]//li[contains(@class, "delete")]/a',
       'delete link' => '//tbody/tr[{row}]/td[5]//li[contains(@class, "delete")]/a/@href',
-    );
-    $all_values = array(
-      1 => array(
+    ];
+    $all_values = [
+      1 => [
         'title href' => Url::fromRoute('name.settings')->toString(),
         'title' => t('Default'),
         'machine' => 'default',
         'pattern' => '((((t+ig)+im)+if)+is)+jc',
         'formatted' => 'Mr Joe John Peter Mark Doe Jnr., B.Sc., Ph.D. JOAN SUE DOE Prince',
-      ),
-      2 => array(
+      ],
+      2 => [
         'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'family'])->toString(),
         'title' => t('Family'),
         'machine' => 'family',
@@ -51,8 +51,8 @@ class NameAdminTest extends NameTestBase {
         'formatted' => 'Doe DOE',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'family'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'family'])->toString(),
-      ),
-      3 => array(
+      ],
+      3 => [
         'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'full'])->toString(),
         'title' => t('Full'),
         'machine' => 'full',
@@ -62,8 +62,8 @@ class NameAdminTest extends NameTestBase {
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'full'])->toString(),
         'delete' => t('Delete'),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'full'])->toString(),
-      ),
-      4 => array(
+      ],
+      4 => [
         'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'given'])->toString(),
         'title' => t('Given'),
         'machine' => 'given',
@@ -73,8 +73,8 @@ class NameAdminTest extends NameTestBase {
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'given'])->toString(),
         'delete' => t('Delete'),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'given'])->toString(),
-      ),
-      5 => array(
+      ],
+      5 => [
         'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'short_full'])->toString(),
         'title' => t('Given Family'),
         'machine' => 'short_full',
@@ -82,8 +82,8 @@ class NameAdminTest extends NameTestBase {
         'formatted' => 'Joe Doe JOAN DOE Prince',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'short_full'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'short_full'])->toString(),
-      ),
-      6 => array(
+      ],
+      6 => [
         'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'formal'])->toString(),
         'title' => t('Title Family'),
         'machine' => 'formal',
@@ -91,8 +91,8 @@ class NameAdminTest extends NameTestBase {
         'formatted' => 'Mr Doe DOE',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'formal'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'formal'])->toString(),
-      ),
-    );
+      ],
+    ];
 
     foreach ($all_values as $id => $row) {
       $this->assertRow($row, $row_template, $id);
@@ -101,19 +101,19 @@ class NameAdminTest extends NameTestBase {
     // Load the name settings form.
     $this->drupalGet('admin/config/regional/name/settings');
 
-    // Fieldset rendering check
+    // Fieldset rendering check.
     $this->assertRaw('Format string help', 'Testing the help fieldgroup');
 
-    $default_values = array(
+    $default_values = [
       'name_settings[default_format]' => 't+ig+im+if+is+kc',
       'name_settings[sep1]' => ' ',
       'name_settings[sep2]' => ', ',
       'name_settings[sep3]' => '',
-    );
+    ];
     foreach ($default_values as $name => $value) {
       $this->assertField($name, $value);
     }
-    // ID example
+    // ID example.
     $this->assertFieldById('edit-name-settings-sep1', ' ', t('Sep 3 default value.'));
     $post_values = $default_values;
     $post_values['name_settings[default_format]'] = '';
@@ -124,12 +124,12 @@ class NameAdminTest extends NameTestBase {
     $this->drupalPostForm('admin/config/regional/name/settings', $post_values, t('Save configuration'));
     $this->assertText(t('Default format field is required.'));
 
-    $test_values = array(
+    $test_values = [
       'name_settings[default_format]' => 'c+ks+if+im+ig+t',
       'name_settings[sep1]' => '~',
       'name_settings[sep2]' => '^',
       'name_settings[sep3]' => '-',
-    );
+    ];
     $this->drupalPostForm('admin/config/regional/name/settings', $test_values, t('Save configuration'));
     $this->assertText(t('The configuration options have been saved.'));
 
@@ -147,29 +147,29 @@ class NameAdminTest extends NameTestBase {
 
     $this->drupalGet('admin/config/regional/name/add');
     $this->assertRaw('Format string help', 'Testing the help fieldgroup');
-    $values = array('label' => '', 'id' => '', 'pattern' => '');
+    $values = ['label' => '', 'id' => '', 'pattern' => ''];
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
-    foreach (array(t('Name'), t('Machine-readable name'), t('Format')) as $title) {
-      $this->assertText(t('@field field is required', array('@field' => $title)));
+    foreach ([t('Name'), t('Machine-readable name'), t('Format')] as $title) {
+      $this->assertText(t('@field field is required', ['@field' => $title]));
     }
-    $values = array('label' => 'given', 'id' => '1234567890abcdefghijklmnopqrstuvwxyz_', 'pattern' => 'a');
+    $values = ['label' => 'given', 'id' => '1234567890abcdefghijklmnopqrstuvwxyz_', 'pattern' => 'a'];
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
-    $this->assertNoText(t('@field field is required', array('@field' => t('Format'))));
-    $this->assertNoText(t('@field field is required', array('@field' => t('Machine-readable name'))));
+    $this->assertNoText(t('@field field is required', ['@field' => t('Format')]));
+    $this->assertNoText(t('@field field is required', ['@field' => t('Machine-readable name')]));
 
-    $values = array('label' => 'given', 'id' => '%&*(', 'pattern' => 'a');
+    $values = ['label' => 'given', 'id' => '%&*(', 'pattern' => 'a'];
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
     $this->assertText(t('The machine-readable name must contain only lowercase letters, numbers, and underscores.'));
 
-    $values = array('label' => 'default', 'id' => 'default', 'pattern' => 'a');
+    $values = ['label' => 'default', 'id' => 'default', 'pattern' => 'a'];
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
     $this->assertText(t('The machine-readable name is already in use. It must be unique.'));
 
-    $values = array('label' => 'Test', 'id' => 'test', 'pattern' => 'abc');
+    $values = ['label' => 'Test', 'id' => 'test', 'pattern' => 'abc'];
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
     $this->assertText(t('Name format Test added.'));
 
-    $row = array(
+    $row = [
       'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'test'])->toString(),
       'title' => 'Test',
       'machine' => 'test',
@@ -177,18 +177,18 @@ class NameAdminTest extends NameTestBase {
       'formatted' => 'abB.Sc., Ph.D. ab ab',
       'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'test'])->toString(),
       'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'test'])->toString(),
-    );
+    ];
     $this->assertRow($row, $row_template, 3);
 
-    $values = array('label' => 'new name', 'pattern' => 'f+g');
+    $values = ['label' => 'new name', 'pattern' => 'f+g'];
     $this->drupalPostForm('admin/config/regional/name/manage/test', $values, t('Save'));
     $this->assertText(t('Name format new name has been updated.'));
 
-    $row = array(
+    $row = [
       'label' => $values['label'],
       'id' => 'test',
       'pattern' => $values['pattern'],
-    );
+    ];
     $this->assertRow($row, $row_template, 3);
 
     $this->drupalGet('admin/config/regional/name/manage/60');
@@ -198,10 +198,10 @@ class NameAdminTest extends NameTestBase {
     $this->assertResponse(404);
 
     $this->drupalGet('admin/config/regional/name/manage/test/delete');
-    $this->assertText(t('Are you sure you want to delete the custom format @title?', array('@title' => $values['label'])));
+    $this->assertText(t('Are you sure you want to delete the custom format @title?', ['@title' => $values['label']]));
 
-    $this->drupalPostForm(NULL, array('confirm' => 1), t('Delete'));
-    $this->assertText(t('The name format @title has been deleted.', array('@title' => $values['label'])));
+    $this->drupalPostForm(NULL, ['confirm' => 1], t('Delete'));
+    $this->assertText(t('The name format @title has been deleted.', ['@title' => $values['label']]));
   }
 
   /**

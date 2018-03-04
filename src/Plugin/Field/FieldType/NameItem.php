@@ -180,6 +180,7 @@ class NameItem extends FieldItemBase {
    * {@inheritDoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+    $properties = [];
     $properties['title'] = DataDefinition::create('string')
       ->setLabel(t('Title'));
 

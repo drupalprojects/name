@@ -30,8 +30,8 @@ class NameFormatParser {
    *
    * Move this parser to a proper service.
    */
-  public static function parse($name_components, $format = '', $settings = array(), $tokens = NULL) {
-    foreach (array('sep1', 'sep2', 'sep3') as $key) {
+  public static function parse($name_components, $format = '', $settings = [], $tokens = NULL) {
+    foreach (['sep1', 'sep2', 'sep3'] as $key) {
       if (!isset($settings[$key])) {
         $config = \Drupal::config('name.settings')->get();
         $settings[$key] = $config[$key];
@@ -41,7 +41,10 @@ class NameFormatParser {
     return $parser->format($name_components, $format, $settings, $tokens);
   }
 
-  public function format($name_components, $format = '', $settings = array(), $tokens = NULL) {
+  /**
+   *
+   */
+  public function format($name_components, $format = '', $settings = [], $tokens = NULL) {
     if (empty($format)) {
       return '';
     }
@@ -53,7 +56,7 @@ class NameFormatParser {
     // Neutralise any escaped backslashes.
     $format = str_replace('\\\\', "\t", $format);
 
-    $pieces = array();
+    $pieces = [];
     $len = strlen($format);
     $modifiers = '';
     $conditions = '';
@@ -116,7 +119,7 @@ class NameFormatParser {
       }
     }
 
-    $parsed_pieces = array();
+    $parsed_pieces = [];
     for ($i = 0; $i < count($pieces); $i++) {
       $component = $pieces[$i]['value'];
       $conditions = $pieces[$i]['conditions'];
@@ -169,17 +172,23 @@ class NameFormatParser {
     return str_replace('\\\\', "\t", implode('', $parsed_pieces));
   }
 
+  /**
+   *
+   */
   protected function addComponent($string, &$modifiers = '', &$conditions = '') {
     $string = $this->applyModifiers($string, $modifiers);
-    $piece = array(
+    $piece = [
       'value' => $string,
       'conditions' => $conditions,
-    );
+    ];
     $conditions = '';
     $modifiers = '';
     return $piece;
   }
 
+  /**
+   *
+   */
   protected function applyModifiers($string, $modifiers) {
     if (!is_null($string) || strlen($string)) {
       if ($modifiers) {
@@ -197,25 +206,30 @@ class NameFormatParser {
             case 'L':
               $string = Unicode::strtolower($string);
               break;
+
             case 'U':
               $string = Unicode::strtoupper($string);
               break;
+
             case 'F':
               $string = Unicode::ucfirst($string);
               break;
+
             case 'G':
               if (!empty($string)) {
                 $parts = explode(' ', $string);
-                $string = array();
+                $string = [];
                 foreach ($parts as $part) {
                   $string[] = Unicode::ucfirst($part);
                 }
                 $string = implode(' ', $string);
               }
               break;
+
             case 'T':
               $string = trim($string);
               break;
+
             case 'S':
               $string = Html::escape($string);
               break;
@@ -236,7 +250,7 @@ class NameFormatParser {
   protected function closingBracketPosition($string) {
     // Simplify the string by removing escaped brackets.
     $depth = 0;
-    $string = str_replace(array('\(', '\)'), array('__', '__'), $string);
+    $string = str_replace(['\(', '\)'], ['__', '__'], $string);
     for ($i = 0; $i < strlen($string); $i++) {
       $char = $string{$i};
       if ($char == '(') {
@@ -252,18 +266,21 @@ class NameFormatParser {
     return FALSE;
   }
 
-  protected function generateTokens($name_components, $settings = array()) {
+  /**
+   *
+   */
+  protected function generateTokens($name_components, array $settings = []) {
     $name_components = (array) $name_components;
     $markup = !empty($settings['markup']);
-    $name_components += array(
+    $name_components += [
       'title' => '',
       'given' => '',
       'middle' => '',
       'family' => '',
       'credentials' => '',
       'generational' => '',
-    );
-    $tokens = array(
+    ];
+    $tokens = [
       't' => $this->renderComponent($name_components['title'], 'title', $markup),
       'g' => $this->renderComponent($name_components['given'], 'given', $markup),
       'm' => $this->renderComponent($name_components['middle'], 'middle', $markup),
@@ -276,20 +293,20 @@ class NameFormatParser {
       'i' => $settings['sep1'],
       'j' => $settings['sep2'],
       'k' => $settings['sep3'],
-    );
+    ];
     $given = $tokens['g'];
     $family = $tokens['f'];
     if ($given || $family) {
-      $tokens += array(
+      $tokens += [
         'e' => $given ? $given : $family,
         'E' => $family ? $family : $given,
-      );
+      ];
     }
     else {
-      $tokens += array(
+      $tokens += [
         'e' => NULL,
         'E' => NULL,
-      );
+      ];
     }
     return $tokens;
   }
