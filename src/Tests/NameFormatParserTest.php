@@ -33,24 +33,40 @@ class NameFormatParserTest extends UnitTestCase {
       'given' => [
         'components' => ['given' => 'John'],
         'tests' => [
-          // Test that only the given name creates a entry
-          't' => '', // Title
-          'g' => 'John', // Given name
-          '\g' => 'g', // Escaped letter
-          'm' => '', // Middle name(s)
-          'f' => '', // Family name
-          'c' => '', // Credentials
-          's' => '', // Generational suffix
-          'x' => 'J', // First letter given
-          'y' => '', // First letter middle
-          'z' => '', // First letter family
-          'e' => 'John', // Either the given or family name. Given name is given preference
-          'E' => 'John', // Either the given or family name. Family name is given preference
-          // Combination test
-          'g f' => 'John ', // Using a single space
-          'gif' => 'John ', // Separator 1
-          'gjf' => 'John, ', // Separator 2
-          'gkf' => 'John', // Separator 3
+          // Test that only the given name creates a entry.
+          // Title.
+          't' => '',
+          // Given name.
+          'g' => 'John',
+          // Escaped letter.
+          '\g' => 'g',
+          // Middle name(s).
+          'm' => '',
+          // Family name.
+          'f' => '',
+          // Credentials.
+          'c' => '',
+          // Generational suffix.
+          's' => '',
+          // First letter given.
+          'x' => 'J',
+          // First letter middle.
+          'y' => '',
+          // First letter family.
+          'z' => '',
+          // Either the given or family name. Given name is given preference.
+          'e' => 'John',
+          // Either the given or family name. Family name is given preference.
+          'E' => 'John',
+          // Combination tests.
+          // Using a single space
+          'g f' => 'John ',
+          // Separator 1
+          'gif' => 'John ',
+          // Separator 2
+          'gjf' => 'John, ',
+          // Separator 3
+          'gkf' => 'John',
           'f g' => ' John',
           'fig' => ' John',
           'fjg' => ', John',
@@ -59,30 +75,51 @@ class NameFormatParserTest extends UnitTestCase {
           'tigit' => ' John ',
           'tjgjt' => ', John, ',
           'tkgkt' => 'John',
-          // Modifier entries
-          'Lg' => 'john', // lowercase
-          'Ug' => 'JOHN', // uppercase
-          'Fg' => 'John', // first letter to uppercase
-          'Gg' => 'John', // first letter of all words to uppercase
-          'LF(g)' => 'John', // lowercase, first letter to uppercase
-          'LG(g)' => 'John', // lowercase, first letter of all words to uppercase
-          'LFg' => 'John', // lowercase, first letter to uppercase
-          'LGg' => 'John', // lowercase, first letter of all words to uppercase
-          'Tg' => 'John', // Trims whitespace around the next token
-          'Sg' => 'John', // check_plain
-          // Conditional entries
-          '(((g)))' => 'John', // brackets
-          '(g))()(' => 'John)(', // brackets - mismatched
-          'g+ f' => 'John', // Insert the token if both the surrounding tokens are not empty
-          'g= f' => 'John', // Insert the token, if and only if the next token after it is not empty
-          'g^ f' => 'John ', // Skip the token, if and only if the next token after it is not empty
-          's|c|g|m|f|t' => 'John', // Uses only the first one.
-          'g|f' => 'John', // Uses the previous token unless empty, otherwise it uses this token
-          // Real world examples
-          'L(t= g= m= f= s=,(= c))' => ' john', // Full name with a comma-space before credentials
-          'TS(LF(t= g= m= f= s)=,(= c))' => 'john', // Full name with a comma-space before credentials. ucfirst does not work on a whitespace
-          'L(t+ g+ m+ f+ s+,(= c))' => 'john', // Full name with a comma-space before credentials
-          'TS(LF(t+ g+ m+ f+ s)+,(= c))' => 'John', // Full name with a comma-space before credentials
+          // Modifier entries.
+          // To lowercase.
+          'Lg' => 'john',
+          // To uppercase.
+          'Ug' => 'JOHN',
+          // First letter to uppercase.
+          'Fg' => 'John',
+          // First letter of all words to uppercase.
+          'Gg' => 'John',
+          // Lowercase, first letter to uppercase.
+          'LF(g)' => 'John',
+          // Lowercase, first letter of all words to uppercase.
+          'LG(g)' => 'John',
+          // Lowercase, first letter to uppercase.
+          'LFg' => 'John',
+          // Lowercase, first letter of all words to uppercase.
+          'LGg' => 'John',
+          // Trims whitespace around the next token.
+          'Tg' => 'John',
+          // @todo: assess the old check_plain run on code test / token.
+          'Sg' => 'John',
+          // Conditional entries.
+          // Brackets.
+          '(((g)))' => 'John',
+          // Brackets - mismatched.
+          '(g))()(' => 'John)(',
+          // Insert the token if both the surrounding tokens are not empty
+          'g+ f' => 'John',
+          // Insert the token, if and only if the next token after it is not empty.
+          'g= f' => 'John',
+          // Skip the token, if and only if the next token after it is not empty.
+          'g^ f' => 'John ',
+          // Uses only the first one.
+          's|c|g|m|f|t' => 'John',
+          // Uses the previous token unless empty, otherwise it uses this token.
+          'g|f' => 'John',
+          // Real world examples.
+          // Full name with a comma-space before credentials.
+          'L(t= g= m= f= s=,(= c))' => ' john',
+          // Full name with a comma-space before credentials. ucfirst does not work on a whitespace.
+          'TS(LF(t= g= m= f= s)=,(= c))' => 'john',
+          // Full name with a comma-space before credentials.
+          'L(t+ g+ m+ f+ s+,(= c))' => 'john',
+          // Full name with a comma-space before credentials.
+          'TS(LF(t+ g+ m+ f+ s)+,(= c))' => 'John',
         ],
       ],
       'full' => [
@@ -94,25 +131,40 @@ class NameFormatParserTest extends UnitTestCase {
           'generational' => 'sR',
           'credentials' => 'b.Sc, pHd',
         ],
-        //MR. JoHn pEter dOE sR b.Sc, pHd
+        // Tests "MR. JoHn pEter dOE sR b.Sc, pHd".
         'tests' => [
-          // Test that only the given name creates a entry
-          't' => 'MR.', // Title
-          'g' => 'JoHn', // Given name
-          'm' => 'pEter', // Middle name(s)
-          'f' => 'dOE', // Family name
-          'c' => 'b.Sc, pHd', // Credentials
-          's' => 'sR', // Generational suffix
-          'x' => 'J', // First letter given
-          'y' => 'p', // First letter middle
-          'z' => 'd', // First letter family
-          'e' => 'JoHn', // Either the given or family name. Given name is given preference
-          'E' => 'dOE', // Either the given or family name. Family name is given preference
-          // Combination test
-          'g f' => 'JoHn dOE', // Using a single space
-          'gif' => 'JoHn dOE', // Separator 1
-          'gjf' => 'JoHn, dOE', // Separator 2
-          'gkf' => 'JoHndOE', // Separator 3
+          // Test that only the given name creates a entry.
+          // Title.
+          't' => 'MR.',
+          // Given name.
+          'g' => 'JoHn',
+          // Middle name(s).
+          'm' => 'pEter',
+          // Family name.
+          'f' => 'dOE',
+          // Credentials.
+          'c' => 'b.Sc, pHd',
+          // Generational suffix.
+          's' => 'sR',
+          // First letter given.
+          'x' => 'J',
+          // First letter middle.
+          'y' => 'p',
+          // First letter family.
+          'z' => 'd',
+          // Either the given or family name. Given name is given preference.
+          'e' => 'JoHn',
+          // Either the given or family name. Family name is given preference.
+          'E' => 'dOE',
+          // Combination tests.
+          // Using a single space.
+          'g f' => 'JoHn dOE',
+          // Separator 1.
+          'gif' => 'JoHn dOE',
+          // Separator 2.
+          'gjf' => 'JoHn, dOE',
+          // Separator 3.
+          'gkf' => 'JoHndOE',
           'f g' => 'dOE JoHn',
           'fig' => 'dOE JoHn',
           'fjg' => 'dOE, JoHn',
@@ -121,25 +173,41 @@ class NameFormatParserTest extends UnitTestCase {
           'tigit' => 'MR. JoHn MR.',
           'tjgjt' => 'MR., JoHn, MR.',
           'tkgkt' => 'MR.JoHnMR.',
-          // Modifier entries
-          'L(t g m f s c)' => 'mr. john peter doe sr b.sc, phd', // lowercase
-          'U(t g m f s c)' => 'MR. JOHN PETER DOE SR B.SC, PHD', // uppercase
-          'F(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd', // first letter to uppercase
-          'G(t g m f s c)' => 'MR. JoHn PEter DOE SR B.Sc, PHd', // first letter of all words to uppercase
-          'LF(t g m f s c)' => 'Mr. john peter doe sr b.sc, phd', // first letter to uppercase
-          'LG(t g m f s c)' => 'Mr. John Peter Doe Sr B.sc, Phd', // first letter of all words to uppercase
-          'T(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd', // Trims whitespace around the next token
-          'S(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd', // check_plain
+          // Modifier entries.
+          // Lowercase.
+          'L(t g m f s c)' => 'mr. john peter doe sr b.sc, phd',
+          // Uppercase
+          'U(t g m f s c)' => 'MR. JOHN PETER DOE SR B.SC, PHD',
+          // First letter to uppercase
+          'F(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
+          // First letter of all words to uppercase.
+          'G(t g m f s c)' => 'MR. JoHn PEter DOE SR B.Sc, PHd',
+          // First letter to uppercase.
+          'LF(t g m f s c)' => 'Mr. john peter doe sr b.sc, phd',
+          // First letter of all words to uppercase.
+          'LG(t g m f s c)' => 'Mr. John Peter Doe Sr B.sc, Phd',
+          // Trims whitespace around the next token.
+          'T(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
+          // @todo: Assess the old check_plain run on code test / token.
+          'S(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
           // Conditional entries
-          '(((t g m f s c)))' => 'MR. JoHn pEter dOE sR b.Sc, pHd', // brackets
-          '(t g m f s c))()(' => 'MR. JoHn pEter dOE sR b.Sc, pHd)(', // brackets - mismatched
-          't= g= m= f= s= c' => 'MR. JoHn pEter dOE sR b.Sc, pHd', // Insert the token, if and only if the next token after it is not empty
-          'g|m|f' => 'JoHn', // Uses the previous token unless empty, otherwise it uses this token
-          'm|f|g' => 'pEter', // Uses the previous token unless empty, otherwise it uses this token
-          's|c|g|m|f|t' => 'sR', // Uses only the first one.
-          // Real world examples
-          'L(t= g= m= f= s=,(= c))' => 'mr. john peter doe sr, b.sc, phd', // Full name with a comma-space before credentials
-          'TS(LG(t= g= m= f= s)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.sc, Phd', // Full name with a comma-space before credentials
+          // Brackets.
+          '(((t g m f s c)))' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
+          // Brackets - mismatched.
+          '(t g m f s c))()(' => 'MR. JoHn pEter dOE sR b.Sc, pHd)(',
+          // Insert the token, if and only if the next token after it is not empty.
+          't= g= m= f= s= c' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
+          // Uses the previous token unless empty, otherwise it uses this token.
+          'g|m|f' => 'JoHn',
+          // Uses the previous token unless empty, otherwise it uses this token.
+          'm|f|g' => 'pEter',
+          // Uses only the first one.
+          's|c|g|m|f|t' => 'sR',
+          // Real world examples.
+          // Full name with a comma-space before credentials.
+          'L(t= g= m= f= s=,(= c))' => 'mr. john peter doe sr, b.sc, phd',
+          // Full name with a comma-space before credentials.
+          'TS(LG(t= g= m= f= s)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.sc, Phd',
         ],
       ],
     ];
@@ -149,6 +217,7 @@ class NameFormatParserTest extends UnitTestCase {
    * Convert names() to PHPUnit compatible format.
    *
    * @return array
+   *   An array of names.
    */
   public function patternDataProvider() {
     $data = [];
@@ -180,4 +249,5 @@ class NameFormatParserTest extends UnitTestCase {
     $formatted = NameFormatParser::parse($components, $pattern, $settings);
     $this->assertEquals($expected, $formatted);
   }
+
 }

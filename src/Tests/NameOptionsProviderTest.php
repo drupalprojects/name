@@ -2,7 +2,6 @@
 
 namespace Drupal\name\Tests;
 
-use Drupal\name\NameOptionsProvider;
 use Drupal\simpletest\KernelTestBase;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;

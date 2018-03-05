@@ -34,4 +34,5 @@ interface NameFormatInterface extends ConfigEntityInterface {
    *   TRUE if the name format is locked, FALSE otherwise.
    */
   public function isLocked();
+
 }

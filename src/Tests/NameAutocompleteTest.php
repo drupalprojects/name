@@ -2,7 +2,6 @@
 
 namespace Drupal\name\Tests;
 
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\name\Controller\NameAutocompleteController;
 use Drupal\simpletest\KernelTestBase;
 use Symfony\Component\HttpFoundation\JsonResponse;

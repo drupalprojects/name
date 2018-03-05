@@ -3,7 +3,6 @@
 namespace Drupal\name\Tests;
 
 use Drupal\simpletest\WebTestBase;
-use Drupal\name\NameFormatParser;
 
 /**
  * Helper test class with some added functions for testing.
@@ -21,8 +20,26 @@ abstract class NameTestBase extends WebTestBase {
     'name',
   ];
 
+  /**
+   * Possible unused leftover from D7?
+   *
+   * @var mixed $instance
+   */
   protected $instance;
+
+  /**
+   * Web user to run the tests for.
+   *
+   * @var \Drupal\user\Entity\User
+   */
   protected $web_user;
+
+
+  /**
+   * Admin user to run the tests for.
+   *
+   * @var \Drupal\user\Entity\User
+   */
   protected $admin_user;
 
   /**

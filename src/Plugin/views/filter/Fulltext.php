@@ -92,6 +92,7 @@ class Fulltext extends FilterPluginBase {
    * Contains operation.
    *
    * @param string $fulltext_field
+   *   The db field.
    */
   public function op_contains($fulltext_field) {
     $value = Unicode::strtolower($this->value[0]);
@@ -104,6 +105,7 @@ class Fulltext extends FilterPluginBase {
    * The word operation.
    *
    * @param string $fulltext_field
+   *   The db field.
    */
   public function op_word($fulltext_field) {
     $where = $this->operator == 'word' ? db_or() : db_and();

@@ -7,19 +7,22 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 
+/**
+ * The name option provider for the name field.
+ */
 class NameOptionsProvider {
 
   /**
    * The entity manager.
    *
-   * @var EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityManagerInterface
    */
   protected $entityManger;
 
   /**
    * The module handler.
    *
-   * @var ModuleHandlerInterface
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -40,8 +43,10 @@ class NameOptionsProvider {
   /**
    * Contructs the service.
    *
-   * @param EntityManagerInterface $entity_manager
-   * @param ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
   public function __construct(EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
     $this->entityManger = $entity_manager;

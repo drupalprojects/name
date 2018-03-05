@@ -25,18 +25,18 @@ class NameFieldTest extends NameTestBase {
   ];
 
   /**
-   *
+   * {@inheritdoc}
    */
   public static function getInfo() {
     return [
       'name' => 'Node Name Field',
-      'description' => 'Various tests on creating a name field on a node.',
+      'description' => 'Various tests on creating a name field on a node.' ,
       'group' => 'Name',
     ];
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
@@ -63,10 +63,10 @@ class NameFieldTest extends NameTestBase {
 
     // Required test.
     $field_settings = [];
-    foreach ($this->name_getFieldStorageSettings() as $key => $value) {
+    foreach ($this->nameGetFieldStorageSettings() as $key => $value) {
       $field_settings[$key] = '';
     }
-    foreach ($this->name_getFieldStorageSettingsCheckboxes() as $key => $value) {
+    foreach ($this->nameGetFieldStorageSettingsCheckboxes() as $key => $value) {
       $field_settings[$key] = FALSE;
     }
 
@@ -91,7 +91,10 @@ class NameFieldTest extends NameTestBase {
       t('@field options are required.', ['@field' => $n['generational']]),
 
       t('@field field is required.', ['@field' => t('Components')]),
-      t('@field must have one of the following components: @components', ['@field' => t('Minimum components'), '@components' => Html::escape(implode(', ', [$n['given'], $n['family']]))]),
+      t('@field must have one of the following components: @components', [
+        '@field' => t('Minimum components'),
+        '@components' => Html::escape(implode(', ', [$n['given'], $n['family']]))
+      ]),
     ];
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -137,11 +140,16 @@ class NameFieldTest extends NameTestBase {
       t('@field must be lower than or equal to 255.', ['@field' => $n['family']]),
       t('@field is not a valid number.', ['@field' => $n['generational']]),
       t('@field must be a number.', ['@field' => $n['credentials']]),
-
-      t('@field must have one of the following components: @components', ['@field' => t('Minimum components'), '@components' => Html::escape(implode(', ', [$n['given'], $n['family']]))]),
-
-      t("The vocabulary 'machine' in @field could not be found.", ['@field' => t('@title options', ['@title' => $n['title']])]),
-      t("The vocabulary '123' in @field could not be found.", ['@field' => t('@generational options', ['@generational' => $n['generational']])]),
+      t('@field must have one of the following components: @components', [
+        '@field' => t('Minimum components'),
+        '@components' => Html::escape(implode(', ', [$n['given'], $n['family']])),
+      ]),
+      t("The vocabulary 'machine' in @field could not be found.", [
+        '@field' => t('@title options', ['@title' => $n['title']]),
+      ]),
+      t("The vocabulary '123' in @field could not be found.", [
+        '@field' => t('@generational options', ['@generational' => $n['generational']]),
+      ]),
     ];
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -157,8 +165,12 @@ class NameFieldTest extends NameTestBase {
     $this->resetAll();
     $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
     $required_messages = [
-      t('The following options exceed the maximum allowed @field length: Aaaaa., Bbbbbbbb, Ccccc.', ['@field' => t('@title options', ['@title' => $n['title']])]),
-      t('The following options exceed the maximum allowed @field length: AAAA, VIII, BBBB', ['@field' => t('@generational options', ['@generational' => $n['generational']])]),
+      t('The following options exceed the maximum allowed @field length: Aaaaa., Bbbbbbbb, Ccccc.', [
+        '@field' => t('@title options', ['@title' => $n['title']]),
+      ]),
+      t('The following options exceed the maximum allowed @field length: AAAA, VIII, BBBB', [
+        '@field' => t('@generational options', ['@generational' => $n['generational']]),
+      ]),
     ];
 
     foreach ($required_messages as $message) {
@@ -188,8 +200,12 @@ class NameFieldTest extends NameTestBase {
     $this->resetAll();
     $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
     $required_messages = [
-      t('@field can only have one blank value assigned to it.', ['@field' => t('@title options', ['@title' => $n['title']])]),
-      t('@field can only have one blank value assigned to it.', ['@field' => t('@generational options', ['@generational' => $n['generational']])]),
+      t('@field can only have one blank value assigned to it.', ['@field' => t('@title options', [
+        '@title' => $n['title']]),
+      ]),
+      t('@field can only have one blank value assigned to it.', ['@field' => t('@generational options', [
+        '@generational' => $n['generational'],
+      ])]),
     ];
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -197,7 +213,7 @@ class NameFieldTest extends NameTestBase {
 
     // Save the field again with the default values.
     $this->resetAll();
-    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $this->name_getFieldStorageSettings(), t('Save field settings'));
+    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $this->nameGetFieldStorageSettings(), t('Save field settings'));
 
     $this->assertText(t('Updated field Test name field settings.'));
 
@@ -238,18 +254,22 @@ class NameFieldTest extends NameTestBase {
               array('@label' => t('Minimum components'), '@label2' => t('Components'),
               '@components' => Html::escape(implode(', ', array($n['title'], $n['generational'], $n['credentials']))))),
       */
-
       t('Maximum length for @field must be higher than or equal to 1.', ['@field' => $n['title']]),
       t('Maximum length for @field must be higher than or equal to 1.', ['@field' => $n['given']]),
       t('Maximum length for @field must be a number.', ['@field' => $n['middle']]),
       t('Maximum length for @field must be lower than or equal to 255.', ['@field' => $n['family']]),
       t('Maximum length for @field is not a valid number.', ['@field' => $n['generational']]),
       t('Maximum length for @field must be a number.', ['@field' => $n['credentials']]),
-
-      t('@field must have one of the following components: @components', ['@field' => t('Minimum components'), '@components' => Html::escape(implode(', ', [$n['given'], $n['family']]))]),
-
-      t("The vocabulary 'machine' in @field could not be found.", ['@field' => t('@title options', ['@title' => $n['title']])]),
-      t("The vocabulary '123' in @field could not be found.", ['@field' => t('@generational options', ['@generational' => $n['generational']])]),
+      t('@field must have one of the following components: @components', [
+        '@field' => t('Minimum components'),
+        '@components' => Html::escape(implode(', ', [$n['given'], $n['family']])),
+      ]),
+      t("The vocabulary 'machine' in @field could not be found.", ['@field' => t('@title options', [
+        '@title' => $n['title'],
+      ])]),
+      t("The vocabulary '123' in @field could not be found.", [
+        '@field' => t('@generational options', ['@generational' => $n['generational']]),
+      ]),
     ];
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -320,9 +340,12 @@ class NameFieldTest extends NameTestBase {
   }
 
   /**
+   * Helper function to get the field storage settings.
    *
+   * @return array
+   *   The settings.
    */
-  public function name_getFieldStorageSettings() {
+  public function nameGetFieldStorageSettings() {
     $field_settings = [
       'settings[components][title]' => TRUE,
       'settings[components][given]' => TRUE,
@@ -363,9 +386,12 @@ class NameFieldTest extends NameTestBase {
   }
 
   /**
+   * Helper function to get the field storage checkbox settings.
    *
+   * @return array
+   *   The settings.
    */
-  public function name_getFieldStorageSettingsCheckboxes() {
+  public function nameGetFieldStorageSettingsCheckboxes() {
     $field_settings = [
       'settings[components][title]' => TRUE,
       'settings[components][given]' => TRUE,

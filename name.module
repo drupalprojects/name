@@ -201,6 +201,16 @@ function _name_translations($intersect = NULL) {
 }
 
 /**
+ * Private internal helper function.
+ *
+ * @return string[]
+ *   An array of the core field columns.
+ */
+function _name_component_keys() {
+  return ['title', 'given', 'middle', 'family', 'credentials', 'generational'];
+}
+
+/**
  * Private helper function to define the formatter rendering methods.
  */
 function _name_formatter_output_types() {
@@ -295,7 +305,7 @@ function name_element_expand($element, &$form_state, $complete_form) {
  * @return array
  *   The constructed component FAPI structure for a name element.
  */
-function name_element_render_component($components, $component_key, $base_element, $core) {
+function name_element_render_component(array $components, $component_key, array $base_element, $core) {
   $component = $components[$component_key];
   $element = [];
   // Allow other modules to append additional FAPI properties to the element.
@@ -503,7 +513,7 @@ function _name_component_layout(&$element, $layout = 'default') {
  *
  * @group validation
  */
-function name_element_validate_is_empty($item) {
+function name_element_validate_is_empty(array $item) {
   foreach (_name_translations() as $key => $title) {
     // Title & generational have no meaning by themselves.
     if ($key == 'title' || $key == 'generational') {
@@ -558,6 +568,7 @@ function _name_formatter_multiple_options() {
  *   If this is a string, then the processing happens on this.
  *   If this is an array, the processing happens on the column index.
  * @param string $column
+ *   The item column to look at.
  * @param string $type
  *   Tells the function how to handle the text processing:
  *     'default' runs through check_plain()

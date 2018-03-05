@@ -21,6 +21,7 @@ trait NameTestTrait {
    *   The bundle.
    *
    * @return \Drupal\Core\Field\FieldDefinitionInterface
+   *   The field definition.
    */
   public function createNameField($field_name, $entity_type, $bundle) {
     FieldStorageConfig::create([
@@ -46,7 +47,9 @@ trait NameTestTrait {
    *
    * @param array $values
    *   The arrays to combine.
+   *
    * @return array
+   *   The combined array.
    */
   public function mapAssoc(array $values) {
     return array_combine($values, $values);

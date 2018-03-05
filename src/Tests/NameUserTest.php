@@ -2,7 +2,6 @@
 
 namespace Drupal\name\Tests;
 
-use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\simpletest\KernelTestBase;

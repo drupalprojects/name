@@ -14,7 +14,7 @@ abstract class NameFormatFormBase extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function exists($entity_id, array $element,  FormStateInterface $form_state) {
+  public function exists($entity_id, array $element, FormStateInterface $form_state) {
     return NameFormat::load($entity_id);
   }
 
@@ -68,6 +68,7 @@ abstract class NameFormatFormBase extends EntityForm {
    * Help box.
    *
    * @return array
+   *   FAPI build of the help section.
    */
   public function nameFormatHelp() {
     module_load_include('inc', 'name', 'name.admin');

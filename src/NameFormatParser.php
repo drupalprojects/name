@@ -59,7 +59,6 @@ class NameFormatParser {
     $format = str_replace('\\\\', "\t", $format);
 
     $pieces = [];
-    $len = strlen($format);
     $modifiers = '';
     $conditions = '';
     for ($i = 0; $i < strlen($format); $i++) {

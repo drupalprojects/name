@@ -11,7 +11,7 @@
  * @param array $excluded_components
  *   This will empty (set to "") any specified values.
  */
-function name_example_names($excluded_components = [], $field_name = NULL) {
+function name_example_names(array $excluded_components = [], $field_name = NULL) {
   $example_names = [];
   if (isset($field_name)) {
     $example_names = \Drupal::config('name.examples.' . $field_name)->get('examples');
@@ -48,8 +48,10 @@ function _name_get_name_format_help_form() {
 }
 
 /**
- * Themes the instance settings of the name component into a nice table, rather
- * than a long list of individual elements.
+ * Themes the instance settings of the name component into a nice table.
+ *
+ * @param array $form
+ *   The form to expand out.
  */
 function _name_field_settings_pre_render($form) {
   $form['styled_settings'] = [

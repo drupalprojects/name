@@ -26,7 +26,7 @@ use Drupal\Core\Url;
 class NameItem extends FieldItemBase {
 
   /**
-   * Definition of name field components
+   * Definition of name field components.
    *
    * @var array
    */
@@ -202,6 +202,9 @@ class NameItem extends FieldItemBase {
     return $properties;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public function storageSettingsForm(array &$form, FormStateInterface $form_state, $has_data) {
     $field = $this->getFieldDefinition();
     $settings = $field->getSettings();
@@ -331,9 +334,9 @@ class NameItem extends FieldItemBase {
     if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
       // TODO - Make the labels more generic.
       // Generational suffixes may be imported from one or more vocabularies
-      // using the tag '[vocabulary:xxx]', where xxx is the vocabulary id. Terms
-      // that exceed the maximum length of the generational suffix are not added
-      // to the options list.
+      // using the tag '[vocabulary:xxx]', where xxx is the vocabulary id.
+      // Terms that exceed the maximum length of the generational suffix are
+      // not added to the options list.
       $element['title_options']['#description'] .= ' ' . $this->t("%label_plural may be also imported from one or more vocabularies using the tag '[vocabulary:xxx]', where xxx is the vocabulary machine-name or id. Terms that exceed the maximum length of the %label are not added to the options list.", [
         '%label_plural' => $this->t('Titles'),
         '%label' => $this->t('Title'),
@@ -556,7 +559,15 @@ class NameItem extends FieldItemBase {
     ];
   }
 
-  public static function validateMinimumComponents($element, FormStateInterface $form_state) {
+  /**
+   * Helper function to validate minimum components.
+   *
+   * @param array $element
+   *   Element being validated.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  public static function validateMinimumComponents(array $element, FormStateInterface $form_state) {
     $minimum_components = $form_state->getValue(['settings', 'minimum_components']);
     $diff = array_intersect(array_keys(array_filter($minimum_components)), ['given', 'family']);
     if (count($diff) == 0) {
@@ -580,18 +591,46 @@ class NameItem extends FieldItemBase {
     }
   }
 
+  /**
+   * Helper function to validate minimum components.
+   *
+   * @param array $element
+   *   Element being validated.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
   public static function validateTitleOptions($element, FormStateInterface $form_state) {
     $values = static::extractAllowedValues($element['#value']);
     $max_length = $form_state->getValue(['settings', 'max_length', 'title']);
     static::validateOptions($element, $form_state, $values, $max_length);
   }
 
+  /**
+   * Helper function to validate minimum components.
+   *
+   * @param array $element
+   *   Element being validated.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
   public static function validateGenerationalOptions($element, FormStateInterface $form_state) {
     $values = static::extractAllowedValues($element['#value']);
     $max_length = $form_state->getValue(['settings', 'max_length', 'generational']);
     static::validateOptions($element, $form_state, $values, $max_length);
   }
 
+  /**
+   * Helper function to validate minimum components.
+   *
+   * @param array $element
+   *   Element being validated.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param mixed $values
+   *   Values to check.
+   * @param int $max_length
+   *   The max length.
+   */
   protected static function validateOptions($element, FormStateInterface $form_state, $values, $max_length) {
     $label = $element['#title'];
 
@@ -748,6 +787,15 @@ class NameItem extends FieldItemBase {
     return $names[array_rand($names)];
   }
 
+  /**
+   * Helper function to get the allowed values.
+   *
+   * @param string $string
+   *   The string to parse.
+   *
+   * @return array
+   *   The parsed values.
+   */
   protected static function extractAllowedValues($string) {
     return array_filter(array_map('trim', explode("\n", $string)));
   }

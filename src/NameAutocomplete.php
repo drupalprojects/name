@@ -35,6 +35,7 @@ class NameAutocomplete {
    * Constructor for the NameAutocomplete class.
    *
    * @param NameOptionsProvider $options_provider
+   *   Name options provider.
    */
   public function __construct(NameOptionsProvider $options_provider) {
     $this->optionsProvider = $options_provider;
@@ -43,7 +44,7 @@ class NameAutocomplete {
   /**
    * Get matches for the autocompletion of name components.
    *
-   * @param FieldDefinitionInterface $field
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field
    *   The field definition.
    * @param string $target
    *   The name field component.
@@ -91,7 +92,7 @@ class NameAutocomplete {
       default:
         $action['components'] = [];
         foreach (explode('-', $target) as $component) {
-          if (in_array($component, ['title', 'given', 'middle', 'family', 'credentials', 'generational'])) {
+          if (in_array($component, _name_component_keys())) {
             $action['components'][$component] = $component;
           }
         }
@@ -177,10 +178,12 @@ class NameAutocomplete {
    * Helper function to combine values.
    *
    * @param array $values
+   *   Array values to combine.
    *
    * @return array
+   *   Combined array values.
    */
-  public function mapAssoc($values) {
+  public function mapAssoc(array $values) {
     return array_combine($values, $values);
   }
 

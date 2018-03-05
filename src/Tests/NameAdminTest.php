@@ -113,7 +113,7 @@ class NameAdminTest extends NameTestBase {
       $this->assertField($name, $value);
     }
     // ID example.
-    $this->assertFieldById('edit-name-settings-sep1', ' ', t('Sep 3 default value.'));
+    $this->assertFieldById('edit-name-settings-sep1', ' ', t('Sep 1 default value.'));
     $post_values = $default_values;
     $post_values['name_settings[default_format]'] = '';
 
@@ -211,10 +211,13 @@ class NameAdminTest extends NameTestBase {
    * Helper function to test a table cell via it's expected value.
    *
    * @param array $row
+   *   Table rows to test.
    * @param array $row_template
-   * @param integer $id
+   *   The parameters used for each row test.
+   * @param int $id
+   *   The row ID.
    */
-  public function assertRow($row, $row_template, $id) {
+  public function assertRow(array $row, array $row_template, $id) {
     foreach ($row as $cell_code => $value) {
       if (isset($row_template[$cell_code])) {
         $xpath = str_replace('{row}', $id, $row_template[$cell_code]);

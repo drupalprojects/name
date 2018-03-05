@@ -68,7 +68,9 @@ class NameSettingsForm extends ConfigFormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $default_format = trim($form_state->getValue(['name_settings', 'default_format']));
     if (empty($default_format) && !strlen($default_format)) {
-      $form_state->setErrorByName('name_settings][default_format', $this->t('%title field is required.', array('%title' => $form['name_settings']['default_format']['#title'])));
+      $form_state->setErrorByName('name_settings][default_format', $this->t('%title field is required.', [
+        '%title' => $form['name_settings']['default_format']['#title'],
+      ]));
     }
     parent::validateForm($form, $form_state);
   }

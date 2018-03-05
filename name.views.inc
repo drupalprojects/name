@@ -4,6 +4,7 @@
  * @file
  * Views integration for name fields.
  */
+
 use Drupal\field\FieldStorageConfigInterface;
 
 /**
@@ -17,11 +18,11 @@ function name_field_views_data(FieldStorageConfigInterface $field_storage) {
 
   foreach ($data as $table_name => $table_data) {
     $data[$table_name][$field_name]['filter'] = [
-     'field' => $field_name,
-     'table' => $table_name,
-     'field_name' => $field_name,
-     'id' => 'name_fulltext',
-     'allow_empty' => TRUE,
+      'field' => $field_name,
+      'table' => $table_name,
+      'field_name' => $field_name,
+      'id' => 'name_fulltext',
+      'allow_empty' => TRUE,
     ];
   }
 
