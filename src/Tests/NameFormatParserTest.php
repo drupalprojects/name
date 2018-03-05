@@ -59,13 +59,13 @@ class NameFormatParserTest extends UnitTestCase {
           // Either the given or family name. Family name is given preference.
           'E' => 'John',
           // Combination tests.
-          // Using a single space
+          // Using a single space.
           'g f' => 'John ',
-          // Separator 1
+          // Separator 1.
           'gif' => 'John ',
-          // Separator 2
+          // Separator 2.
           'gjf' => 'John, ',
-          // Separator 3
+          // Separator 3.
           'gkf' => 'John',
           'f g' => ' John',
           'fig' => ' John',
@@ -101,7 +101,7 @@ class NameFormatParserTest extends UnitTestCase {
           '(((g)))' => 'John',
           // Brackets - mismatched.
           '(g))()(' => 'John)(',
-          // Insert the token if both the surrounding tokens are not empty
+          // Insert the token if both the surrounding tokens are not empty.
           'g+ f' => 'John',
           // Insert the token, if and only if the next token after it is not empty.
           'g= f' => 'John',
@@ -176,9 +176,9 @@ class NameFormatParserTest extends UnitTestCase {
           // Modifier entries.
           // Lowercase.
           'L(t g m f s c)' => 'mr. john peter doe sr b.sc, phd',
-          // Uppercase
+          // Uppercase.
           'U(t g m f s c)' => 'MR. JOHN PETER DOE SR B.SC, PHD',
-          // First letter to uppercase
+          // First letter to uppercase.
           'F(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
           // First letter of all words to uppercase.
           'G(t g m f s c)' => 'MR. JoHn PEter DOE SR B.Sc, PHd',

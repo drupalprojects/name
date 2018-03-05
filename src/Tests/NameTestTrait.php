@@ -29,7 +29,7 @@ trait NameTestTrait {
       'entity_type' => $entity_type,
       'type' => 'name',
     ])
-    ->save();
+      ->save();
 
     $field_config = FieldConfig::create([
       'field_name' => $field_name,

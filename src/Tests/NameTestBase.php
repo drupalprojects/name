@@ -8,6 +8,7 @@ use Drupal\simpletest\WebTestBase;
  * Helper test class with some added functions for testing.
  */
 abstract class NameTestBase extends WebTestBase {
+
   /**
    * Modules to enable.
    *
@@ -23,7 +24,7 @@ abstract class NameTestBase extends WebTestBase {
   /**
    * Possible unused leftover from D7?
    *
-   * @var mixed $instance
+   * @var mixed
    */
   protected $instance;
 

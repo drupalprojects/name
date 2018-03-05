@@ -93,7 +93,7 @@ class NameFieldTest extends NameTestBase {
       t('@field field is required.', ['@field' => t('Components')]),
       t('@field must have one of the following components: @components', [
         '@field' => t('Minimum components'),
-        '@components' => Html::escape(implode(', ', [$n['given'], $n['family']]))
+        '@components' => Html::escape(implode(', ', [$n['given'], $n['family']])),
       ]),
     ];
     foreach ($required_messages as $message) {
@@ -200,12 +200,16 @@ class NameFieldTest extends NameTestBase {
     $this->resetAll();
     $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
     $required_messages = [
-      t('@field can only have one blank value assigned to it.', ['@field' => t('@title options', [
-        '@title' => $n['title']]),
+      t('@field can only have one blank value assigned to it.', [
+        '@field' => t('@title options', [
+          '@title' => $n['title'],
+        ]),
       ]),
-      t('@field can only have one blank value assigned to it.', ['@field' => t('@generational options', [
-        '@generational' => $n['generational'],
-      ])]),
+      t('@field can only have one blank value assigned to it.', [
+        '@field' => t('@generational options', [
+          '@generational' => $n['generational'],
+        ]),
+      ]),
     ];
     foreach ($required_messages as $message) {
       $this->assertText($message);
@@ -264,9 +268,11 @@ class NameFieldTest extends NameTestBase {
         '@field' => t('Minimum components'),
         '@components' => Html::escape(implode(', ', [$n['given'], $n['family']])),
       ]),
-      t("The vocabulary 'machine' in @field could not be found.", ['@field' => t('@title options', [
-        '@title' => $n['title'],
-      ])]),
+      t("The vocabulary 'machine' in @field could not be found.", [
+        '@field' => t('@title options', [
+          '@title' => $n['title'],
+        ]),
+      ]),
       t("The vocabulary '123' in @field could not be found.", [
         '@field' => t('@generational options', ['@generational' => $n['generational']]),
       ]),
