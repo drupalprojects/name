@@ -4,6 +4,8 @@ namespace Drupal\name;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Main class that formats a name from an array of components.
@@ -24,23 +26,57 @@ use Drupal\Component\Utility\Unicode;
  */
 class NameFormatParser {
 
+  use StringTranslationTrait;
+
   /**
-   * Parses an array of name components into the supplied format.
+   * The factory for configuration objects.
    *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * Global settings.
+   *
+   * Values include:
+   * - sep1: First defined separator.
+   * - sep2: Seconddefined separator.
+   * - sep3: Third defined separator.
+   *
+   * @var array
+   */
+  protected $globalSettings;
+
+  /**
+   * Constructs a name formatter object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory) {
+    $this->configFactory = $config_factory;
+    $config = $this->configFactory->get('name.settings');
+    $this->globalSettings = [
+      'sep1' => $config->get('sep1'),
+      'sep2' => $config->get('sep2'),
+      'sep3' => $config->get('sep3'),
+    ];
+  }
+
+
+  /**
    * @todo: Look at replacing the raw string functions with the Drupal equivalent
    * functions. Will need to test this carefully...
    *
    * @todo: Move this parser to a proper service.
    */
-  public static function parse($name_components, $format = '', $settings = [], $tokens = NULL) {
-    foreach (['sep1', 'sep2', 'sep3'] as $key) {
-      if (!isset($settings[$key])) {
-        $config = \Drupal::config('name.settings')->get();
-        $settings[$key] = $config[$key];
-      }
-    }
-    $parser = new self();
-    return $parser->format($name_components, $format, $settings, $tokens);
+  public function parse($name_components, $format = '', array $settings = [], $tokens = NULL) {
+    $settings += [
+      'sep1' => $this->globalSettings['sep1'],
+      'sep2' => $this->globalSettings['sep2'],
+      'sep3' => $this->globalSettings['sep3'],
+    ];
+    return $this->format($name_components, $format, $settings, $tokens);
   }
 
   /**
@@ -320,7 +356,7 @@ class NameFormatParser {
    * flag is set. If set, it runs the component through Html::escape() and
    * wraps the component in a span with the component name set as the class.
    */
-  public static function renderComponent($value, $component_key, $markup, $modifier = NULL) {
+  public function renderComponent($value, $component_key, $markup, $modifier = NULL) {
     if (empty($value) || !Unicode::strlen($value)) {
       return NULL;
     }
@@ -334,6 +370,58 @@ class NameFormatParser {
       return '<span class="' . Html::escape($component_key) . '">' . Html::escape($value) . '</span>';
     }
     return $value;
+  }
+
+  /**
+   * Supported tokens.
+   */
+  function tokenHelp() {
+    $tokens = [
+      't' => $this->t('Title'),
+      'g' => $this->t('Given name'),
+      'm' => $this->t('Middle name(s)'),
+      'f' => $this->t('Family name'),
+      'c' => $this->t('Credentials'),
+      's' => $this->t('Generational suffix'),
+      'x' => $this->t('First letter given'),
+      'y' => $this->t('First letter middle'),
+      'z' => $this->t('First letter family'),
+      'e' => $this->t('Conditional: Either the given or family name. Given name is given preference.'),
+      'E' => $this->t('Conditional: Either the given or family name. Family name is given preference.'),
+      'i' => $this->t('Separator 1'),
+      'j' => $this->t('Separator 2'),
+      'k' => $this->t('Separator 3'),
+      '\\' => $this->t('You can prevent a character in the format string from being expanded by escaping it with a preceding backslash.'),
+      'L' => $this->t('Modifier: Converts the next token to all lowercase.'),
+      'U' => $this->t('Modifier: Converts the next token to all uppercase.'),
+      'F' => $this->t('Modifier: Converts the first letter to uppercase.'),
+      'G' => $this->t('Modifier: Converts the first letter of ALL words to uppercase.'),
+      'T' => $this->t('Modifier: Trims whitespace around the next token.'),
+      'S' => $this->t('Modifier: Ensures that the next token is safe for the display.'),
+      '+' => $this->t('Conditional: Insert the token if both the surrounding tokens are not empty.'),
+      '-' => $this->t('Conditional: Insert the token if the previous token is not empty'),
+      '~' => $this->t('Conditional: Insert the token if the previous token is empty'),
+      '=' => $this->t('Conditional: Insert the token if the next token is not empty.'),
+      '^' => $this->t('Conditional: Insert the token if the next token is empty.'),
+      '|' => $this->t('Conditional: Uses the previous token unless empty, otherwise it uses this token.'),
+      '(' => $this->t('Group: Start of token grouping.'),
+      ')' => $this->t('Group: End of token grouping.'),
+    ];
+
+    // Placeholders for token support insertion on the [object / key | entity / bundle].
+    $unsupported_tokens = [
+      '1' => $this->t('Token placeholder 1'),
+      '2' => $this->t('Token placeholder 2'),
+      '3' => $this->t('Token placeholder 3'),
+      '4' => $this->t('Token placeholder 4'),
+      '5' => $this->t('Token placeholder 5'),
+      '6' => $this->t('Token placeholder 6'),
+      '7' => $this->t('Token placeholder 7'),
+      '8' => $this->t('Token placeholder 8'),
+      '9' => $this->t('Token placeholder 9'),
+    ];
+
+    return $tokens;
   }
 
 }

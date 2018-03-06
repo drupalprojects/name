@@ -6,7 +6,6 @@
  */
 
 use Drupal\Component\Utility\Html;
-use Drupal\name\NameFormatParser;
 
 /**
  * Wrapper theming function for name_format().
@@ -19,7 +18,7 @@ function theme_name_item($variables) {
   if (empty($format)) {
     $format = name_get_format_by_machine_name('default');
   }
-  return NameFormatParser::parse($variables['item'], $format, $variables['settings']);
+  return \Drupal::service('name.format_parser')->parse($variables['item'], $format, $variables['settings']);
 }
 
 /**

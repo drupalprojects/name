@@ -39,6 +39,13 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
   protected $entityManager;
 
   /**
+   * The name format parser.
+   *
+   * @var \Drupal\name\NameFormatParser
+   */
+  protected $parser;
+
+/**
    * Constructs a NameFormatter instance.
    *
    * @param string $plugin_id
@@ -57,11 +64,14 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
    *   Any third party settings settings.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param \Drupal\name\NameFormatParser $parser
+   *   The name format parser.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityManagerInterface $entity_manager) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityManagerInterface $entity_manager, NameFormatParser $parser) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
     $this->entityManager = $entity_manager;
+    $this->parser = $parser;
   }
 
   /**
@@ -76,7 +86,8 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('entity.manager')
+      $container->get('entity.manager'),
+      $container->get('name.format_parser')
     );
   }
 
@@ -226,7 +237,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
     $examples = name_example_names($excluded_components, $field_name);
     if ($examples && $example = array_shift($examples)) {
       $format = name_get_format_by_machine_name($machine_name);
-      $formatted = Html::escape(NameFormatParser::parse($example, $format));
+      $formatted = Html::escape($this->parser->parse($example, $format));
       if (empty($formatted)) {
         $summary[] = $this->t('Example: <em>&lt;&lt;empty&gt;&gt;</em>');
       }
@@ -267,7 +278,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
 
     foreach ($items as $delta => $item) {
       // We still have raw user input here unless the markup flag has been used.
-      $value = NameFormatParser::parse($item->toArray(), $format, [
+      $value = $this->parser->parse($item->toArray(), $format, [
         'object' => $entity,
         'type' => $entity->getEntityTypeId(),
         'markup' => $this->useMarkup(),

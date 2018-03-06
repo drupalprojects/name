@@ -2,8 +2,9 @@
 
 namespace Drupal\name\Tests;
 
-use Drupal\name\NameFormatParser;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use Drupal\name\NameFormatParser;
 
 /**
  * Tests the name formatter.
@@ -11,6 +12,25 @@ use Drupal\Tests\UnitTestCase;
  * @group name
  */
 class NameFormatParserTest extends UnitTestCase {
+
+  /**
+   * The name format parser.
+   *
+   * @var \Drupal\name\NameFormatParser
+   */
+  protected $parser;
+
+  protected function setUp() {
+    parent::setUp();
+
+    $config_factory = $this->getConfigFactoryStub(['name.settings' => ['sep1' => ', ', 'sep2' => ' ', 'sep3' => '']]);
+    $container = new ContainerBuilder();
+    $container->set('config.factory', $config_factory);
+    $container->set('string_translation', $this->getStringTranslationStub());
+    \Drupal::setContainer($container);
+
+    $this->parser = new NameFormatParser($config_factory);
+  }
 
   /**
    * {@inheritDoc}
@@ -24,11 +44,51 @@ class NameFormatParserTest extends UnitTestCase {
   }
 
   /**
+   * Convert names() to PHPUnit compatible format.
+   *
+   * @return array
+   *   An array of names.
+   */
+  public function patternDataProvider() {
+    $data = [];
+
+    foreach ($this->names() as $dataSet) {
+      foreach ($dataSet['tests'] as $pattern => $expected) {
+        $data[] = [
+          $dataSet['components'],
+          $pattern,
+          $expected,
+        ];
+      }
+    }
+
+    return $data;
+  }
+
+  /**
+   * Block Test NameFormatParser::parse
+   *
+   * @dataProvider patternDataProvider
+   */
+  public function testParser($components, $pattern, $expected) {
+    if ($this->parser) {
+      $settings = [
+        'sep1' => ' ',
+        'sep2' => ', ',
+        'sep3' => '',
+      ];
+
+      $formatted = $this->parser->parse($components, $pattern, $settings);
+      $this->assertEquals($expected, $formatted);
+    }
+  }
+
+  /**
    * Helper function to provide data for testParser.
    *
    * @return array
    */
-  public function names() {
+  protected function names() {
     return [
       'given' => [
         'components' => ['given' => 'John'],
@@ -211,43 +271,6 @@ class NameFormatParserTest extends UnitTestCase {
         ],
       ],
     ];
-  }
-
-  /**
-   * Convert names() to PHPUnit compatible format.
-   *
-   * @return array
-   *   An array of names.
-   */
-  public function patternDataProvider() {
-    $data = [];
-
-    foreach ($this->names() as $dataSet) {
-      foreach ($dataSet['tests'] as $pattern => $expected) {
-        $data[] = [
-          $dataSet['components'],
-          $pattern,
-          $expected,
-        ];
-      }
-    }
-
-    return $data;
-  }
-
-  /**
-   * Test NameFormatParser::parse
-   *
-   * @dataProvider patternDataProvider
-   */
-  public function testParser($components, $pattern, $expected) {
-    $settings = [
-      'sep1' => ' ',
-      'sep2' => ', ',
-      'sep3' => '',
-    ];
-    $formatted = NameFormatParser::parse($components, $pattern, $settings);
-    $this->assertEquals($expected, $formatted);
   }
 
 }

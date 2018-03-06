@@ -5,11 +5,47 @@ namespace Drupal\name;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Name format list builder for the admin page.
  */
 class NameFormatListBuilder extends ConfigEntityListBuilder {
+
+  /**
+   * The name format parser.
+   *
+   * @var \Drupal\name\NameFormatParser
+   */
+  protected $parser;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    return new static(
+      $entity_type,
+      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $container->get('name.format_parser')
+    );
+  }
+
+  /**
+   * Constructs a new EntityListBuilder object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   *   The entity storage class.
+   * @param \Drupal\name\NameFormatParser $parser
+   *   The name format parser.
+   */
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, NameFormatParser $parser) {
+    parent::__construct($entity_type, $storage);
+    $this->parser = $parser;
+  }
 
   /**
    * {@inheritdoc}
@@ -51,7 +87,7 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
   public function examples(EntityInterface $entity) {
     $examples = [];
     foreach ($this->nameExamples() as $index => $example_name) {
-      $formatted = Html::escape(NameFormatParser::parse($example_name, $entity->get('pattern')));
+      $formatted = Html::escape($this->parser->parse($example_name, $entity->get('pattern')));
       if (empty($formatted)) {
         $formatted = '<em>&lt;&lt;empty&gt;&gt;</em>';
       }

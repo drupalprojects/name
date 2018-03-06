@@ -2,7 +2,9 @@ services:
   name.autocomplete:
     class: Drupal\name\NameAutocomplete
     arguments: ['@name.options_provider']
-
   name.options_provider:
     class: Drupal\name\NameOptionsProvider
     arguments: ['@entity.manager', '@module_handler']
+  name.format_parser:
+    class: Drupal\name\NameFormatParser
+    arguments: ['@config.factory']

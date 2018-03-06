@@ -18,10 +18,6 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\name\NameFormatParser;
-
-// @todo: Move the code from name.content.inc to the main module.
-require_once __DIR__ . '/includes/name.parser.inc';
 
 /**
  * Implements hook_theme().
@@ -48,11 +44,19 @@ function name_theme() {
     // format parameter.
     'name_format_parameter_help' => [
       'render element' => 'element',
-      'file' => 'includes/name.parser.inc',
     ],
   ];
 
   return $theme;
+}
+
+/**
+ * Prepares variables for name-format-parameter-help template.
+ *
+ * @param $variables
+ */
+function template_preprocess_name_format_parameter_help(&$variables) {
+  $variables['tokens'] = \Drupal::service('name.format_parser')->tokenHelp();
 }
 
 /**
@@ -63,7 +67,7 @@ function name_theme() {
  * wraps the component in a span with the component name set as the class.
  */
 function name_render_component($value, $component_key, $markup, $modifier = NULL) {
-  return NameFormatParser::renderComponent($value, $component_key, $markup, $modifier);
+  return \Drupal::service('name.format_parser')->renderComponent($value, $component_key, $markup, $modifier);
 }
 
 /**
@@ -138,7 +142,7 @@ function name_user_load(array $users) {
         else {
           if ($account->hasField($field->getName()) && !$account->get($field->getName())->isEmpty()) {
             // We still have raw user input here.
-            $names[$uid] = NameFormatParser::parse($account->get($field->getName())->get(0)->getValue(), $format->get('pattern'), ['object' => $account, 'type' => 'user']);
+            $names[$uid] = \Drupal::service('name.format_parser')->parse($account->get($field->getName())->get(0)->getValue(), $format->get('pattern'), ['object' => $account, 'type' => 'user']);
             $users[$uid]->realname = $names[$uid];
           }
         }

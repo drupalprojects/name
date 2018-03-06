@@ -5,8 +5,6 @@
  * Builds placeholder replacement tokens for country-related data.
  */
 
-use Drupal\name\NameFormatParser;
-
 /**
  * Implements hook_token_info().
  */
@@ -140,7 +138,7 @@ function _name_tokens($type, $tokens, array $data = [], array $options = []) {
             }
 
             foreach ($items as $item) {
-              $names[] = NameFormatParser::parse($item, $format);
+              $names[] = \Drupal::service('name.format_parser')->parse($item, $format);
             }
           }
           else {
@@ -190,13 +188,13 @@ function _name_tokens($type, $tokens, array $data = [], array $options = []) {
     foreach ($tokens as $key => $original) {
       if ($key == 'default') {
         // Full default formatted name.
-        $default = NameFormatParser::parse($name_components, \Drupal::config('name.settings')->get('default_format'));
+        $default = \Drupal::service('name.format_parser')->parse($name_components, 'default');
         $replacements[$original] = $sanitize ? check_plain($default) : $default;
       }
       elseif (strpos($key, 'formatter-') === 0) {
         list(, $machine_name) = explode('-', $key, 2);
         $format = name_get_format_by_machine_name($machine_name);
-        $formated_name = NameFormatParser::parse($name_components, $format);
+        $formated_name = \Drupal::service('name.format_parser')->parse($name_components, $format);
         $replacements[$original] = $sanitize ? check_plain($formated_name) : $formated_name;
       }
       elseif (strpos($key, 'component-') === 0) {
