@@ -20,6 +20,9 @@ class NameFormatParserTest extends UnitTestCase {
    */
   protected $parser;
 
+  /**
+   * {@inheritDoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -190,6 +193,7 @@ class NameFormatParserTest extends UnitTestCase {
           'family' => 'dOE',
           'generational' => 'sR',
           'credentials' => 'b.Sc, pHd',
+          'preferred' => 'peTe',
         ],
         // Tests "MR. JoHn pEter dOE sR b.Sc, pHd".
         'tests' => [
@@ -198,6 +202,8 @@ class NameFormatParserTest extends UnitTestCase {
           't' => 'MR.',
           // Given name.
           'g' => 'JoHn',
+          // Preferred name.
+          'p' => 'peTe',
           // Middle name(s).
           'm' => 'pEter',
           // Family name.
@@ -206,12 +212,18 @@ class NameFormatParserTest extends UnitTestCase {
           'c' => 'b.Sc, pHd',
           // Generational suffix.
           's' => 'sR',
+          // First preferred given.
+          'x' => 'p',
           // First letter given.
           'x' => 'J',
           // First letter middle.
           'y' => 'p',
           // First letter family.
           'z' => 'd',
+          // Either the preferred or family name. Preferred name is given preference.
+          'd' => 'peTe',
+          // Either the preferred or family name. Family name is given preference.
+          'D' => 'dOE',
           // Either the given or family name. Given name is given preference.
           'e' => 'JoHn',
           // Either the given or family name. Family name is given preference.
@@ -219,6 +231,8 @@ class NameFormatParserTest extends UnitTestCase {
           // Combination tests.
           // Using a single space.
           'g f' => 'JoHn dOE',
+          // Using a single space with preferred.
+          'p f' => 'peTe dOE',
           // Separator 1.
           'gif' => 'JoHn dOE',
           // Separator 2.

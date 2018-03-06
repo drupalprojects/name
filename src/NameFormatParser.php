@@ -317,14 +317,17 @@ class NameFormatParser {
       'family' => '',
       'credentials' => '',
       'generational' => '',
+      'preferred' => '',
     ];
     $tokens = [
       't' => $this->renderComponent($name_components['title'], 'title', $markup),
       'g' => $this->renderComponent($name_components['given'], 'given', $markup),
+      'p' => $this->renderFirstComponent([$name_components['preferred'], $name_components['given']], 'given', $markup),
       'm' => $this->renderComponent($name_components['middle'], 'middle', $markup),
       'f' => $this->renderComponent($name_components['family'], 'family', $markup),
       'c' => $this->renderComponent($name_components['credentials'], 'credentials', $markup),
       's' => $this->renderComponent($name_components['generational'], 'generational', $markup),
+      'w' => $this->renderFirstComponent([$name_components['preferred'], $name_components['given']], 'initial', $markup),
       'x' => $this->renderComponent($name_components['given'], 'given', $markup, 'initial'),
       'y' => $this->renderComponent($name_components['middle'], 'middle', $markup, 'initial'),
       'z' => $this->renderComponent($name_components['family'], 'family', $markup, 'initial'),
@@ -332,21 +335,46 @@ class NameFormatParser {
       'j' => $settings['sep2'],
       'k' => $settings['sep3'],
     ];
+    $preferred = $tokens['p'];
     $given = $tokens['g'];
     $family = $tokens['f'];
+    if ($preferred || $family) {
+      $tokens += [
+        'd' => $preferred ? $preferred : $family,
+        'D' => $family ? $family : $preferred,
+      ];
+    }
     if ($given || $family) {
       $tokens += [
         'e' => $given ? $given : $family,
         'E' => $family ? $family : $given,
       ];
     }
-    else {
-      $tokens += [
-        'e' => NULL,
-        'E' => NULL,
-      ];
-    }
+    $tokens += [
+      'd' => NULL,
+      'D' => NULL,
+      'e' => NULL,
+      'E' => NULL,
+    ];
     return $tokens;
+  }
+
+  /**
+   * Finds and renders the first renderable name component value.
+   *
+   * This function does not by default sanitize the output unless the markup
+   * flag is set. If this is set, it runs the component through check_plain() and
+   * wraps the component in a span with the component name set as the class.
+   */
+  public function renderFirstComponent(array $values, $component_key, $markup, $modifier = NULL) {
+    foreach ($values as $value) {
+      $output = $this->renderComponent($value, $component_key, $markup, $modifier);
+      if (isset($output) && strlen($output)) {
+        return $output;
+      }
+    }
+
+    return NULL;
   }
 
   /**
@@ -378,14 +406,18 @@ class NameFormatParser {
   function tokenHelp() {
     $tokens = [
       't' => $this->t('Title'),
+      'p' => $this->t('Preferred name, use given name if not set'),
       'g' => $this->t('Given name'),
       'm' => $this->t('Middle name(s)'),
       'f' => $this->t('Family name'),
       'c' => $this->t('Credentials'),
       's' => $this->t('Generational suffix'),
+      'w' => $this->t('First letter preferred or given names'),
       'x' => $this->t('First letter given'),
       'y' => $this->t('First letter middle'),
       'z' => $this->t('First letter family'),
+      'd' => $this->t('Conditional: Either the preferred given or family name. Preferred name is given preference over given or family names.'),
+      'D' => $this->t('Conditional: Either the preferred given or family name. Family name is given preference over preferred or given names.'),
       'e' => $this->t('Conditional: Either the given or family name. Given name is given preference.'),
       'E' => $this->t('Conditional: Either the given or family name. Family name is given preference.'),
       'i' => $this->t('Separator 1'),
