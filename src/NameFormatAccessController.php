@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * The entity access controller for name formats.
+ * The entity access controller for name and list formats.
  */
 class NameFormatAccessController extends EntityAccessControlHandler {
 

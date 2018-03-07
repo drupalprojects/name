@@ -184,7 +184,7 @@ class NameAdminTest extends NameTestBase {
     $this->assertRow($row, $row_template, 3);
 
     $values = ['label' => 'new name', 'pattern' => 'f+g'];
-    $this->drupalPostForm('admin/config/regional/name/manage/test', $values, t('Save'));
+    $this->drupalPostForm('admin/config/regional/name/manage/test', $values, t('Save format'));
     $this->assertText(t('Name format new name has been updated.'));
 
     $row = [

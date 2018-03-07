@@ -172,6 +172,18 @@ function name_get_custom_format_options() {
 }
 
 /**
+ * Helper function to generate a list of all defined custom formatting options.
+ */
+function name_get_custom_list_format_options() {
+  $options = [];
+  foreach (entity_load_multiple('name_list_format') as $format) {
+    $options[$format->id()] = $format->label();
+  }
+  natcasesort($options);
+  return $options;
+}
+
+/**
  * Loads a format based on the machine name.
  */
 function name_get_format_by_machine_name($machine_name) {

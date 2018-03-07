@@ -20,7 +20,41 @@ name.name_format.*:
     pattern:
       type: string
       label: 'Pattern'
-
+name.name_list_format.*:
+  type: config_entity
+  label: 'Name list format'
+  mapping:
+    id:
+      type: string
+      label: 'Format identifier'
+    uuid:
+      type: string
+      label: 'UUID'
+    label:
+      type: label
+      label: 'Label'
+    locked:
+      type: boolean
+      label: 'Locked'
+    status:
+      type: boolean
+      label: 'Status'
+    delimiter:
+      type: string
+      label: 'Delimiter'
+    and:
+      type: string
+      label: 'Last delimiter type'
+    delimiter_precedes_last:
+      type: string
+      label: 'Standard delimiter precedes last delimiter'
+    el_al_min:
+      type: integer
+      label: 'Reduce list and append el al'
+    el_al_first:
+      type: integer
+      label: 'Number of names to display when using el al'
+      
 name.settings:
   type: config_object
   label: 'Name sttings'
@@ -38,8 +72,8 @@ name.settings:
       type: string
       label: 'Inline styles'
     inline_styles_rtl:
-     type: string
-     label: 'Inline styles (RTL)'
+      type: string
+      label: 'Inline styles (RTL)'
     sep1:
       type: string
       label: 'Separator 1'

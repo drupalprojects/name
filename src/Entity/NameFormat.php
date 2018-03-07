@@ -15,9 +15,9 @@ use Drupal\name\NameFormatInterface;
  *     "access" = "Drupal\name\NameFormatAccessController",
  *     "list_builder" = "Drupal\name\NameFormatListBuilder",
  *     "form" = {
- *       "add" = "Drupal\name\Form\NameFormatAddForm",
- *       "edit" = "Drupal\name\Form\NameFormatEditForm",
- *       "delete" = "Drupal\name\Form\NameFormatDeleteForm"
+ *       "add" = "Drupal\name\Form\NameFormatForm",
+ *       "edit" = "Drupal\name\Form\NameFormatForm",
+ *       "delete" = "Drupal\name\Form\NameFormatDeleteConfirm"
  *     },
  *     "list_builder" = "Drupal\name\NameFormatListBuilder"
  *   },

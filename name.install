@@ -59,3 +59,10 @@ function name_update_8001() {
 
   db_drop_table('name_custom_format');
 }
+
+/**
+ * Clear caches to register the new name list plugin.
+ */
+function name_update_8201() {
+  // Empty update to cause a cache rebuild.
+}
