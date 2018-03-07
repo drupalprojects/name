@@ -94,11 +94,7 @@ class NameAdminTest extends NameTestBase {
     // Load the name settings form.
     $this->drupalGet('admin/config/regional/name/settings');
 
-    // Fieldset rendering check.
-    $this->assertRaw('Format string help', 'Testing the help fieldgroup');
-
     $default_values = [
-      'name_settings[default_format]' => 't+ig+im+if+is+kc',
       'name_settings[sep1]' => ' ',
       'name_settings[sep2]' => ', ',
       'name_settings[sep3]' => '',
@@ -108,17 +104,8 @@ class NameAdminTest extends NameTestBase {
     }
     // ID example.
     $this->assertFieldById('edit-name-settings-sep1', ' ', t('Sep 1 default value.'));
-    $post_values = $default_values;
-    $post_values['name_settings[default_format]'] = '';
-
-    $this->drupalPostForm('admin/config/regional/name/settings', $post_values, t('Save configuration'));
-    $this->assertText(t('Default format field is required.'));
-    $post_values['name_settings[default_format]'] = '     ';
-    $this->drupalPostForm('admin/config/regional/name/settings', $post_values, t('Save configuration'));
-    $this->assertText(t('Default format field is required.'));
 
     $test_values = [
-      'name_settings[default_format]' => 'c+ks+if+im+ig+t',
       'name_settings[sep1]' => '~',
       'name_settings[sep2]' => '^',
       'name_settings[sep3]' => '-',

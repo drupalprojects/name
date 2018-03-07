@@ -60,11 +60,8 @@ name.settings:
   label: 'Name sttings'
   mapping:
     component_required_marker:
-     type: string
-     label: 'Component required marker'
-    default_format:
       type: string
-      label: 'Default wrapper'
+      label: 'Component required marker'
     element_wrapper:
       type: boolean
       label: 'Element wrapper'

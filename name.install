@@ -41,7 +41,6 @@ function name_update_8001() {
     ->save();
 
   \Drupal::config('name.settings')
-    ->set('default_format', $settings['default_format'])
     ->set('sep1', $settings['sep1'])
     ->set('sep2', $settings['sep2'])
     ->set('sep3', $settings['sep3'])
