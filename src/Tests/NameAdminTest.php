@@ -15,9 +15,9 @@ use Drupal\name\NameFormatInterface;
 class NameAdminTest extends NameTestBase {
 
   /**
-   * The most basic test.
+   * Misc tests related to adding, updating and removing formats.
    */
-  public function testAdminSettings() {
+  public function testAdminFormatSettings() {
     // Default settings and system settings.
     $this->drupalLogin($this->admin_user);
 
@@ -36,14 +36,12 @@ class NameAdminTest extends NameTestBase {
     ];
     $all_values = [
       1 => [
-        'title href' => Url::fromRoute('name.settings')->toString(),
         'title' => t('Default'),
         'machine' => 'default',
         'pattern' => '((((t+ig)+im)+if)+is)+jc',
         'formatted' => 'Mr Joe John Peter Mark Doe Jnr., B.Sc., Ph.D. JOAN SUE DOE Prince',
       ],
       2 => [
-        'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'family'])->toString(),
         'title' => t('Family'),
         'machine' => 'family',
         'pattern' => 'f',
@@ -52,7 +50,6 @@ class NameAdminTest extends NameTestBase {
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'family'])->toString(),
       ],
       3 => [
-        'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'full'])->toString(),
         'title' => t('Full'),
         'machine' => 'full',
         'pattern' => '((((t+ig)+im)+if)+is)+jc',
@@ -63,7 +60,6 @@ class NameAdminTest extends NameTestBase {
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'full'])->toString(),
       ],
       4 => [
-        'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'given'])->toString(),
         'title' => t('Given'),
         'machine' => 'given',
         'pattern' => 'g',
@@ -74,7 +70,6 @@ class NameAdminTest extends NameTestBase {
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'given'])->toString(),
       ],
       5 => [
-        'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'short_full'])->toString(),
         'title' => t('Given Family'),
         'machine' => 'short_full',
         'pattern' => 'g+if',
@@ -83,7 +78,6 @@ class NameAdminTest extends NameTestBase {
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'short_full'])->toString(),
       ],
       6 => [
-        'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'formal'])->toString(),
         'title' => t('Title Family'),
         'machine' => 'formal',
         'pattern' => 't+if',
@@ -173,7 +167,6 @@ class NameAdminTest extends NameTestBase {
     $this->assertText(t('Name format Test added.'));
 
     $row = [
-      'title href' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'test'])->toString(),
       'title' => 'Test',
       'machine' => 'test',
       'pattern' => 'abc',
@@ -206,6 +199,127 @@ class NameAdminTest extends NameTestBase {
     $this->drupalPostForm(NULL, ['confirm' => 1], t('Delete'));
     $this->assertText(t('The name format @title has been deleted.', ['@title' => $values['label']]));
   }
+
+  /**
+   * Misc tests related to adding, updating and removing formats.
+   */
+  public function testAdminListFormatSettings() {
+    // Default settings and system settings.
+    $this->drupalLogin($this->admin_user);
+
+    // The default installed formats.
+    $this->drupalGet('admin/config/regional/name/list');
+
+    $row_template = [
+      'title'       => '//tbody/tr[{row}]/td[1]',
+      'machine'     => '//tbody/tr[{row}]/td[2]',
+      // 'examples'   => '//tbody/tr[{row}]/td[3]',
+      'edit'        => '//tbody/tr[{row}]/td[4]//li[contains(@class, "edit")]/a',
+      'edit link'   => '//tbody/tr[{row}]/td[4]//li[contains(@class, "edit")]/a/@href',
+      'delete'      => '//tbody/tr[{row}]/td[4]//li[contains(@class, "delete")]/a',
+      'delete link' => '//tbody/tr[{row}]/td[4]//li[contains(@class, "delete")]/a/@href',
+    ];
+    $all_values = [
+      1 => [
+        'title' => t('Default'),
+        'machine' => 'default',
+        // 'examples' => 'todo',
+        'edit link' => Url::fromRoute('entity.name_list_format.edit_form', ['name_list_format' => 'default'])->toString(),
+      ],
+    ];
+
+    foreach ($all_values as $id => $row) {
+      $this->assertRow($row, $row_template, $id);
+    }
+
+    $this->drupalGet('admin/config/regional/name/list/add');
+
+    // All bar delimiter are required
+    $values = [
+      'label' => '',
+      'id' => '',
+      'delimiter' => '',
+      // One or text or symbol.
+      // 'and' => '',
+      // One or never, always or contextual.
+      // 'delimiter_precedes_last' => '',
+      // Integers 0 (never reduce) through 20.
+      // 'el_al_min' => '',
+      // Integers 1 through 20.
+      // 'el_al_first' => '',
+    ];
+    $this->drupalPostForm('admin/config/regional/name/list/add', $values, t('Save list format'));
+    $labels = [
+      t('Name'),
+      t('Machine-readable name'),
+    ];
+    foreach ($labels as $title) {
+      $this->assertText(t('@field field is required', ['@field' => $title]));
+    }
+    $values = [
+      'label' => 'comma',
+      'id' => '1234567890abcdefghijklmnopqrstuvwxyz_',
+      'delimiter' => ', ',
+      'and' => 'text',
+      'delimiter_precedes_last' => 'always',
+      'el_al_min' => '14',
+      'el_al_first' => '5',
+    ];
+    $this->drupalPostForm('admin/config/regional/name/list/add', $values, t('Save list format'));
+    $this->assertNoText(t('@field field is required', ['@field' => t('Last delimiter type')]));
+    $this->assertNoText(t('@field field is required', ['@field' => t('Machine-readable name')]));
+
+    $values['id'] = '%&*(';
+    $this->drupalPostForm('admin/config/regional/name/list/add', $values, t('Save list format'));
+    $this->assertText(t('The machine-readable name must contain only lowercase letters, numbers, and underscores.'));
+
+    $values = ['label' => 'default', 'id' => 'default', 'delimiter' => 'a'];
+    $this->drupalPostForm('admin/config/regional/name/list/add', $values, t('Save list format'));
+    $this->assertText(t('The machine-readable name is already in use. It must be unique.'));
+
+    $values = [
+      'label' => 'Test label',
+      'id' => 'test',
+      'delimiter' => ' / ',
+      'and' => 'symbol',
+      'delimiter_precedes_last' => 'contextual',
+      'el_al_min' => '3',
+      'el_al_first' => '1',
+    ];
+    $this->drupalPostForm('admin/config/regional/name/list/add', $values, t('Save list format'));
+    $this->assertText(t('Name list format Test label added.'));
+
+    $row = [
+      'title' => 'Test label',
+      'machine' => 'test',
+      'delimiter' => ' / ',
+      'edit link' => Url::fromRoute('entity.name_list_format.edit_form', ['name_list_format' => 'test'])->toString(),
+      'delete link' => Url::fromRoute('entity.name_list_format.delete_form', ['name_list_format' => 'test'])->toString(),
+    ];
+    $row_template = [
+      'title'       => '//tbody/tr[{row}]/td[1]',
+      'machine'     => '//tbody/tr[{row}]/td[2]',
+      // 'example'     => '//tbody/tr[{row}]/td[3]',
+      'edit'        => '//tbody/tr[{row}]/td[4]//li[contains(@class, "edit")]/a',
+      'edit link'   => '//tbody/tr[{row}]/td[4]//li[contains(@class, "edit")]/a/@href',
+      'delete'      => '//tbody/tr[{row}]/td[4]//li[contains(@class, "delete")]/a',
+      'delete link' => '//tbody/tr[{row}]/td[4]//li[contains(@class, "delete")]/a/@href',
+    ];
+    $this->assertRow($row, $row_template, 3);
+
+    $this->drupalGet('admin/config/regional/name/list/manage/60');
+    $this->assertResponse(404);
+
+    $this->drupalGet('admin/config/regional/name/list/manage/60/delete');
+    $this->assertResponse(404);
+
+    $this->drupalGet('admin/config/regional/name/list/manage/test/delete');
+    $this->assertText(t('Are you sure you want to delete the custom list format @title?', ['@title' => $values['label']]));
+
+    $this->drupalPostForm(NULL, ['confirm' => 1], t('Delete'));
+    $this->assertText(t('The name list format @title has been deleted.', ['@title' => $values['label']]));
+  }
+
 
   /**
    * Helper function to test a table cell via it's expected value.

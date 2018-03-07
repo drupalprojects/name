@@ -63,9 +63,10 @@ class NameListFormatListBuilder extends ConfigEntityListBuilder {
     $row = [];
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
+    // @todo: Add examples.
     $row['examples'] = array(
       'data' => array(
-        '#markup' => implode('<br/>', $this->examples($entity))
+        '#markup' => '',
       )
     );
     $operations = $this->buildOperations($entity);

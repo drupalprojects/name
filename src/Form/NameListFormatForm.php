@@ -58,6 +58,7 @@ class NameListFormatForm extends EntityForm {
       ),
       '#default_value' => $this->entity->and,
       '#description' => $this->t('This specifies the delimiter between the second to last and the last name.'),
+      '#required' => TRUE,
     );
     $element['delimiter_precedes_last'] = array(
       '#type' => 'radios',
@@ -69,6 +70,7 @@ class NameListFormatForm extends EntityForm {
       ),
       '#default_value' => $this->entity->delimiter_precedes_last,
       '#description' => $this->t('This specifies the delimiter between the second to last and the last name. Contextual means that the delimiter is only included for lists with three or more names.'),
+      '#required' => TRUE,
     );
     $options = range(1, 20);
     $options = array_combine($options, $options);
@@ -78,12 +80,14 @@ class NameListFormatForm extends EntityForm {
       '#options' => array(0 => $this->t('Never reduce')) + $options,
       '#default_value' => $this->entity->el_al_min,
       '#description' => $this->t('This specifies a limit on the number of names to display. After this limit, names are removed and the abbrivation <em>et al</em> is appended. This Latin abbrivation of <em>et alii</em> means "and others".'),
+      '#required' => TRUE,
     );
     $element['el_al_first'] = array(
       '#type' => 'select',
       '#title' => $this->t('Number of names to display when using <em>el al</em>'),
       '#options' => $options,
       '#default_value' => $this->entity->el_al_first,
+      '#required' => TRUE,
     );
 
     return $element;
