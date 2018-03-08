@@ -194,6 +194,7 @@ class NameFormatParserTest extends UnitTestCase {
           'generational' => 'sR',
           'credentials' => 'b.Sc, pHd',
           'preferred' => 'peTe',
+          'alternative' => 'aLt',
         ],
         // Tests "MR. JoHn pEter dOE sR b.Sc, pHd".
         'tests' => [
@@ -212,6 +213,8 @@ class NameFormatParserTest extends UnitTestCase {
           'c' => 'b.Sc, pHd',
           // Generational suffix.
           's' => 'sR',
+          // Alternative name.
+          'a' => 'aLt',
           // First preferred given.
           'x' => 'p',
           // First letter given.
@@ -220,6 +223,8 @@ class NameFormatParserTest extends UnitTestCase {
           'y' => 'p',
           // First letter family.
           'z' => 'd',
+          // First letter of alternative name.
+          'A' => 'a',
           // Either the preferred or family name. Preferred name is given preference.
           'd' => 'peTe',
           // Either the preferred or family name. Family name is given preference.
@@ -274,6 +279,10 @@ class NameFormatParserTest extends UnitTestCase {
           // Uses the previous token unless empty, otherwise it uses this token.
           'g|m|f' => 'JoHn',
           // Uses the previous token unless empty, otherwise it uses this token.
+          'g|a' => 'JoHn',
+          // Uses the previous token unless empty, otherwise it uses this token.
+          'a|g' => 'aLt',
+          // Uses the previous token unless empty, otherwise it uses this token.
           'm|f|g' => 'pEter',
           // Uses only the first one.
           's|c|g|m|f|t' => 'sR',
@@ -282,6 +291,10 @@ class NameFormatParserTest extends UnitTestCase {
           'L(t= g= m= f= s=,(= c))' => 'mr. john peter doe sr, b.sc, phd',
           // Full name with a comma-space before credentials.
           'TS(LG(t= g= m= f= s)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.sc, Phd',
+          // Alternative or full name followed by a comma-space before credentials.
+          'TS(a|LG(t= g= m= f= s)=,LG(= c))' => 'aLt, B.sc, Phd',
+          // Full name or alternative followed by a comma-space before credentials.
+          'TS((LG(t= g= m= f= s)|a)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.sc, Phd',
         ],
       ],
     ];
