@@ -205,6 +205,8 @@ class NameFormatParserTest extends UnitTestCase {
           'g' => 'JoHn',
           // Preferred name.
           'p' => 'peTe',
+          // Preferred name without fallback.
+          'q' => 'peTe',
           // Middle name(s).
           'm' => 'pEter',
           // Family name.
@@ -215,8 +217,10 @@ class NameFormatParserTest extends UnitTestCase {
           's' => 'sR',
           // Alternative name.
           'a' => 'aLt',
-          // First preferred given.
-          'x' => 'p',
+          // First letter of the preferred or given.
+          'w' => 'p',
+          // First letter of the preferred without fallback.
+          'v' => 'p',
           // First letter given.
           'x' => 'J',
           // First letter middle.
@@ -264,7 +268,7 @@ class NameFormatParserTest extends UnitTestCase {
           // First letter to uppercase.
           'LF(t g m f s c)' => 'Mr. john peter doe sr b.sc, phd',
           // First letter of all words to uppercase.
-          'LG(t g m f s c)' => 'Mr. John Peter Doe Sr B.sc, Phd',
+          'LG(t g m f s c)' => 'Mr. John Peter Doe Sr B.Sc, Phd',
           // Trims whitespace around the next token.
           'T(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
           // @todo: Assess the old check_plain run on code test / token.
@@ -290,11 +294,13 @@ class NameFormatParserTest extends UnitTestCase {
           // Full name with a comma-space before credentials.
           'L(t= g= m= f= s=,(= c))' => 'mr. john peter doe sr, b.sc, phd',
           // Full name with a comma-space before credentials.
-          'TS(LG(t= g= m= f= s)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.sc, Phd',
+          'TS(LG(t= g= m= f= s)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.Sc, Phd',
           // Alternative or full name followed by a comma-space before credentials.
-          'TS(a|LG(t= g= m= f= s)=,LG(= c))' => 'aLt, B.sc, Phd',
+          'TS(a|LG(t= g= m= f= s)=,LG(= c))' => 'aLt, B.Sc, Phd',
           // Full name or alternative followed by a comma-space before credentials.
-          'TS((LG(t= g= m= f= s)|a)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.sc, Phd',
+          'TS((LG(t= g= m= f= s)|a)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.Sc, Phd',
+          // Full name including preferred name (nickname).
+          'TS(LG(((t+ig+i(=\(q-\)))+im)+if)+iLG(s))' => 'Mr. John (Pete) Peter Doe Sr',
         ],
       ],
     ];

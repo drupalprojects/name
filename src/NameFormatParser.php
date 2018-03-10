@@ -67,8 +67,6 @@ class NameFormatParser {
   /**
    * @todo: Look at replacing the raw string functions with the Drupal equivalent
    * functions. Will need to test this carefully...
-   *
-   * @todo: Move this parser to a proper service.
    */
   public function parse($name_components, $format = '', array $settings = [], $tokens = NULL) {
     $settings += [
@@ -82,7 +80,7 @@ class NameFormatParser {
   /**
    * Formats an array of name components into the supplied format.
    */
-  public function format($name_components, $format = '', array $settings = [], $tokens = NULL) {
+  protected function format($name_components, $format = '', array $settings = [], $tokens = NULL) {
     if (empty($format)) {
       return '';
     }
@@ -254,14 +252,7 @@ class NameFormatParser {
               break;
 
             case 'G':
-              if (!empty($string)) {
-                $parts = explode(' ', $string);
-                $string = [];
-                foreach ($parts as $part) {
-                  $string[] = Unicode::ucfirst($part);
-                }
-                $string = implode(' ', $string);
-              }
+              $string = UniCode::ucwords($string);
               break;
 
             case 'T':
@@ -324,12 +315,14 @@ class NameFormatParser {
       't' => $this->renderComponent($name_components['title'], 'title', $markup),
       'g' => $this->renderComponent($name_components['given'], 'given', $markup),
       'p' => $this->renderFirstComponent([$name_components['preferred'], $name_components['given']], 'given', $markup),
+      'q' => $this->renderComponent($name_components['preferred'], 'preferred', $markup),
       'm' => $this->renderComponent($name_components['middle'], 'middle', $markup),
       'f' => $this->renderComponent($name_components['family'], 'family', $markup),
       'c' => $this->renderComponent($name_components['credentials'], 'credentials', $markup),
       'a' => $this->renderComponent($name_components['alternative'], 'alternative', $markup),
       's' => $this->renderComponent($name_components['generational'], 'generational', $markup),
-      'w' => $this->renderFirstComponent([$name_components['preferred'], $name_components['given']], 'initial', $markup),
+      'v' => $this->renderComponent($name_components['preferred'], 'preferred', $markup, 'initial'),
+      'w' => $this->renderFirstComponent([$name_components['preferred'], $name_components['given']], 'given', $markup, 'initial'),
       'x' => $this->renderComponent($name_components['given'], 'given', $markup, 'initial'),
       'y' => $this->renderComponent($name_components['middle'], 'middle', $markup, 'initial'),
       'z' => $this->renderComponent($name_components['family'], 'family', $markup, 'initial'),
@@ -369,7 +362,7 @@ class NameFormatParser {
    * flag is set. If this is set, it runs the component through check_plain() and
    * wraps the component in a span with the component name set as the class.
    */
-  public function renderFirstComponent(array $values, $component_key, $markup, $modifier = NULL) {
+  protected function renderFirstComponent(array $values, $component_key, $markup, $modifier = NULL) {
     foreach ($values as $value) {
       $output = $this->renderComponent($value, $component_key, $markup, $modifier);
       if (isset($output) && strlen($output)) {
@@ -387,7 +380,7 @@ class NameFormatParser {
    * flag is set. If set, it runs the component through Html::escape() and
    * wraps the component in a span with the component name set as the class.
    */
-  public function renderComponent($value, $component_key, $markup, $modifier = NULL) {
+  protected function renderComponent($value, $component_key, $markup, $modifier = NULL) {
     if (empty($value) || !Unicode::strlen($value)) {
       return NULL;
     }
@@ -406,28 +399,30 @@ class NameFormatParser {
   /**
    * Supported tokens.
    */
-  function tokenHelp() {
+  public function tokenHelp() {
     $tokens = [
-      't' => $this->t('Title'),
-      'p' => $this->t('Preferred name, use given name if not set'),
-      'g' => $this->t('Given name'),
-      'm' => $this->t('Middle name(s)'),
-      'f' => $this->t('Family name'),
-      'c' => $this->t('Credentials'),
-      's' => $this->t('Generational suffix'),
-      'a' => $this->t('Alternative value'),
-      'w' => $this->t('First letter preferred or given names'),
-      'x' => $this->t('First letter given'),
-      'y' => $this->t('First letter middle'),
-      'z' => $this->t('First letter family'),
-      'A' => $this->t('First letter of alternative value'),
+      't' => $this->t('Title.'),
+      'p' => $this->t('Preferred name, use given name if not set.'),
+      'q' => $this->t('Preferred name.'),
+      'g' => $this->t('Given name.'),
+      'm' => $this->t('Middle name(s).'),
+      'f' => $this->t('Family name.'),
+      'c' => $this->t('Credentials.'),
+      's' => $this->t('Generational suffix.'),
+      'a' => $this->t('Alternative value.'),
+      'v' => $this->t('First letter preferred name.'),
+      'w' => $this->t('First letter preferred or given name.'),
+      'x' => $this->t('First letter given.'),
+      'y' => $this->t('First letter middle.'),
+      'z' => $this->t('First letter family.'),
+      'A' => $this->t('First letter of alternative value.'),
       'd' => $this->t('Conditional: Either the preferred given or family name. Preferred name is given preference over given or family names.'),
       'D' => $this->t('Conditional: Either the preferred given or family name. Family name is given preference over preferred or given names.'),
       'e' => $this->t('Conditional: Either the given or family name. Given name is given preference.'),
       'E' => $this->t('Conditional: Either the given or family name. Family name is given preference.'),
-      'i' => $this->t('Separator 1'),
-      'j' => $this->t('Separator 2'),
-      'k' => $this->t('Separator 3'),
+      'i' => $this->t('Separator 1.'),
+      'j' => $this->t('Separator 2.'),
+      'k' => $this->t('Separator 3.'),
       '\\' => $this->t('You can prevent a character in the format string from being expanded by escaping it with a preceding backslash.'),
       'L' => $this->t('Modifier: Converts the next token to all lowercase.'),
       'U' => $this->t('Modifier: Converts the next token to all uppercase.'),
@@ -436,8 +431,8 @@ class NameFormatParser {
       'T' => $this->t('Modifier: Trims whitespace around the next token.'),
       'S' => $this->t('Modifier: Ensures that the next token is safe for the display.'),
       '+' => $this->t('Conditional: Insert the token if both the surrounding tokens are not empty.'),
-      '-' => $this->t('Conditional: Insert the token if the previous token is not empty'),
-      '~' => $this->t('Conditional: Insert the token if the previous token is empty'),
+      '-' => $this->t('Conditional: Insert the token if the previous token is not empty.'),
+      '~' => $this->t('Conditional: Insert the token if the previous token is empty.'),
       '=' => $this->t('Conditional: Insert the token if the next token is not empty.'),
       '^' => $this->t('Conditional: Insert the token if the next token is empty.'),
       '|' => $this->t('Conditional: Uses the previous token unless empty, otherwise it uses this token.'),
@@ -447,15 +442,15 @@ class NameFormatParser {
 
     // Placeholders for token support insertion on the [object / key | entity / bundle].
     $unsupported_tokens = [
-      '1' => $this->t('Token placeholder 1'),
-      '2' => $this->t('Token placeholder 2'),
-      '3' => $this->t('Token placeholder 3'),
-      '4' => $this->t('Token placeholder 4'),
-      '5' => $this->t('Token placeholder 5'),
-      '6' => $this->t('Token placeholder 6'),
-      '7' => $this->t('Token placeholder 7'),
-      '8' => $this->t('Token placeholder 8'),
-      '9' => $this->t('Token placeholder 9'),
+      '1' => $this->t('Token placeholder 1.'),
+      '2' => $this->t('Token placeholder 2.'),
+      '3' => $this->t('Token placeholder 3.'),
+      '4' => $this->t('Token placeholder 4.'),
+      '5' => $this->t('Token placeholder 5.'),
+      '6' => $this->t('Token placeholder 6.'),
+      '7' => $this->t('Token placeholder 7.'),
+      '8' => $this->t('Token placeholder 8.'),
+      '9' => $this->t('Token placeholder 9.'),
     ];
 
     return $tokens;
