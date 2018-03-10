@@ -381,7 +381,7 @@ class NameItem extends FieldItemBase {
         if ($name == 'title' || $name == 'generational') {
           continue;
         }
-        if (isset($value) && !isset($this->properties[$name])) {
+        if (isset($value) && strlen($value) && !isset($this->properties[$name])) {
           return FALSE;
         }
       }
