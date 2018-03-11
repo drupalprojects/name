@@ -56,6 +56,13 @@ class NameFormatParser {
   protected $sep3 = '';
 
   /**
+   * Used to seperate words using the "b" and "B" modifiers.
+   *
+   * @var string
+   */
+  protected $boundaryRegExp = '/[\b,\s]/';
+
+  /**
    * Parses a name component array into the given format.
    */
   public function parse($name_components, $format = '', array $settings = [], $tokens = NULL) {
@@ -65,6 +72,9 @@ class NameFormatParser {
       }
     }
     $this->markup = !empty($settings['markup']);
+    if (isset($settings['boundary']) && strlen($settings['boundary'])) {
+      $this->boundary = $settings['boundary'];
+    }
 
     return $this->format($name_components, $format, $tokens);
   }
@@ -107,6 +117,8 @@ class NameFormatParser {
         case 'T':
         case 'S':
         case 'G':
+        case 'B':
+        case 'b':
           $modifiers .= $char;
           break;
 
@@ -254,6 +266,17 @@ class NameFormatParser {
             case 'S':
               $string = Html::escape($string);
               break;
+
+            case 'B':
+              $parts = preg_split($this->boundaryRegExp, $string);
+              $string = (string) array_shift($parts);
+              break;
+
+            case 'b':
+              $parts = preg_split($this->boundaryRegExp, $string);
+              $string = (string) array_pop($parts);
+              break;
+
           }
         }
         $string = $prefix . $string . $suffix;
@@ -442,6 +465,8 @@ class NameFormatParser {
       'G' => $this->t('Modifier: Converts the first letter of ALL words to uppercase.'),
       'T' => $this->t('Modifier: Trims whitespace around the next token.'),
       'S' => $this->t('Modifier: Ensures that the next token is safe for the display.'),
+      'B' => $this->t('Modifier: Use the first word of the next token.'),
+      'b' => $this->t('Modifier: Use the last word of the next token.'),
       '+' => $this->t('Conditional: Insert the token if both the surrounding tokens are not empty.'),
       '-' => $this->t('Conditional: Insert the token if the previous token is not empty.'),
       '~' => $this->t('Conditional: Insert the token if the previous token is empty.'),

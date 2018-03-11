@@ -149,14 +149,14 @@ class NameAdminTest extends NameTestBase {
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
     $this->assertText(t('The machine-readable name is already in use. It must be unique.'));
 
-    $values = ['label' => 'Test', 'id' => 'test', 'pattern' => '\abc'];
+    $values = ['label' => 'Test', 'id' => 'test', 'pattern' => '\a\bc'];
     $this->drupalPostForm('admin/config/regional/name/add', $values, t('Save format'));
     $this->assertText(t('Name format Test added.'));
 
     $row = [
       'title' => 'Test',
       'machine' => 'test',
-      'pattern' => '\abc',
+      'pattern' => '\a\bc',
       'formatted' => 'abB.Sc., Ph.D. ab ab',
       'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'test'])->toString(),
       'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'test'])->toString(),

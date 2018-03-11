@@ -281,6 +281,14 @@ class NameFormatParserTest extends UnitTestCase {
           'T(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
           // @todo: Assess the old check_plain run on code test / token.
           'S(t g m f s c)' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
+          // Use the first word of the next token.
+          'Bc' => 'b.Sc',
+          // Use the last word of the next token.
+          'bc' => 'pHd',
+          // Use the first word of the next token, nested tokens.
+          'B((LG(g= m= f= s)|a)=,LG(= c))' => 'John',
+          // Use the last word of the next token, nested tokens.
+          'b((LG(g= m= f= s)|a)=,LG(= c))' => 'Phd',
           // Conditional entries
           // Brackets.
           '(((t g m f s c)))' => 'MR. JoHn pEter dOE sR b.Sc, pHd',
