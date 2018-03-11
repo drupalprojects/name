@@ -229,6 +229,14 @@ class NameFormatParserTest extends UnitTestCase {
           'z' => 'd',
           // First letter of alternative name.
           'A' => 'a',
+          // Initials (all) from given and family.
+          'I' => 'JD',
+          // Initials (all) from given, middle and family.
+          'J' => 'JPD',
+          // Initials (all) from given.
+          'K' => 'J',
+          // Initials (all) from given and middle.
+          'M' => 'JP',
           // Either the preferred or family name. Preferred name is given preference.
           'd' => 'peTe',
           // Either the preferred or family name. Family name is given preference.
@@ -301,6 +309,26 @@ class NameFormatParserTest extends UnitTestCase {
           'TS((LG(t= g= m= f= s)|a)=,LG(= c))' => 'Mr. John Peter Doe Sr, B.Sc, Phd',
           // Full name including preferred name (nickname).
           'TS(LG(((t+ig+i(=\(q-\)))+im)+if)+iLG(s))' => 'Mr. John (Pete) Peter Doe Sr',
+        ],
+      ],
+      'initials' => [
+        'components' => [
+          'given' => 'JoHn william',
+          'middle' => 'pEter smith jOnes',
+          'family' => 'dOE waLker',
+        ],
+        // Tests "JoHn william pEter smith dOE waLker".
+        'tests' => [
+          // Initials (all) from given and family.
+          'I' => 'JWDW',
+          // Initials (all) from given, middle and family.
+          'J' => 'JWPSJDW',
+          // Initials (all) from given.
+          'K' => 'JW',
+          // Initials (all) from given and middle.
+          'M' => 'JWPSJ',
+          // Family name with custom conditional separator before initials.
+          'LG(f)+(; )K' => 'Doe Walker; JW',
         ],
       ],
     ];

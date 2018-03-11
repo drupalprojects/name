@@ -327,6 +327,10 @@ class NameFormatParser {
       'y' => $this->renderComponent($name_components['middle'], 'middle', $markup, 'initial'),
       'z' => $this->renderComponent($name_components['family'], 'family', $markup, 'initial'),
       'A' => $this->renderComponent($name_components['alternative'], 'alternative', $markup, 'initial'),
+      'I' => $this->renderComponent($name_components['given'] . ' ' . $name_components['family'], 'initials', $markup, 'initials'),
+      'J' => $this->renderComponent($name_components['given'] . ' ' . $name_components['middle'] . ' ' . $name_components['family'], 'initials', $markup, 'initials'),
+      'K' => $this->renderComponent($name_components['given'], 'initials', $markup, 'initials'),
+      'M' => $this->renderComponent($name_components['given'] . ' ' . $name_components['middle'], 'initials', $markup, 'initials'),
       'i' => $settings['sep1'],
       'j' => $settings['sep2'],
       'k' => $settings['sep3'],
@@ -385,8 +389,15 @@ class NameFormatParser {
       return NULL;
     }
     switch ($modifier) {
+      // First letter first word.
       case 'initial':
         $value = Unicode::substr($value, 0, 1);
+        break;
+
+      // First letter all words.
+      case 'initials':
+        // First letter all words.
+        $value = NameUnicodeExtras::initials($value);
         break;
 
     }
@@ -416,6 +427,10 @@ class NameFormatParser {
       'y' => $this->t('First letter middle.'),
       'z' => $this->t('First letter family.'),
       'A' => $this->t('First letter of alternative value.'),
+      'I' => $this->t('Initials (all) from given and family.'),
+      'J' => $this->t('Initials (all) from given, middle and family.'),
+      'K' => $this->t('Initials (all) from given.'),
+      'M' => $this->t('Initials (all) from given and middle.'),
       'd' => $this->t('Conditional: Either the preferred given or family name. Preferred name is given preference over given or family names.'),
       'D' => $this->t('Conditional: Either the preferred given or family name. Family name is given preference over preferred or given names.'),
       'e' => $this->t('Conditional: Either the given or family name. Given name is given preference.'),
