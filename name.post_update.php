@@ -35,7 +35,6 @@ function name_post_update_create_name_list_format() {
     $default_list->save();
     drupal_set_message(t('Default name list format was added.'));
   }
-  // @todo: maybe parse all defined field settings to discover all variations?
 }
 
 /**
@@ -67,7 +66,7 @@ function name_post_update_formatter_settings() {
           ->loadByProperties($properties);
       foreach ($view_displays as $view_display) {
         if ($component = $view_display->getComponent($field_name)) {
-          $settings = $component->settings;
+          $settings = (array) $component->settings;
           $settings['list_format'] = isset($settings['multiple']) && $settings['multiple'] == 'default' ? '' : 'default';
           $settings = array_intersect_key($settings, $default_settings);
           $settings += $default_settings;
@@ -81,4 +80,50 @@ function name_post_update_formatter_settings() {
   }
 
   drupal_set_message(t('New name list formatter settings are implemented. Please review any name display settings that used inline lists.'));
+}
+
+/**
+ * Updates the field formatter settings for new link and alternative data sources settings.
+ */
+function name_post_update_formatter_settings_link_and_external_sources() {
+  $field_storage_configs = \Drupal::entityManager()
+      ->getStorage('field_storage_config')
+      ->loadByProperties(['type' => 'name']);
+  $new_settings = [
+    "format" => "default",
+    "markup" => FALSE,
+    "output" => "default",
+    "list_format" => "",
+    "link_target" => "",
+    "preferred_field_reference" => "",
+    "preferred_field_reference_separator" => ", ",
+    "alternative_field_reference" => "",
+    "alternative_field_reference_separator" => ", ",
+  ];
+
+  foreach ($field_storage_configs as $field_storage) {
+    $field_name = $field_storage->getName();
+    $fields = \Drupal::entityManager()
+      ->getStorage('field_config')
+      ->loadByProperties(['field_name' => $field_name]);
+    foreach ($fields as $field) {
+      $properties = [
+        'targetEntityType' => $field->getTargetEntityTypeId(),
+        'bundle' => $field->getTargetBundle()
+      ];
+      $view_displays = \Drupal::entityManager()
+          ->getStorage('entity_view_display')
+          ->loadByProperties($properties);
+      foreach ($view_displays as $view_display) {
+        if ($component = $view_display->getComponent($field_name)) {
+          $settings = (array) $component->settings;
+          $settings += $new_settings;
+          $view_display->setComponent($field_name, array(
+              'type' => 'name_default',
+              'settings' => $settings,
+            ) + $component)->save();
+        }
+      }
+    }
+  }
 }

@@ -2,8 +2,6 @@
 
 namespace Drupal\name;
 
-use Drupal\Component\Render\MarkupInterface;
-
 /**
  * Provides an interface defining a name formatter.
  */

@@ -11,7 +11,6 @@ use Drupal\Core\Utility\Token;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Render\HtmlEscapedText;
 use Drupal\name\Render\NameListFormattableMarkup;
-use Drupal\Component\Utility\Html;
 
 /**
  * Primary name formatter for an array of name components.
