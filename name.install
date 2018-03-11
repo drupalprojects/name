@@ -60,8 +60,11 @@ function name_update_8001() {
 }
 
 /**
- * Clear caches to register the new name list plugin.
+ * Register the new name list format plugin.
  */
-function name_update_8201() {
-  // Empty update to cause a cache rebuild.
+function name_update_8202() {
+  // Create the entity type.
+  \Drupal::entityTypeManager()->clearCachedDefinitions();
+  $name_list_format = \Drupal::entityTypeManager()->getDefinition('name_list_format');
+  \Drupal::entityDefinitionUpdateManager()->installEntityType($name_list_format);
 }

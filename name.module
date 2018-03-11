@@ -60,17 +60,6 @@ function template_preprocess_name_format_parameter_help(&$variables) {
 }
 
 /**
- * Renders a name component value.
- *
- * This function does not by default sanitize the output unless the markup
- * flag is set. If this is set, it runs the component through check_plain() and
- * wraps the component in a span with the component name set as the class.
- */
-function name_render_component($value, $component_key, $markup, $modifier = NULL) {
-  return \Drupal::service('name.format_parser')->renderComponent($value, $component_key, $markup, $modifier);
-}
-
-/**
  * Implements hook_user_format_name_alter().
  */
 function name_user_format_name_alter(&$name, AccountInterface $account) {
@@ -198,10 +187,15 @@ function name_get_format_by_machine_name($machine_name) {
 /**
  * Static cache to reuse translated name components.
  *
- * These have double encoding to allow easy and targeted string overrides in the
- * sites settings.php file.
+ * These have double encoding to allow easy and targeted string overrides.
+ *
+ * @param string[]
+ *   An array of field component keys of the translations required.
+ *
+ * @return string[]
+ *   Keyed array of the field component labels.
  */
-function _name_translations($intersect = NULL) {
+function _name_translations(array $intersect = NULL) {
   static $nt = NULL;
   if (!isset($nt)) {
     $nt = [
@@ -564,16 +558,6 @@ function _name_formatter_output_options() {
     'default' => t('Default'),
     'plain' => t('Plain text'),
     'raw' => t('Raw value (not recommended)'),
-  ];
-}
-
-/**
- * Helper function to define the available multiple formatter options.
- */
-function _name_formatter_multiple_options() {
-  return [
-    'default' => t('Default'),
-    'inline_list' => t('Inline list'),
   ];
 }
 

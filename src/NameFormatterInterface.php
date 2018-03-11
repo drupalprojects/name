@@ -1,0 +1,107 @@
+<?php
+
+namespace Drupal\name;
+
+use Drupal\Component\Render\MarkupInterface;
+
+/**
+ * Provides an interface defining a name formatter.
+ */
+interface NameFormatterInterface {
+
+  /**
+   * Formats an array of name components.
+   *
+   * @param array $components
+   *   An array of name components to format.
+   *
+   *   The Expected format of the components is:
+   *   - title (string): The persons title
+   *   - given (string):
+   *   - middle (string):
+   *   - family (string):
+   *   - generational (string):
+   *   - credentials (string):
+   *
+   *   @todo
+   *   Optionally, additional metadata can be past along with the base components
+   *   - entity type (string): The type of entity linked to this name.
+   *   - entity (object): The entity linked to this name.
+   *   - link (bool): Boolean flag to link to the entity.
+   *
+   * @param string $type
+   *   (optional) The name format type to load. If the format does not exist,
+   *   the 'default' format is used.
+   *   Defaults to 'default'.
+   * @param string|null $langcode
+   *   (optional) Language code to translate to. NULL (default) means to use
+   *   the user interface language for the page.
+   *
+   * @return mixed
+   *   Returns a renderable object.
+   */
+  public function format(array $components, $type = 'default', $langcode = NULL);
+
+  /**
+   * Formats a list of author information.
+   *
+   * @param array $items
+   *   A nested array of name components to format.
+   * @param string $type
+   *   (optional) The name format type to load. If the format does not exist,
+   *   the 'default' format is used.
+   *   Defaults to 'default'.
+   * @param string $list_type
+   *   (optional) The list format type to load. If the format does not exist,
+   *   the 'default' format is used.
+   *   Defaults to 'default'.
+   * @param string|null $langcode
+   *   (optional) Language code to translate to. NULL (default) means to use
+   *   the user interface language for the page.
+   *
+   * @return \Drupal\Component\Render\MarkupInterface
+   *   The processed name in a MarkupInterface object.
+   */
+  public function formatList(array $items, $type = 'default', $list_type = 'default', $langcode = NULL);
+
+  /**
+   * Sets the value of a setting for the formatter.
+   *
+   * @param string $key
+   *   The setting name.
+   * @param mixed $value
+   *   The setting value.
+   *
+   * @return \Drupal\name\NameFormatterInterface
+   *   The name formatter instance.
+   */
+  public function setSetting($key, $value);
+
+  /**
+   * Gets the value of a setting for the formatter.
+   *
+   * @param string $key
+   *   The setting name.
+   *
+   * @return mixed
+   *   The value of the setting or NULL if not found.
+   */
+  public function getSetting($key);
+
+  /**
+   * Defines the supported final delimitor options.
+   *
+   * return array
+   *   Keyed options that are supported.
+   */
+  public function getLastDelimitorTypes();
+
+  /**
+   * Defines the supported final delimitor behavior options.
+   *
+   * return array
+   *   Keyed options that are supported.
+   */
+  public function getLastDelimitorBehaviors();
+
+}

@@ -8,3 +8,6 @@ services:
   name.format_parser:
     class: Drupal\name\NameFormatParser
     arguments: []
+  name.formatter:
+    class: Drupal\name\NameFormatter
+    arguments: ['@entity.manager', '@name.format_parser', '@language_manager', '@string_translation', '@config.factory', '@token']

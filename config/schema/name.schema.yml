@@ -425,21 +425,6 @@ field.formatter.settings.name_default:
     output:
       type: string
       label: 'Output'
-    multiple:
+    list_format:
       type: string
-      label: 'Multiple format options'
-    multiple_delimiter:
-      type: string
-      label: 'Delimiter'
-    multiple_and:
-      type: string
-      label: 'Last delimiter type'
-    multiple_delimiter_precedes_last:
-      type: string
-      label: 'Standard delimiter precedes last delimiter'
-    multiple_el_al_min:
-      type: string
-      label: 'Reduce list and append el al'
-    multiple_el_al_first:
-      type: string
-      label: 'Number of names to display when using el al'
+      label: 'List format'

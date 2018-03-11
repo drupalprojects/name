@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @FieldWidget(
  *   id = "name_default",
  *   module = "name",
- *   label = @Translation("Name field widget"),
+ *   label = @Translation("Name components"),
  *   field_types = {
  *     "name"
  *   }
