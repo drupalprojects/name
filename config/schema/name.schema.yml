@@ -106,7 +106,7 @@ name.examples.*:
               label: 'Middle'
             family:
               type: string
-              label: 'Familry'
+              label: 'Family'
             generational:
               type: string
               label: 'Generational'
