@@ -102,19 +102,8 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
   public function render() {
     return [
       'list' => parent::render(),
-      'help' => $this->nameFormatHelp(),
+      'help' => $this->parser->renderableTokenHelp(),
     ];
-  }
-
-  /**
-   * Help box.
-   *
-   * @return array
-   *   The Details help FAPI array.
-   */
-  public function nameFormatHelp() {
-    module_load_include('inc', 'name', 'name.admin');
-    return _name_get_name_format_help_form();
   }
 
   /**

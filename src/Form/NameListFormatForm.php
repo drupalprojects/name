@@ -4,12 +4,33 @@ namespace Drupal\name\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\name\NameFormatterInterface;
 use Drupal\name\Entity\NameListFormat;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a form controller for name list formats.
  */
 class NameListFormatForm extends EntityForm {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('name.formatter')
+    );
+  }
+
+  /**
+   * Constructs a new NameListFormatForm object.
+   *
+   * @param \Drupal\name\NameFormatterInterface $formatter
+   *   The name formatter.
+   */
+  public function __construct(NameFormatterInterface $formatter) {
+    $this->formatter = $formatter;
+  }
 
   /**
    * {@inheritdoc}
@@ -52,10 +73,7 @@ class NameListFormatForm extends EntityForm {
     $element['and'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Last delimiter type'),
-      '#options' => array(
-        'text' => $this->t('Textual (and)'),
-        'symbol' => $this->t('Ampersand (&amp;)'),
-      ),
+      '#options' => $this->formatter->getLastDelimitorTypes(),
       '#default_value' => $this->entity->and,
       '#description' => $this->t('This specifies the delimiter between the second to last and the last name.'),
       '#required' => TRUE,
@@ -63,11 +81,7 @@ class NameListFormatForm extends EntityForm {
     $element['delimiter_precedes_last'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Standard delimiter precedes last delimiter'),
-      '#options' => array(
-        'never' => $this->t('Never (i.e. "J. Doe and T. Williams")'),
-        'always' => $this->t('Always (i.e. "J. Doe<strong>,</strong> and T. Williams")'),
-        'contextual' => $this->t('Contextual (i.e. "J. Doe and T. Williams" <em>or</em> "J. Doe, S. Smith<strong>,</strong> and T. Williams")'),
-      ),
+      '#options' => $this->formatter->getLastDelimitorBehaviors(),
       '#default_value' => $this->entity->delimiter_precedes_last,
       '#description' => $this->t('This specifies the delimiter between the second to last and the last name. Contextual means that the delimiter is only included for lists with three or more names.'),
       '#required' => TRUE,

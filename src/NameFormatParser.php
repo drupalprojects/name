@@ -485,4 +485,24 @@ class NameFormatParser {
     return $tokens;
   }
 
+  /**
+   * Helper function to provide name format token help.
+   *
+   * @return array
+   *   A renderable array of tokens in a details element..
+   */
+  public function renderableTokenHelp() {
+    return [
+      '#type' => 'details',
+      '#title' => t('Format string help'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#parents' => [],
+      'format_parameters' => [
+        '#theme' => 'name_format_parameter_help',
+        '#tokens' => $this->tokenHelp(),
+      ],
+    ];
+  }
+
 }

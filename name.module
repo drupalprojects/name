@@ -43,20 +43,11 @@ function name_theme() {
     // Provides the help for the recognized characters in the name_format()
     // format parameter.
     'name_format_parameter_help' => [
-      'render element' => 'element',
+      'variables' => ['tokens' => []],
     ],
   ];
 
   return $theme;
-}
-
-/**
- * Prepares variables for name-format-parameter-help template.
- *
- * @param $variables
- */
-function template_preprocess_name_format_parameter_help(&$variables) {
-  $variables['tokens'] = \Drupal::service('name.format_parser')->tokenHelp();
 }
 
 /**

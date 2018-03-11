@@ -4,12 +4,40 @@ namespace Drupal\name\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\name\NameFormatParser;
 use Drupal\name\Entity\NameFormat;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a base form controller for date formats.
  */
 class NameFormatForm extends EntityForm {
+
+  /**
+   * The name format parser for token help.
+   *
+   * @var \Drupal\name\NameFormatParser
+   */
+  protected $parser;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('name.format_parser')
+    );
+  }
+
+  /**
+   * Constructs a new NameListFormatForm object.
+   *
+   * @param \Drupal\name\NameFormatParser $parser
+   *   The name format parser.
+   */
+  public function __construct(NameFormatParser $parser) {
+    $this->parser = $parser;
+  }
 
   /**
    * {@inheritdoc}
@@ -51,7 +79,7 @@ class NameFormatForm extends EntityForm {
       '#required' => TRUE,
     );
 
-    $element['help'] = $this->nameFormatHelp();
+    $element['help'] = $this->parser->renderableTokenHelp();
 
     return $element;
   }
@@ -86,16 +114,6 @@ class NameFormatForm extends EntityForm {
       drupal_set_message($this->t('Name format %label has been updated.', ['%label' => $this->entity->label()]));
     }
     $this->entity->save();
-  }
-
-  /**
-   * Help box.
-   *
-   * @return array
-   */
-  public function nameFormatHelp() {
-    module_load_include('inc', 'name', 'name.admin');
-    return _name_get_name_format_help_form();
   }
 
 }
