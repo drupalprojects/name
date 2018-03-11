@@ -4,7 +4,6 @@ namespace Drupal\name;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -29,64 +28,57 @@ class NameFormatParser {
   use StringTranslationTrait;
 
   /**
-   * The factory for configuration objects.
+   * Flag to add markup around name components.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var bool
    */
-  protected $configFactory;
+  protected $markup = FALSE;
 
   /**
-   * Global settings.
+   * First separator.
    *
-   * Values include:
-   * - sep1: First defined separator.
-   * - sep2: Seconddefined separator.
-   * - sep3: Third defined separator.
-   *
-   * @var array
+   * @var string
    */
-  protected $globalSettings;
+  protected $sep1 = ' ';
 
   /**
-   * Constructs a name formatter object.
+   * Second separator.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
+   * @var string
    */
-  public function __construct(ConfigFactoryInterface $config_factory) {
-    $this->configFactory = $config_factory;
-    $config = $this->configFactory->get('name.settings');
-    $this->globalSettings = [
-      'sep1' => $config->get('sep1'),
-      'sep2' => $config->get('sep2'),
-      'sep3' => $config->get('sep3'),
-    ];
-  }
-
+  protected $sep2 = ', ';
 
   /**
-   * @todo: Look at replacing the raw string functions with the Drupal equivalent
-   * functions. Will need to test this carefully...
+   * Third separator.
+   *
+   * @var string
+   */
+  protected $sep3 = '';
+
+  /**
+   * Parses a name component array into the given format.
    */
   public function parse($name_components, $format = '', array $settings = [], $tokens = NULL) {
-    $settings += [
-      'sep1' => $this->globalSettings['sep1'],
-      'sep2' => $this->globalSettings['sep2'],
-      'sep3' => $this->globalSettings['sep3'],
-    ];
-    return $this->format($name_components, $format, $settings, $tokens);
+    foreach (['sep1', 'sep2', 'sep3'] as $sep_key) {
+      if (isset($settings[$sep_key])) {
+        $this->{$sep_key} = (string) $settings[$sep_key];
+      }
+    }
+    $this->markup = !empty($settings['markup']);
+
+    return $this->format($name_components, $format, $tokens);
   }
 
   /**
    * Formats an array of name components into the supplied format.
    */
-  protected function format($name_components, $format = '', array $settings = [], $tokens = NULL) {
+  protected function format($name_components, $format = '', $tokens = NULL) {
     if (empty($format)) {
       return '';
     }
 
     if (!isset($tokens)) {
-      $tokens = $this->generateTokens($name_components, $settings);
+      $tokens = $this->generateTokens($name_components);
     }
 
     // Neutralise any escaped backslashes.
@@ -131,7 +123,7 @@ class NameFormatParser {
         case ')':
           $remaining_string = substr($format, $i);
           if ($char == '(' && $closing_bracket = $this->closingBracketPosition($remaining_string)) {
-            $sub_string = $this->format($tokens, substr($format, $i + 1, $closing_bracket - 1), $settings, $tokens);
+            $sub_string = $this->format($tokens, substr($format, $i + 1, $closing_bracket - 1), $tokens);
 
             // Increment the counter past the closing bracket.
             $i += $closing_bracket;
@@ -298,9 +290,8 @@ class NameFormatParser {
   /**
    * Generates the tokens from the name item.
    */
-  protected function generateTokens($name_components, array $settings = []) {
+  protected function generateTokens($name_components) {
     $name_components = (array) $name_components;
-    $markup = !empty($settings['markup']);
     $name_components += [
       'title' => '',
       'given' => '',
@@ -312,28 +303,28 @@ class NameFormatParser {
       'alternative' => '',
     ];
     $tokens = [
-      't' => $this->renderComponent($name_components['title'], 'title', $markup),
-      'g' => $this->renderComponent($name_components['given'], 'given', $markup),
-      'p' => $this->renderFirstComponent([$name_components['preferred'], $name_components['given']], 'given', $markup),
-      'q' => $this->renderComponent($name_components['preferred'], 'preferred', $markup),
-      'm' => $this->renderComponent($name_components['middle'], 'middle', $markup),
-      'f' => $this->renderComponent($name_components['family'], 'family', $markup),
-      'c' => $this->renderComponent($name_components['credentials'], 'credentials', $markup),
-      'a' => $this->renderComponent($name_components['alternative'], 'alternative', $markup),
-      's' => $this->renderComponent($name_components['generational'], 'generational', $markup),
-      'v' => $this->renderComponent($name_components['preferred'], 'preferred', $markup, 'initial'),
-      'w' => $this->renderFirstComponent([$name_components['preferred'], $name_components['given']], 'given', $markup, 'initial'),
-      'x' => $this->renderComponent($name_components['given'], 'given', $markup, 'initial'),
-      'y' => $this->renderComponent($name_components['middle'], 'middle', $markup, 'initial'),
-      'z' => $this->renderComponent($name_components['family'], 'family', $markup, 'initial'),
-      'A' => $this->renderComponent($name_components['alternative'], 'alternative', $markup, 'initial'),
-      'I' => $this->renderComponent($name_components['given'] . ' ' . $name_components['family'], 'initials', $markup, 'initials'),
-      'J' => $this->renderComponent($name_components['given'] . ' ' . $name_components['middle'] . ' ' . $name_components['family'], 'initials', $markup, 'initials'),
-      'K' => $this->renderComponent($name_components['given'], 'initials', $markup, 'initials'),
-      'M' => $this->renderComponent($name_components['given'] . ' ' . $name_components['middle'], 'initials', $markup, 'initials'),
-      'i' => $settings['sep1'],
-      'j' => $settings['sep2'],
-      'k' => $settings['sep3'],
+      't' => $this->renderComponent($name_components['title'], 'title'),
+      'g' => $this->renderComponent($name_components['given'], 'given'),
+      'p' => $this->renderFirstComponent([$name_components['preferred'], $name_components['given']], 'given'),
+      'q' => $this->renderComponent($name_components['preferred'], 'preferred'),
+      'm' => $this->renderComponent($name_components['middle'], 'middle'),
+      'f' => $this->renderComponent($name_components['family'], 'family'),
+      'c' => $this->renderComponent($name_components['credentials'], 'credentials'),
+      'a' => $this->renderComponent($name_components['alternative'], 'alternative'),
+      's' => $this->renderComponent($name_components['generational'], 'generational'),
+      'v' => $this->renderComponent($name_components['preferred'], 'preferred', 'initial'),
+      'w' => $this->renderFirstComponent([$name_components['preferred'], $name_components['given']], 'given', 'initial'),
+      'x' => $this->renderComponent($name_components['given'], 'given', 'initial'),
+      'y' => $this->renderComponent($name_components['middle'], 'middle', 'initial'),
+      'z' => $this->renderComponent($name_components['family'], 'family', 'initial'),
+      'A' => $this->renderComponent($name_components['alternative'], 'alternative', 'initial'),
+      'I' => $this->renderComponent($name_components['given'] . ' ' . $name_components['family'], 'initials', 'initials'),
+      'J' => $this->renderComponent($name_components['given'] . ' ' . $name_components['middle'] . ' ' . $name_components['family'], 'initials', 'initials'),
+      'K' => $this->renderComponent($name_components['given'], 'initials', 'initials'),
+      'M' => $this->renderComponent($name_components['given'] . ' ' . $name_components['middle'], 'initials', 'initials'),
+      'i' => $this->sep1,
+      'j' => $this->sep2,
+      'k' => $this->sep3,
     ];
     $preferred = $tokens['p'];
     $given = $tokens['g'];
@@ -366,9 +357,9 @@ class NameFormatParser {
    * flag is set. If this is set, it runs the component through check_plain() and
    * wraps the component in a span with the component name set as the class.
    */
-  protected function renderFirstComponent(array $values, $component_key, $markup, $modifier = NULL) {
+  protected function renderFirstComponent(array $values, $component_key, $modifier = NULL) {
     foreach ($values as $value) {
-      $output = $this->renderComponent($value, $component_key, $markup, $modifier);
+      $output = $this->renderComponent($value, $component_key, $modifier);
       if (isset($output) && strlen($output)) {
         return $output;
       }
@@ -384,7 +375,7 @@ class NameFormatParser {
    * flag is set. If set, it runs the component through Html::escape() and
    * wraps the component in a span with the component name set as the class.
    */
-  protected function renderComponent($value, $component_key, $markup, $modifier = NULL) {
+  protected function renderComponent($value, $component_key, $modifier = NULL) {
     if (empty($value) || !Unicode::strlen($value)) {
       return NULL;
     }
@@ -401,7 +392,7 @@ class NameFormatParser {
         break;
 
     }
-    if ($markup) {
+    if ($this->markup) {
       return '<span class="' . Html::escape($component_key) . '">' . Html::escape($value) . '</span>';
     }
     return $value;
@@ -409,8 +400,14 @@ class NameFormatParser {
 
   /**
    * Supported tokens.
+   *
+   * @param bool $describe
+   *   Appends the description of the letter to the description.
+   *
+   * @return string[]
+   *   An array of strings keyed by the token.
    */
-  public function tokenHelp() {
+  public function tokenHelp($describe = TRUE) {
     $tokens = [
       't' => $this->t('Title.'),
       'p' => $this->t('Preferred name, use given name if not set.'),
@@ -454,6 +451,23 @@ class NameFormatParser {
       '(' => $this->t('Group: Start of token grouping.'),
       ')' => $this->t('Group: End of token grouping.'),
     ];
+
+    if ($describe) {
+      foreach ($tokens as $letter => $description) {
+        if (preg_match('/^[a-z]+$/', $letter)) {
+          $tokens[$letter] = $this->t('@description<br><small>(lowercase @letter)</small>', [
+            '@description' => $description,
+            '@letter' => Unicode::strtoupper($letter),
+          ]);
+        }
+        elseif (preg_match('/^[A-Z]+$/', $letter)) {
+          $tokens[$letter] = $this->t('@description<br><small>(uppercase @letter)</small>', [
+            '@description' => $description,
+            '@letter' => Unicode::strtoupper($letter),
+          ]);
+        }
+      }
+    }
 
     // Placeholders for token support insertion on the [object / key | entity / bundle].
     $unsupported_tokens = [
