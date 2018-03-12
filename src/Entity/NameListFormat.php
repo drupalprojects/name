@@ -27,6 +27,19 @@ use Drupal\name\NameListFormatInterface;
  *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
+ *   config_export = {
+ *     "id",
+ *     "uuid",
+ *     "langcode",
+ *     "label",
+ *     "locked",
+ *     "status",
+ *     "delimiter",
+ *     "and",
+ *     "delimiter_precedes_last",
+ *     "el_al_min",
+ *     "el_al_first",
+ *   },
  *   links = {
  *     "edit-form" = "/admin/config/regional/name/list/manage/{name_format}",
  *     "delete-form" = "/admin/config/regional/name/list/manage/{name_format}/delete"

@@ -28,6 +28,15 @@ use Drupal\name\NameFormatInterface;
  *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
+ *   config_export = {
+ *     "id",
+ *     "uuid",
+ *     "label",
+ *     "status",
+ *     "langcode",
+ *     "locked",
+ *     "pattern",
+ *   },
  *   links = {
  *     "edit-form" = "/admin/config/regional/name/manage/{name_format}",
  *     "delete-form" = "/admin/config/regional/name/manage/{name_format}/delete"
