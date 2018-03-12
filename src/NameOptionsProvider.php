@@ -13,6 +13,13 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 class NameOptionsProvider {
 
   /**
+   * The regular expression for finding the vocabulary token.
+   *
+   * @var string
+   */
+  const vocabularyRegExp = '/^\[vocabulary:([0-9a-z\_]{1,})\]/';
+
+  /**
    * The entity manager.
    *
    * @var \Drupal\Core\Entity\EntityManagerInterface
@@ -65,7 +72,7 @@ class NameOptionsProvider {
     $fs = $field->getFieldStorageDefinition()->getSettings();
     $options = $fs[$component . '_options'];
     foreach ($options as $index => $opt) {
-      if (preg_match('/^\[vocabulary:([0-9a-z\_]{1,})\]/', trim($opt), $matches)) {
+      if (preg_match(self::vocabularyRegExp, trim($opt), $matches)) {
         unset($options[$index]);
         if ($this->termStorage && $this->vocabularyStorage) {
           $vocabulary = $this->vocabularyStorage->load($matches[1]);

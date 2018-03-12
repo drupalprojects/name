@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\name\NameOptionsProvider;
 
 /**
  * Plugin implementation of the 'name' field type.
@@ -644,7 +645,7 @@ class NameItem extends FieldItemBase {
         $default_options[] = $value;
       }
       // Simple checks on the taxonomy includes.
-      elseif (preg_match('/^\[vocabulary:([0-9a-z\_]{1,})\]/', $value, $matches)) {
+      elseif (preg_match(NameOptionsProvider::vocabularyRegExp, $value, $matches)) {
         if (!\Drupal::moduleHandler()->moduleExists('taxonomy')) {
           $form_state->setError($element, t("The taxonomy module must be enabled before using the '%tag' tag in %label.", [
             '%tag' => $matches[0],
