@@ -1,7 +1,6 @@
 name: Name Field
 type: module
 description: 'Defines a persons name field type.'
-version: VERSION
 core: 8.x
 dependencies:
   - 'drupal:field'
