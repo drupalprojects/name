@@ -24,8 +24,6 @@ function name_devel_generate($object, $field, $instance, $bundle) {
  * You can specify another function here to generate your own list.
  */
 function _name_devel_generate($object, $field, $instance, $bundle) {
-  $object_field = array();
-
   $func = variable_get('name_devel_generate_names', '_name_devel_generate_name');
   $names = $func($field);
   if (!isset($instance['setting']['components'])) {
