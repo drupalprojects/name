@@ -102,7 +102,8 @@ function name_tokens($type, $tokens, array $data = array(), array $options = arr
         // Ensure that this is actually a real field token before replacing.
         // This will mimimise the chances of false matches like 'name-raw'.
         if (field_info_field($field_name)) {
-          $items = field_get_items($type, $data[$type], $field_name);
+          $entity_type = str_replace('-', '_', $type);
+          $items = field_get_items($entity_type, $data[$type], $field_name);
           if (empty($items)) {
             $replacements[$original] = '';
             continue;
