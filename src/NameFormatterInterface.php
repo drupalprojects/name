@@ -89,17 +89,23 @@ interface NameFormatterInterface {
   /**
    * Defines the supported final delimitor options.
    *
-   * return array
+   * @param bool $include_examples
+   *   Flag to include examples in the options.
+   *
+   * @return array
    *   Keyed options that are supported.
    */
-  public function getLastDelimitorTypes();
+  public function getLastDelimitorTypes($include_examples = TRUE);
 
   /**
    * Defines the supported final delimitor behavior options.
    *
-   * return array
+   * @param bool $include_examples
+   *   Flag to include examples in the options.
+   *
+   * @return array
    *   Keyed options that are supported.
    */
-  public function getLastDelimitorBehaviors();
+  public function getLastDelimitorBehaviors($include_examples = TRUE);
 
 }

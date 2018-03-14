@@ -277,22 +277,39 @@ class NameFormatter implements NameFormatterInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLastDelimitorTypes() {
-    return [
-      'text' => $this->t('Textual (and)'),
-      'symbol' => $this->t('Ampersand (&amp;)'),
-    ];
+  public function getLastDelimitorTypes($include_examples = TRUE) {
+    if ($include_examples) {
+      return [
+        'text' => $this->t('Textual (and)'),
+        'symbol' => $this->t('Ampersand (&amp;)'),
+      ];
+    }
+    else {
+      return [
+        'text' => $this->t('Textual'),
+        'symbol' => $this->t('Ampersand'),
+      ];
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getLastDelimitorBehaviors() {
-    return [
-      'never' => $this->t('Never (i.e. "J. Doe and T. Williams")'),
-      'always' => $this->t('Always (i.e. "J. Doe<strong>,</strong> and T. Williams")'),
-      'contextual' => $this->t('Contextual (i.e. "J. Doe and T. Williams" <em>or</em> "J. Doe, S. Smith<strong>,</strong> and T. Williams")'),
-    ];
+  public function getLastDelimitorBehaviors($include_examples = TRUE) {
+    if ($include_examples) {
+      return [
+        'never' => $this->t('Never (i.e. "J. Doe and T. Williams")'),
+        'always' => $this->t('Always (i.e. "J. Doe<strong>,</strong> and T. Williams")'),
+        'contextual' => $this->t('Contextual (i.e. "J. Doe and T. Williams" <em>or</em> "J. Doe, S. Smith<strong>,</strong> and T. Williams")'),
+      ];
+    }
+    else {
+      return [
+        'never' => $this->t('Never'),
+        'always' => $this->t('Always'),
+        'contextual' => $this->t('Contextual'),
+      ];
+    }
   }
 
 }

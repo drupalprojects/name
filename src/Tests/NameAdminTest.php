@@ -200,11 +200,12 @@ class NameAdminTest extends NameTestBase {
     $row_template = [
       'title'       => '//tbody/tr[{row}]/td[1]',
       'machine'     => '//tbody/tr[{row}]/td[2]',
-      // 'examples'   => '//tbody/tr[{row}]/td[3]',
-      'edit'        => '//tbody/tr[{row}]/td[4]//li[contains(@class, "edit")]/a',
-      'edit link'   => '//tbody/tr[{row}]/td[4]//li[contains(@class, "edit")]/a/@href',
-      'delete'      => '//tbody/tr[{row}]/td[4]//li[contains(@class, "delete")]/a',
-      'delete link' => '//tbody/tr[{row}]/td[4]//li[contains(@class, "delete")]/a/@href',
+      'settings'    => '//tbody/tr[{row}]/td[3]',
+      // 'examples'   => '//tbody/tr[{row}]/td[4]',
+      'edit'        => '//tbody/tr[{row}]/td[5]//li[contains(@class, "edit")]/a',
+      'edit link'   => '//tbody/tr[{row}]/td[5]//li[contains(@class, "edit")]/a/@href',
+      'delete'      => '//tbody/tr[{row}]/td[5]//li[contains(@class, "delete")]/a',
+      'delete link' => '//tbody/tr[{row}]/td[5]//li[contains(@class, "delete")]/a/@href',
     ];
     $all_values = [
       1 => [
@@ -283,16 +284,14 @@ class NameAdminTest extends NameTestBase {
       'edit link' => Url::fromRoute('entity.name_list_format.edit_form', ['name_list_format' => 'test'])->toString(),
       'delete link' => Url::fromRoute('entity.name_list_format.delete_form', ['name_list_format' => 'test'])->toString(),
     ];
-    $row_template = [
-      'title'       => '//tbody/tr[{row}]/td[1]',
-      'machine'     => '//tbody/tr[{row}]/td[2]',
-      // 'example'     => '//tbody/tr[{row}]/td[3]',
-      'edit'        => '//tbody/tr[{row}]/td[4]//li[contains(@class, "edit")]/a',
-      'edit link'   => '//tbody/tr[{row}]/td[4]//li[contains(@class, "edit")]/a/@href',
-      'delete'      => '//tbody/tr[{row}]/td[4]//li[contains(@class, "delete")]/a',
-      'delete link' => '//tbody/tr[{row}]/td[4]//li[contains(@class, "delete")]/a/@href',
-    ];
     $this->assertRow($row, $row_template, 3);
+//
+    $summary_text = [
+      'Delimiters: " / " and Ampersand (&)',
+      'Reduce after 3 items and show 1 items followed by el al.',
+      'Last delimiter: Contextual',
+    ];
+    $this->assertRowContains(['settings' => $summary_text], $row_template, 3);
 
     $this->drupalGet('admin/config/regional/name/list/manage/60');
     $this->assertResponse(404);
@@ -342,6 +341,40 @@ class NameAdminTest extends NameTestBase {
         }
         else {
           $this->assertEqual($results, $value, $message);
+        }
+      }
+    }
+  }
+
+  /**
+   * Helper function to test a table cell via it's expected value.
+   *
+   * @param array $row
+   *   Table rows to test.
+   * @param array $row_template
+   *   The parameters used for each row test.
+   * @param int $id
+   *   The row ID.
+   */
+  public function assertRowContains(array $row, array $row_template, $id) {
+    foreach ($row as $cell_code => $values) {
+      if (isset($row_template[$cell_code])) {
+        $xpath = str_replace('{row}', $id, $row_template[$cell_code]);
+        $raw_xpath = $this->xpath($xpath);
+        if (!is_array($raw_xpath)) {
+          $results = '__MISSING__';
+        }
+        else {
+          $results = '';
+          foreach ($raw_xpath as $elm) {
+            $results .= $elm->asXML();
+          }
+          $results = strip_tags($results);
+        }
+        $values = (array) $values;
+        foreach ($values as $value) {
+          $message = "{$cell_code} [{$id}] '{$xpath}': testing '{$value}'; got '{$results}'.";
+          $this->assertText($results, $value, $message);
         }
       }
     }
