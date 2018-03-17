@@ -391,6 +391,43 @@ class NameItem extends FieldItemBase {
   }
 
   /**
+   * Returns active components only.
+   *
+   * @return array
+   *   Array of filtered name component values.
+   */
+  public function filteredArray() {
+    $values = [];
+    $field = $this->getFieldDefinition();
+    $settings = $field->getSettings();
+    $active_components = array_filter($settings['components']);
+    foreach ($this->getProperties() as $name => $property) {
+      if ($active_components[$name]) {
+        $values[$name] = $property->getValue();
+      }
+    }
+    return $values;
+  }
+
+  /**
+   * Get a list of active components.
+   *
+   * @return array
+   *   Keyed array of active component labels.
+   */
+  public function activeComponents() {
+    $settings = $this->getFieldDefinition()->getSettings();
+    $components = [];
+    foreach (_name_translations() as $key => $label) {
+      if (!empty($settings['components'][$key])) {
+        $components[$key] = empty($settings['labels'][$key]) ? $label : $settings['labels'][$key];
+      }
+    }
+
+    return $components;
+  }
+
+  /**
    * {@inheritDoc}
    */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
