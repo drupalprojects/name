@@ -54,7 +54,7 @@ name.name_list_format.*:
     el_al_first:
       type: integer
       label: 'Number of names to display when using el al'
-      
+
 name.settings:
   type: config_object
   label: 'Name sttings'
@@ -83,8 +83,7 @@ name.settings:
     user_preferred:
       type: string
       label: 'User preferred'
-
-name.examples.*:
+name.generate.examples:
   type: config_object
   label: 'Examples'
   mapping:
@@ -93,7 +92,7 @@ name.examples.*:
       label: 'Examples'
       sequence:
         - type: mapping
-          label: 'Example'
+          label: 'Name'
           mapping:
             title:
               type: string
@@ -113,7 +112,175 @@ name.examples.*:
             credentials:
               type: string
               label: 'Credentials'
-
+            preferred:
+              type: string
+              label: 'Preferred'
+            alternative:
+              type: string
+              label: 'Alternative'
+name.generate.components:
+  type: config_object
+  label: 'Components'
+  mapping:
+    components:
+      type: mapping
+      label: 'Components'
+      mapping:
+        title:
+          type: sequence
+          label: 'Titles'
+          sequence:
+            type: string
+        given:
+          type: sequence
+          label: 'Given names'
+          sequence:
+            - type: string
+        middle:
+          type: sequence
+          label: 'Middle names'
+          sequence:
+            type: string
+        family:
+          type: sequence
+          label: 'Family names'
+          sequence:
+            type: string
+        generational:
+          type: sequence
+          label: 'Generational suffixes'
+          sequence:
+            type: string
+        credentials:
+          type: sequence
+          label: 'Credentials'
+          sequence:
+            type: string
+        preferred:
+          type: sequence
+          label: 'Preferred names'
+          sequence:
+            type: string
+        alternative:
+          type: sequence
+          label: 'Alternative values'
+          sequence:
+            type: string
+    gender:
+      type: mapping
+      label: 'Gender based components'
+      mapping:
+        female:
+          type: mapping
+          label: 'Female components'
+          mapping:
+            title:
+              type: sequence
+              label: 'Titles'
+              sequence:
+                type: string
+            given:
+              type: sequence
+              label: 'Given names'
+              sequence:
+                type: string
+            middle:
+              type: sequence
+              label: 'Middle names'
+              sequence:
+                type: string
+                label: 'Middle name'
+            family:
+              type: sequence
+              label: 'Family names'
+              sequence:
+                type: string
+                label: 'Family name'
+            generational:
+              type: sequence
+              label: 'Generational suffixes'
+              sequence:
+                type: string
+                label: 'Generational suffix'
+            credentials:
+              type: sequence
+              label: 'Credentials'
+              sequence:
+                type: string
+                label: 'Credential'
+            preferred:
+              type: sequence
+              label: 'Preferred names'
+              sequence:
+                type: string
+                label: 'Preferred name'
+            alternative:
+              type: sequence
+              label: 'Alternative values'
+              sequence:
+                type: string
+                label: 'Alternative value'
+        male:
+          type: mapping
+          label: 'Male components'
+          mapping:
+            title:
+              type: sequence
+              label: 'Titles'
+              sequence:
+                type: string
+                label: 'Title'
+            given:
+              type: sequence
+              label: 'Given names'
+              sequence:
+                type: string
+                label: 'Given name'
+            middle:
+              type: sequence
+              label: 'Middle names'
+              sequence:
+                type: string
+                label: 'Middle name'
+            family:
+              type: sequence
+              label: 'Family names'
+              sequence:
+                type: string
+                label: 'Family name'
+            generational:
+              type: sequence
+              label: 'Generational suffixes'
+              sequence:
+                type: string
+                label: 'Generational suffix'
+            credentials:
+              type: sequence
+              label: 'Credentials'
+              sequence:
+                type: string
+                label: 'Credential'
+            preferred:
+              type: sequence
+              label: 'Preferred names'
+              sequence:
+                type: string
+                label: 'Preferred name'
+            alternative:
+              type: sequence
+              label: 'Alternative values'
+              sequence:
+                type: string
+                label: 'Alternative value'
+name.generate.preferred:
+  type: config_object
+  label: 'Preferred names'
+  mapping:
+    preferred:
+      type: sequence
+      label: 'Preferred names'
+      sequence:
+        type: string
 field.storage_settings.name:
   type: mapping
   label: 'Name field settings'

@@ -208,7 +208,14 @@ function _name_translations(array $intersect = NULL) {
  *   An array of the core field component columns.
  */
 function _name_component_keys() {
-  return ['title', 'given', 'middle', 'family', 'credentials', 'generational'];
+  return [
+    'title' => 'title',
+    'given' => 'given',
+    'middle' => 'middle',
+    'family' => 'family',
+    'credentials' => 'credentials',
+    'generational' => 'generational',
+  ];
 }
 
 /**

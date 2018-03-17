@@ -13,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\name\NameFormatParser;
+use Drupal\name\NameGeneratorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -64,6 +65,13 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
   protected $parser;
 
   /**
+   * The name generator.
+   *
+   * @var \Drupal\name\NameGeneratorInterface
+   */
+  protected $generator;
+
+  /**
    * Constructs a NameFormatter instance.
    *
    * @param string $plugin_id
@@ -88,14 +96,17 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
    *   The name formatter.
    * @param \Drupal\name\NameFormatParser $parser
    *   The name format parser.
+   * @param \Drupal\name\NameGeneratorInterface $generator
+   *   The name format parser.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityManagerInterface $entity_manager, RendererInterface $renderer, \Drupal\name\NameFormatter $formatter, NameFormatParser $parser) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityManagerInterface $entity_manager, RendererInterface $renderer, \Drupal\name\NameFormatter $formatter, NameFormatParser $parser, NameGeneratorInterface $generator) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
     $this->entityManager = $entity_manager;
     $this->renderer = $renderer;
     $this->formatter = $formatter;
     $this->parser = $parser;
+    $this->generator = $generator;
   }
 
   /**
@@ -113,7 +124,8 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       $container->get('entity.manager'),
       $container->get('renderer'),
       $container->get('name.formatter'),
-      $container->get('name.format_parser')
+      $container->get('name.format_parser'),
+      $container->get('name.generator')
     );
   }
 
@@ -242,8 +254,8 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
     $machine_name = isset($settings['format']) ? $settings['format'] : 'default';
     $name_format = $this->entityManager->getStorage('name_format')->load($machine_name);
     if ($name_format) {
-      $summary[] = $this->t('Format: %format (@machine_name)', [
-        '%format' => $name_format->label(),
+      $summary[] = $this->t('Format: @format (@machine_name)', [
+        '@format' => $name_format->label(),
         '@machine_name' => $name_format->id(),
       ]);
     }
@@ -282,20 +294,18 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
     ]);
 
     // Provide an example of the selected format.
-    module_load_include('admin.inc', 'name');
-    $used_components = $this->getFieldSetting('components');
-    $excluded_components = array_diff_key($used_components, _name_translations());
-    $examples = name_example_names($excluded_components, $field_name);
-    if ($examples && $example = array_shift($examples)) {
-      $format = name_get_format_by_machine_name($machine_name);
-      $formatted = Html::escape($this->parser->parse($example, $format));
-      if (empty($formatted)) {
-        $summary[] = $this->t('Example: <em>&lt;&lt;empty&gt;&gt;</em>');
-      }
-      else {
-        $summary[] = $this->t('Example: @example', [
-          '@example' => $formatted,
-        ]);
+    if ($name_format) {
+      $names = $this->generator->loadSampleValues(1, $this->fieldDefinition);
+      if ($name = reset($names)) {
+        $formatted = $this->parser->parse($name, $name_format->get('pattern'));
+        if (empty($formatted)) {
+          $summary[] = $this->t('Example: <em>&lt;&lt;empty&gt;&gt;</em>');
+        }
+        else {
+          $summary[] = $this->t('Example: @example', [
+            '@example' => $formatted,
+          ]);
+        }
       }
     }
 

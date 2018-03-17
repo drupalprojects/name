@@ -11,3 +11,6 @@ services:
   name.formatter:
     class: Drupal\name\NameFormatter
     arguments: ['@entity.manager', '@name.format_parser', '@language_manager', '@string_translation', '@config.factory', '@token']
+  name.generator:
+    class: Drupal\name\NameGenerator
+    arguments: ['@name.formatter', '@name.format_parser', '@config.factory', '@language_manager', '@string_translation']

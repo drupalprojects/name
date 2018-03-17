@@ -6,30 +6,6 @@
  */
 
 /**
- * Helper function to provide a list of example name components.
- *
- * @param array $excluded_components
- *   This will empty (set to "") any specified values.
- */
-function name_example_names(array $excluded_components = [], $field_name = NULL) {
-  $example_names = [];
-  if (isset($field_name)) {
-    $example_names = \Drupal::config('name.examples.' . $field_name)->get('examples');
-  }
-  if (empty($example_names)) {
-    $example_names = \Drupal::config('name.examples.default')->get('examples');
-  }
-  foreach ($example_names as $delta => $example_name) {
-    foreach ($example_name as $component => $value) {
-      if (in_array($component, $excluded_components)) {
-        $example_names[$delta][$component] = '';
-      }
-    }
-  }
-  return $example_names;
-}
-
-/**
  * Themes the instance settings of the name component into a nice table.
  *
  * @param array $form

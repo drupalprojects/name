@@ -8,6 +8,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\name\Entity\NameFormat;
 
 /**
  * Name format list builder for the admin page.
@@ -22,13 +24,28 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
   protected $parser;
 
   /**
+   * The name generator.
+   *
+   * @var \Drupal\name\NameGeneratorInterface
+   */
+  protected $generator;
+
+  /**
+   * The names that were used to generate the list.
+   *
+   * @var array
+   */
+  protected $names;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
       $container->get('entity.manager')->getStorage($entity_type->id()),
-      $container->get('name.format_parser')
+      $container->get('name.format_parser'),
+      $container->get('name.generator')
     );
   }
 
@@ -42,9 +59,10 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
    * @param \Drupal\name\NameFormatParser $parser
    *   The name format parser.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, NameFormatParser $parser) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, NameFormatParser $parser, NameGeneratorInterface $generator) {
     parent::__construct($entity_type, $storage);
     $this->parser = $parser;
+    $this->generator = $generator;
   }
 
   /**
@@ -68,11 +86,7 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
     $row['format'] = $entity->get('pattern');
-    $row['examples'] = [
-      'data' => [
-        '#markup' => implode('<br/>', $this->examples($entity)),
-      ],
-    ];
+    $row['examples'] = $this->examples($entity);
     $operations = $this->buildOperations($entity);
     $row['operations']['data'] = $operations;
     return $row;
@@ -81,19 +95,26 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
   /**
    * Provides some example based on names with various components set.
    *
-   * @return array
-   *   An array of example names with formatting applied.
+   * @param \Drupal\name\Entity\NameFormat $entity;
+   *   The name format entity.
+   *
+   * @return \Drupal\Component\Render\FormattableMarkup
+   *   The example names with formatting applied.
    */
-  public function examples(EntityInterface $entity) {
+  protected function examples(NameFormat $entity) {
+    $this->names = $this->generator->loadSampleValues(4);
     $examples = [];
-    foreach ($this->nameExamples() as $index => $example_name) {
+    foreach ($this->names as $index => $example_name) {
       $formatted = Html::escape($this->parser->parse($example_name, $entity->get('pattern')));
       if (empty($formatted)) {
-        $formatted = '<em>&lt;&lt;empty&gt;&gt;</em>';
+        $formatted = $this->t('&lt;&lt;@empty&gt;&gt;', ['@empty' => $this->t('empty')]);
       }
-      $examples[] = $formatted . " <sup>{$index}</sup>";
+      $examples[] = $this->t('(@num) %name', [
+        '@num' => $index + 1,
+        '%name' => $formatted,
+      ]);
     }
-    return $examples;
+    return new FormattableMarkup(implode('<br>', $examples), []);
   }
 
   /**
@@ -104,17 +125,6 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
       'list' => parent::render(),
       'help' => $this->parser->renderableTokenHelp(),
     ];
-  }
-
-  /**
-   * Example names.
-   *
-   * @return array
-   *   Array of fields sourced from the config files.
-   */
-  public function nameExamples() {
-    module_load_include('inc', 'name', 'name.admin');
-    return name_example_names();
   }
 
 }

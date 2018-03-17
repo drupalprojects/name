@@ -148,4 +148,21 @@ class NameListFormat extends ConfigEntityBase implements NameListFormatInterface
     return (bool) $this->locked;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function listSettings() {
+    $el_al_first = $this->el_al_first;
+    if ($el_al_first > $this->el_al_min) {
+      $el_al_first = $this->el_al_min;
+    }
+    return [
+      'delimiter' => $this->delimiter,
+      'and' => $this->and,
+      'delimiter_precedes_last' => $this->delimiter_precedes_last,
+      'el_al_min' => $this->el_al_min,
+      'el_al_first' => $el_al_first,
+    ];
+  }
+
 }

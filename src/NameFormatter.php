@@ -65,7 +65,7 @@ class NameFormatter implements NameFormatterInterface {
    *
    * Values include:
    * - sep1: First defined separator.
-   * - sep2: Seconddefined separator.
+   * - sep2: Second defined separator.
    * - sep3: Third defined separator.
    * - markup: To markup the individual components.
    *
@@ -111,11 +111,9 @@ class NameFormatter implements NameFormatterInterface {
     $this->stringTranslation = $translation;
     $this->configFactory = $config_factory;
     $config = $this->configFactory->get('name.settings');
-    $this->settings = [
-      'sep1' => $config->get('sep1'),
-      'sep2' => $config->get('sep2'),
-      'sep3' => $config->get('sep3'),
-    ];
+    $this->settings['sep1'] = $config->get('sep1');
+    $this->settings['sep2'] = $config->get('sep2');
+    $this->settings['sep3'] = $config->get('sep3');
     // @todo: Assess if needed.
     $this->token = $token;
   }
@@ -242,14 +240,14 @@ class NameFormatter implements NameFormatterInterface {
    */
   protected function getNameFormatString($format) {
     $config = $this->nameFormatStorage->load($format);
-    if (!$format) {
+    if (!$config) {
       $config = $this->nameFormatStorage->load('default');
     }
     return $config->get('pattern');
   }
 
   /**
-   * Helper function to get the format list settings.
+   * Helper function to load and get the format list settings.
    *
    * @param string $format
    *   The ID of the preferred format to use. This will fallback to the default
@@ -264,14 +262,7 @@ class NameFormatter implements NameFormatterInterface {
     if (!$format) {
       $listFormat = $this->listFormatStorage->load('default');
     }
-    $settings = [
-      'delimiter' => $listFormat->delimiter,
-      'and' => $listFormat->and,
-      'delimiter_precedes_last' => $listFormat->delimiter_precedes_last,
-      'el_al_min' => $listFormat->el_al_min,
-      'el_al_first' => min([$listFormat->el_al_min, $listFormat->el_al_first]),
-    ];
-    return $settings;
+    return $listFormat->listSettings();
   }
 
   /**

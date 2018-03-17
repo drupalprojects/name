@@ -39,13 +39,13 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Default'),
         'machine' => 'default',
         'pattern' => '((((t+ig)+im)+if)+is)+jc',
-        'formatted' => 'Mr Joe John Peter Mark Doe Jnr., B.Sc., Ph.D. JOAN SUE DOE Prince',
+        'formatted' => '(1) Mr John Peter Mark Doe Jnr., B.Sc., Ph.D. (2) JOAN SUE SMITH (3) Prince'
       ],
       2 => [
         'title' => t('Family'),
         'machine' => 'family',
         'pattern' => 'f',
-        'formatted' => 'Doe DOE',
+        'formatted' => '(1) Doe (2) SMITH (3) &lt;&lt;empty&gt;&gt;',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'family'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'family'])->toString(),
       ],
@@ -53,7 +53,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Full'),
         'machine' => 'full',
         'pattern' => '((((t+ig)+im)+if)+is)+jc',
-        'formatted' => 'Mr Joe John Peter Mark Doe Jnr., B.Sc., Ph.D. JOAN SUE DOE Prince',
+        'formatted' => '(1) Mr John Peter Mark Doe Jnr., B.Sc., Ph.D. (2) JOAN SUE SMITH (3) Prince',
         'edit' => t('Edit'),
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'full'])->toString(),
         'delete' => t('Delete'),
@@ -63,7 +63,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Given'),
         'machine' => 'given',
         'pattern' => 'g',
-        'formatted' => 'Joe JOAN Prince',
+        'formatted' => '(1) John (2) JOAN (3) Prince',
         'edit' => t('Edit'),
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'given'])->toString(),
         'delete' => t('Delete'),
@@ -73,7 +73,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Given Family'),
         'machine' => 'short_full',
         'pattern' => 'g+if',
-        'formatted' => 'Joe Doe JOAN DOE Prince',
+        'formatted' => '(1) John Doe (2) JOAN SMITH (3) Prince',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'short_full'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'short_full'])->toString(),
       ],
@@ -81,7 +81,7 @@ class NameAdminTest extends NameTestBase {
         'title' => t('Title Family'),
         'machine' => 'formal',
         'pattern' => 't+if',
-        'formatted' => 'Mr Doe DOE',
+        'formatted' => '(1) Mr Doe (2) SMITH (3) &lt;&lt;empty&gt;&gt;',
         'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'formal'])->toString(),
         'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'formal'])->toString(),
       ],
@@ -157,7 +157,7 @@ class NameAdminTest extends NameTestBase {
       'title' => 'Test',
       'machine' => 'test',
       'pattern' => '\a\bc',
-      'formatted' => 'abB.Sc., Ph.D. ab ab',
+      'formatted' => '(1) abB.Sc., Ph.D. (2) ab (3) ab',
       'edit link' => Url::fromRoute('entity.name_format.edit_form', ['name_format' => 'test'])->toString(),
       'delete link' => Url::fromRoute('entity.name_format.delete_form', ['name_format' => 'test'])->toString(),
     ];
@@ -287,7 +287,7 @@ class NameAdminTest extends NameTestBase {
     $this->assertRow($row, $row_template, 3);
 //
     $summary_text = [
-      'Delimiters: " / " and Ampersand (&)',
+      'Delimiters: " / " and Ampersand (&amp;)',
       'Reduce after 3 items and show 1 items followed by el al.',
       'Last delimiter: Contextual',
     ];
@@ -322,16 +322,12 @@ class NameAdminTest extends NameTestBase {
       if (isset($row_template[$cell_code])) {
         $xpath = str_replace('{row}', $id, $row_template[$cell_code]);
         $raw_xpath = $this->xpath($xpath);
-        if (!is_array($raw_xpath)) {
-          $results = '__MISSING__';
-        }
-        else {
-          $results = (string) current($raw_xpath);
-        }
-        $results = trim($results);
+
+
         // Check URLs with or without the ?destination= query parameter.
-        $message = "Testing {$cell_code} on row {$id} using '{$xpath}' and expecting '" . Html::escape($value) . "', got '" . Html::escape($results) . "'.";
         if (strpos($row_template[$cell_code], '/a/@href')) {
+          $results = $raw_xpath && isset($raw_xpath[0]) ? (string) $raw_xpath[0] : '';
+          $message = "Testing {$cell_code} on row {$id} using '{$xpath}' and expecting '" . Html::escape($value) . "', got '" . Html::escape($results) . "'.";
           if ($results == $value || strpos($results, $value . '?destination=') === 0) {
             $this->pass($message);
           }
@@ -340,6 +336,8 @@ class NameAdminTest extends NameTestBase {
           }
         }
         else {
+          $results = $this->normaliseOutput($raw_xpath);
+          $message = "Testing {$cell_code} on row {$id} using '{$xpath}' and expecting '" . Html::escape($value) . "', got '" . Html::escape($results) . "'.";
           $this->assertEqual($results, $value, $message);
         }
       }
@@ -361,23 +359,48 @@ class NameAdminTest extends NameTestBase {
       if (isset($row_template[$cell_code])) {
         $xpath = str_replace('{row}', $id, $row_template[$cell_code]);
         $raw_xpath = $this->xpath($xpath);
-        if (!is_array($raw_xpath)) {
-          $results = '__MISSING__';
-        }
-        else {
-          $results = '';
-          foreach ($raw_xpath as $elm) {
-            $results .= $elm->asXML();
-          }
-          $results = strip_tags($results);
-        }
+        $results = $this->normaliseOutput($raw_xpath);
         $values = (array) $values;
         foreach ($values as $value) {
           $message = "{$cell_code} [{$id}] '{$xpath}': testing '{$value}'; got '{$results}'.";
-          $this->assertText($results, $value, $message);
+          $this->assertTrue((strpos($results, $value) !== FALSE), $message);
         }
       }
     }
+  }
+
+  /**
+   * Helper function to normalise output for testing results.
+   *
+   * Normalises text by:
+   * - gets complete HTML structure of the child nodes.
+   * - ensures whitespace around any HTML tags.
+   * - removes newlines and ensures single whitespaces.
+   * - trims the string for trailing whitespace.
+   *
+   * @param array|FALSE $raw_xpath
+   *   Raw results from the XML Path lookup.
+   *
+   * @return string
+   *   A normalised string.
+   */
+  protected function normaliseOutput($raw_xpath = []) {
+    if (!is_array($raw_xpath)) {
+      return '__MISSING__';
+    }
+
+    $results = '';
+    foreach ($raw_xpath as $elm) {
+      $results .= $elm->asXML();
+    }
+    // Insert a single whitespace in front of all opening HTML tags.
+    $results = preg_replace('/<(?!\/)/', ' <', $results);
+    // Normalise any newlines.
+    $results = str_replace(["\r", "\n"], ["\n", " "], $results);
+    $results = strip_tags($results);
+    // Normalise any remaining whitespaces into a single space.
+    $results = preg_replace('/\s+/', ' ', $results);
+    return trim($results);
   }
 
 }

@@ -2,11 +2,11 @@
 
 namespace Drupal\name;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\name\Entity\NameListFormat;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Render\FormattableMarkup;
 
@@ -27,6 +27,13 @@ class NameListFormatListBuilder extends ConfigEntityListBuilder {
   protected $parser;
 
   /**
+   * The name generator.
+   *
+   * @var \Drupal\name\NameGeneratorInterface
+   */
+  protected $generator;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
@@ -34,7 +41,8 @@ class NameListFormatListBuilder extends ConfigEntityListBuilder {
       $entity_type,
       $container->get('entity.manager')->getStorage($entity_type->id()),
       $container->get('name.formatter'),
-      $container->get('name.format_parser')
+      $container->get('name.format_parser'),
+      $container->get('name.generator')
     );
   }
 
@@ -49,11 +57,14 @@ class NameListFormatListBuilder extends ConfigEntityListBuilder {
    *   The name formatter.
    * @param \Drupal\name\NameFormatParser $parser
    *   The name format parser.
+   * @param \Drupal\name\NameGeneratorInterface $generator
+   *   The name generator service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, NameFormatterInterface $formatter, NameFormatParser $parser) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, NameFormatterInterface $formatter, NameFormatParser $parser, NameGeneratorInterface $generator) {
     parent::__construct($entity_type, $storage);
     $this->parser = $parser;
     $this->formatter = $formatter;
+    $this->generator = $generator;
   }
 
   /**
@@ -73,74 +84,69 @@ class NameListFormatListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var \Drupal\name\NameListFormatInterface $entity */
     $row = [];
     $row['label'] = $entity->label();
     $row['id'] = $entity->id();
 
+    $settings = $entity->listSettings();
+
     $and_options = $this->formatter->getLastDelimitorTypes();
-    $and_delimiter = isset($and_options[$entity->and]) ? $and_options[$entity->and] : $this->t('-- invalid option --');
+    $and_delimiter = isset($and_options[$settings['and']]) ? $and_options[$settings['and']] : $this->t('-- invalid option --');
 
     $and_behavior_options = $this->formatter->getLastDelimitorBehaviors(FALSE);
-    $and_behavior = isset($and_behavior_options[$entity->delimiter_precedes_last]) ? $and_behavior_options[$entity->delimiter_precedes_last] : $this->t('-- invalid option --');
-    if ($entity->el_al_min) {
+    $and_behavior = isset($and_behavior_options[$settings['delimiter_precedes_last']])
+        ? $and_behavior_options[$settings['delimiter_precedes_last']]
+        : $this->t('-- invalid option --');
+    if ($settings['el_al_min']) {
       $behavior = $this->t('Reduce after @max items and show @min items followed by <em>el al</em>.', [
-        '@max' => $entity->el_al_min,
-        '@min' => min([$entity->el_al_min, $entity->el_al_first]),
+        '@max' => $settings['el_al_min'],
+        '@min' => $settings['el_al_first'],
       ]);
     }
     else {
       $behavior = $this->t('Show all names.');
     }
-    $settings = [
+
+    $summary = [
       $behavior,
-      $this->t('Delimiters: "%delimiter" and %last', [
-        '%delimiter' => $entity->delimiter,
-        '%last' => $and_delimiter,
+      $this->t('Delimiters: "@delimiter" and @last', [
+        '@delimiter' => $settings['delimiter'],
+        '@last' => $and_delimiter,
       ]),
-      $this->t('Last delimiter: %delimiter', ['%delimiter' => $and_behavior]),
+      $this->t('Last delimiter: @delimiter', ['@delimiter' => $and_behavior]),
     ];
     if ($entity->isLocked()) {
-      $settings[] = t('Default format (locked)');
+      $summary[] = t('Default format (locked)');
     }
+    $row['settings'] = new FormattableMarkup(implode('<br>', $summary), []);
 
-    $row['settings'] = new FormattableMarkup(implode('<br>', $settings), []);
+    // Add a few examples.
+    $row['examples'] = $this->examples($entity);
 
-    // @todo: Add examples.
-    $row['examples'] = array(
-      'data' => array(
-        '#markup' => '',
-      )
-    );
     $operations = $this->buildOperations($entity);
     $row['operations']['data'] = $operations;
     return $row;
   }
 
   /**
-   * Provides some example lists based on various length name lists.
-   */
-  public function examples(EntityInterface $entity) {
-    return 'todo';
-    $examples = array();
-    foreach ($this->nameExamples() as $index => $example_name) {
-      $formatted = Html::escape($this->parser->parse($example_name, $entity->get('pattern')));
-      if (empty($formatted)) {
-        $formatted = '<em>&lt;&lt;empty&gt;&gt;</em>';
-      }
-      $examples[] = $formatted . " <sup>{$index}</sup>";
-    }
-    return $examples;
-  }
-
-  /**
-   * Example names.
+   * Provides some example based on names with various components set.
    *
-   * @return null
+   * @param \Drupal\name\Entity\NameListFormat $entity;
+   *   The name format entity.
+   *
+   * @return \Drupal\Component\Render\FormattableMarkup
+   *   The example names with formatting applied.
    */
-  public function nameExamples() {
-    module_load_include('inc', 'name', 'name.admin');
-    return name_example_names();
+  protected function examples(NameListFormat $entity) {
+    $examples = [];
+    foreach ([1, 2, 3, 4] as $num) {
+      $names = $this->generator->generateSampleNames($num);
+      $examples[] = $this->t('(@num) %list', [
+        '@num' => $num,
+        '%list' => $this->formatter->formatList($names, 'family', $entity->id()),
+      ]);
+    }
+    return new FormattableMarkup(implode('<br>', $examples), []);
   }
 
 }

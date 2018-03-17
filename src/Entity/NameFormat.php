@@ -96,21 +96,6 @@ class NameFormat extends ConfigEntityBase implements NameFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPattern($type = NULL) {
-    return isset($this->pattern[$type]) ? $this->pattern[$type] : '';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPattern($pattern, $type = NULL) {
-    $this->pattern[$type] = $pattern;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function isLocked() {
     return (bool) $this->locked;
   }

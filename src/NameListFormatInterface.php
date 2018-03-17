@@ -16,4 +16,13 @@ interface NameListFormatInterface extends ConfigEntityInterface {
    *   TRUE if the name format is locked, FALSE otherwise.
    */
   public function isLocked();
+
+  /**
+   * Get the list settings.
+   *
+   * @return array
+   *   The settings with any custom processing completed.
+   */
+  public function listSettings();
+
 }
