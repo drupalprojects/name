@@ -105,8 +105,8 @@ class NameFormatListBuilder extends ConfigEntityListBuilder {
     $this->names = $this->generator->loadSampleValues(4);
     $examples = [];
     foreach ($this->names as $index => $example_name) {
-      $formatted = Html::escape($this->parser->parse($example_name, $entity->get('pattern')));
-      if (empty($formatted)) {
+      $formatted = $this->parser->parse($example_name, $entity->get('pattern'));
+      if (!strlen($formatted)) {
         $formatted = $this->t('&lt;&lt;@empty&gt;&gt;', ['@empty' => $this->t('empty')]);
       }
       $examples[] = $this->t('(@num) %name', [

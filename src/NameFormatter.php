@@ -75,7 +75,7 @@ class NameFormatter implements NameFormatterInterface {
     'sep1' => ' ',
     'sep2' => ', ',
     'sep3' => '',
-    'markup' => FALSE,
+    'markup' => 'none',
   ];
 
   /**
@@ -138,19 +138,10 @@ class NameFormatter implements NameFormatterInterface {
    */
   public function format(array $components, $type = 'default', $langcode = NULL) {
     $format_string = $this->getNameFormatString($type);
-    $name_string = $this->parser->parse($components, $format_string, $this->settings);
-
-    if ($this->settings['markup']) {
-      $name = new FormattableMarkup($name_string, []);
-    }
-    else {
-      $name = new HtmlEscapedText($name_string, []);
-    }
-
+    $name = $this->parser->parse($components, $format_string, $this->settings);
     if (!empty($components['url'])) {
-      $name = new FormattableMarkup('<a href=":link">:name</a>', [
+      $name = new FormattableMarkup('<a href=":link">' . $name . '</a>', [
         ':link' => $components['url']->toString(),
-        ':name' => $name,
       ]);
     }
 
@@ -185,7 +176,7 @@ class NameFormatter implements NameFormatterInterface {
 
     if ($name_count > $settings['el_al_min']) {
       $etal = $this->t('et al', [], ['context' => 'name']);
-      if ($this->settings['markup']) {
+      if ($this->settings['markup'] !== 'none') {
         $etal = new FormattableMarkup('<em>@etal</em>', ['@etal' => $etal]);
       }
       if (count($names) == 1) {

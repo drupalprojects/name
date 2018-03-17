@@ -35,8 +35,8 @@ interface NameFormatterInterface {
    *   (optional) Language code to translate to. NULL (default) means to use
    *   the user interface language for the page.
    *
-   * @return mixed
-   *   Returns a renderable object.
+   * @return \Drupal\Component\Render\MarkupInterface
+   *   A renderable object representing the name.
    */
   public function format(array $components, $type = 'default', $langcode = NULL);
 

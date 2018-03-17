@@ -112,19 +112,15 @@ function name_user_load(array $users) {
   }
 
   if ($field) {
-    $format = entity_load('name_format', $field->getSetting('override_format'));
-    if ($format) {
-      foreach ($users as $account) {
-        $uid = $account->id();
-        if (isset($names[$uid])) {
+    foreach ($users as $account) {
+      $uid = $account->id();
+      if (isset($names[$uid])) {
+        $users[$uid]->realname = $names[$uid];
+      }
+      else {
+        if ($account->hasField($field->getName()) && !$account->get($field->getName())->isEmpty()) {
+          $names[$uid] = \Drupal::service('name.formatter')->format($account->get($field->getName())->get(0)->getValue(), $field->getSetting('override_format'));
           $users[$uid]->realname = $names[$uid];
-        }
-        else {
-          if ($account->hasField($field->getName()) && !$account->get($field->getName())->isEmpty()) {
-            // We still have raw user input here.
-            $names[$uid] = \Drupal::service('name.format_parser')->parse($account->get($field->getName())->get(0)->getValue(), $format->get('pattern'), ['object' => $account, 'type' => 'user']);
-            $users[$uid]->realname = $names[$uid];
-          }
         }
       }
     }

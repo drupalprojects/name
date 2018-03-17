@@ -2,6 +2,8 @@
 
 namespace Drupal\name;
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Render\HtmlEscapedText;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -28,11 +30,11 @@ class NameFormatParser {
   use StringTranslationTrait;
 
   /**
-   * Flag to add markup around name components.
+   * Markup style for decorating name components.
    *
-   * @var bool
+   * @var string
    */
-  protected $markup = FALSE;
+  protected $markup = 'none';
 
   /**
    * First separator.
@@ -64,6 +66,20 @@ class NameFormatParser {
 
   /**
    * Parses a name component array into the given format.
+   *
+   * @param array $name_components
+   *   Keyed array of name components.
+   * @param string $format
+   *   The name format pattern to generate the name.
+   * @param array $settings
+   *   Additional settings to control the parser.
+   * @param array $tokens
+   *   An array of tokens that will override the tokens generated.
+   *
+   * @return \Drupal\Component\Render\MarkupInterface
+   *   A renderable object representing the name.
+   *
+   * @todo: Make tokens private.
    */
   public function parse($name_components, $format = '', array $settings = [], $tokens = NULL) {
     foreach (['sep1', 'sep2', 'sep3'] as $sep_key) {
@@ -71,12 +87,25 @@ class NameFormatParser {
         $this->{$sep_key} = (string) $settings[$sep_key];
       }
     }
-    $this->markup = !empty($settings['markup']);
+    $this->markup = !empty($settings['markup']) ? $settings['markup'] : 'none';
     if (isset($settings['boundary']) && strlen($settings['boundary'])) {
       $this->boundary = $settings['boundary'];
     }
 
-    return $this->format($name_components, $format, $tokens);
+    $name_string = $this->format($name_components, $format, $tokens);
+    switch ($this->markup) {
+      // Component values are already escaped.
+      case 'simple':
+      case 'rdfa':
+      case 'microdata':
+        return new FormattableMarkup($name_string, []);
+
+      // Raw component values.
+      case 'none':
+      default:
+        return new HtmlEscapedText($name_string);
+
+    }
   }
 
   /**
@@ -415,10 +444,57 @@ class NameFormatParser {
         break;
 
     }
-    if ($this->markup) {
-      return '<span class="' . Html::escape($component_key) . '">' . Html::escape($value) . '</span>';
+
+    // Based on http://schema.org/Person that doesn't cover generational suffix
+    // or preferred names directly.
+    $map = [
+      'title' => 'honorificPrefix',
+      'given' => 'givenName',
+      'middle' => 'additionalName',
+      'family' => 'familyName',
+      'credential' => 'honorificSuffix',
+      'alternative' => 'alternateName',
+    ];
+
+    switch ($this->markup) {
+      case 'simple':
+        return '<span class="' . Html::escape($component_key) . '">' . Html::escape($value) . '</span>';
+
+      case 'microdata':
+        return '<span class="' . Html::escape($component_key) . '"'
+          . (isset($map[$component_key]) ? ' itemprop="' . $map[$component_key] . '"' : '')
+          . '>' . Html::escape($value) . '</span>';
+
+      case 'rdfa':
+        return '<span class="' . Html::escape($component_key) . '"'
+          . (isset($map[$component_key]) ? ' property="schema:' . $map[$component_key] . '"' : '')
+          . '>' . Html::escape($value) . '</span>';
+
+      case 'none':
+      default:
+        return $value;
     }
+
     return $value;
+  }
+
+  /**
+   * Supported markup options.
+   *
+   * @return array
+   *   A keyed array of markup options.
+   */
+  public function getMarkupOptions() {
+    return [
+      // Raw component values.
+      'none' => $this->t('No markup'),
+      // Escaped component values.
+      'simple' => $this->t('Component classes'),
+      // Escaped component values.
+      'microdata' => $this->t('Microdata itemprop components'),
+      // Escaped component values.
+      'rdfa' => $this->t('RDFa property components'),
+    ];
   }
 
   /**

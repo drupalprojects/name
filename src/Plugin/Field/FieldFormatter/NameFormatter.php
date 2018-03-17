@@ -137,8 +137,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
 
     $settings += [
       "format" => "default",
-      "markup" => FALSE,
-      "output" => "default",
+      "markup" => "none",
       "list_format" => "",
       "link_target" => "",
       "preferred_field_reference" => "",
@@ -174,10 +173,12 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
     ];
 
     $elements['markup'] = [
-      '#type' => 'checkbox',
+      '#type' => 'select',
       '#title' => $this->t('Markup'),
       '#default_value' => $this->getSetting('markup'),
+      '#options' => $this->parser->getMarkupOptions(),
       '#description' => $this->t('This option wraps the individual components of the name in SPAN elements with corresponding classes to the component.'),
+      '#required' => TRUE,
     ];
 
     $elements['link_target'] = [
@@ -230,15 +231,6 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       ),
     ];
 
-    $elements['output'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Output'),
-      '#default_value' => $this->getSetting('output'),
-      '#options' => _name_formatter_output_options(),
-      '#description' => $this->t('This option provides additional options for rendering the field. <strong>Normally, using the "Raw value" option would be a security risk.</strong>'),
-      '#required' => TRUE,
-    ];
-
     return $elements;
   }
 
@@ -264,8 +256,9 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       $machine_name = 'default';
     }
 
-    $summary[] = $this->t('Markup: @yesno', [
-      '@yesno' => $this->useMarkup() ? $this->t('yes') : $this->t('no'),
+    $markup_options = $this->parser->getMarkupOptions();
+    $summary[] = $this->t('Markup: @type', [
+      '@type' => $markup_options[$this->getSetting('markup')],
     ]);
 
     if (!empty($settings['link_target'])) {
@@ -286,12 +279,6 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
         '@label' => empty($targets[$settings['alternative_field_reference']]) ? t('-- invalid --') : $targets[$settings['alternative_field_reference']],
       ]);
     }
-
-    $output_options = _name_formatter_output_options();
-    $output = empty($settings['output']) ? 'default' : $settings['output'];
-    $summary[] = $this->t('Output: @format', [
-      '@format' => $output_options[$output],
-    ]);
 
     // Provide an example of the selected format.
     if ($name_format) {
@@ -336,7 +323,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       $item_array[] = $components;
     }
 
-    $this->formatter->setSetting('markup', $this->useMarkup());
+    $this->formatter->setSetting('markup', $this->getSetting('markup'));
 
     if ($list_format) {
       $elements[0]['#markup'] = $this->formatter->formatList($item_array, $format, $list_format, $langcode);

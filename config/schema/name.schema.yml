@@ -587,11 +587,8 @@ field.formatter.settings.name_default:
       type: string
       label: 'Name format'
     markup:
-      type: boolean
-      label: 'Markup'
-    output:
       type: string
-      label: 'Output'
+      label: 'Markup'
     list_format:
       type: string
       label: 'List format'

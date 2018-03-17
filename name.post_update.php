@@ -91,8 +91,7 @@ function name_post_update_formatter_settings_link_and_external_sources() {
       ->loadByProperties(['type' => 'name']);
   $new_settings = [
     "format" => "default",
-    "markup" => FALSE,
-    "output" => "default",
+    "markup" => "none",
     "list_format" => "",
     "link_target" => "",
     "preferred_field_reference" => "",
@@ -115,13 +114,20 @@ function name_post_update_formatter_settings_link_and_external_sources() {
           ->getStorage('entity_view_display')
           ->loadByProperties($properties);
       foreach ($view_displays as $view_display) {
+        /* @var \Drupal\Core\Entity\Entity\EntityViewDisplay $view_display */
         if ($component = $view_display->getComponent($field_name)) {
-          $settings = (array) $component->settings;
+          $settings = (array) $component['settings'];
+          if (empty($settings['markup']) || $settings['markup'] == '1') {
+            $settings['markup'] = empty($settings['markup']) ? 'none' : 'simple';
+          }
+          if (isset($settings['output'])) {
+            unset($settings['output']);
+          }
           $settings += $new_settings;
-          $view_display->setComponent($field_name, array(
+          $view_display->setComponent($field_name, [
               'type' => 'name_default',
               'settings' => $settings,
-            ) + $component)->save();
+            ] + $component)->save();
         }
       }
     }
