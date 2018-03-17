@@ -439,6 +439,7 @@ class NameItem extends FieldItemBase {
         '#options' => [
           'title' => $this->t('above'),
           'description' => $this->t('below'),
+          'placeholder' => $this->t('placeholder'),
           'none' => $this->t('hidden'),
         ],
         '#description' => $this->t('This controls how the label of the component is displayed in the form.'),

@@ -369,6 +369,11 @@ function name_element_render_component(array $components, $component_key, array 
     case 'title':
       break;
 
+    case 'placeholder':
+      $element['#attributes']['placeholder'] = $element['#title'];
+      $element['#title_display'] = 'invisible';
+      break;
+
     case 'none':
       $element['#title_display'] = 'invisible';
       break;
