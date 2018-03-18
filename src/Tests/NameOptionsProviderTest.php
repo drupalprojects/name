@@ -55,7 +55,6 @@ class NameOptionsProviderTest extends KernelTestBase {
    */
   public function testTitleOptionsFromField() {
     $field = $this->createNameField('field_name_test', 'entity_test', 'entity_test');
-
     $settings = $field->getSettings();
     $settings['title_options'] = [
       '-- --',

@@ -422,9 +422,10 @@ trait NameSettingsTrait {
     }
 
     $items = [
-      $this->t('The order for Asian names is Family Middle Given Title'),
-      $this->t('The order for Eastern names is Title Family Given Middle'),
-      $this->t('The order for Western names is Title First Middle Surname'),
+      $this->t('The order for Asian names is Family Middle Given Title Credentials'),
+      $this->t('The order for Eastern names is Title Family Given Middle Credentials'),
+      $this->t('The order for German names is Title Credentials Given Middle Surname'),
+      $this->t('The order for Western names is Title Given Middle Surname Credentials'),
     ];
     $item_list = [
       '#theme' => 'item_list',
@@ -432,7 +433,7 @@ trait NameSettingsTrait {
     ];
     $layout_description = $this->t('<p>This controls the order of the widgets that are displayed in the form.</p>')
       . drupal_render($item_list)
-      . $this->t('<p>Note that when you select the Asian names format, the Generational field is hidden and defaults to an empty string.</p>');
+      . $this->t('<p>Note that when you select the Asian and German name formats, the Generational field is hidden and defaults to an empty string.</p>');
     $element['component_layout'] = [
       '#type' => 'radios',
       '#title' => $this->t('Language layout'),
@@ -441,6 +442,7 @@ trait NameSettingsTrait {
         'default' => $this->t('Western names'),
         'asian' => $this->t('Asian names'),
         'eastern' => $this->t('Eastern names'),
+        'german' => $this->t('German names'),
       ],
       '#description' => $layout_description,
       '#table_group' => 'none',

@@ -491,9 +491,17 @@ function _name_component_layout(&$element, $layout = 'default') {
       'family' => 2,
       'given' => 3,
       'middle' => 4,
-      // 'generational' is removed from the display.
       'generational' => 5,
       'credentials' => 6,
+    ],
+    'german' => [
+      'title' => 1,
+      'credentials' => 2,
+      'given' => 3,
+      'middle' => 4,
+      'family' => 5,
+      // 'generational' is removed from the display
+      'generational' => 7,
     ],
   ];
   if (isset($weights[$layout])) {
@@ -504,7 +512,7 @@ function _name_component_layout(&$element, $layout = 'default') {
     }
   }
 
-  if ($layout == 'asian') {
+  if ($layout == 'asian' || $layout == 'german') {
     if (isset($element['generational'])) {
       $element['generational']['#default_value'] = '';
       $element['generational']['#access'] = FALSE;
