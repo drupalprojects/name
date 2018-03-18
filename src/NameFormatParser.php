@@ -9,21 +9,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Main class that formats a name from an array of components.
- *
- * @param array $name_components
- *   A keyed array of name components.
- *   These are: title, given, middle, family, generational and credentials.
- * @param string $format
- *   The string specifying what format to use.
- * @param array $settings
- *   A keyed array of additional parameters to pass into the function.
- *   Includes:
- *   - 'object' An object or array.
- *     This entity is used for Token module substitutions.
- *     Currently not used.
- *   - 'type' - A string.
- *     The entity identifier: node, user, etc
+ * Converts a name from an array of components into a defined format.
  */
 class NameFormatParser {
 
@@ -73,11 +59,14 @@ class NameFormatParser {
    *   The name format pattern to generate the name.
    * @param array $settings
    *   Additional settings to control the parser.
+   *   - sep1 (string): first separator.
+   *   - sep2 (string): second separator.
+   *   - sep3 (string): third separator.
+   *   - markup (string): key of the markup type.
+   *   - boundary (string): regexp for word boundary.
    *
    * @return \Drupal\Component\Render\MarkupInterface
    *   A renderable object representing the name.
-   *
-   * @todo: Make tokens private.
    */
   public function parse($name_components, $format = '', array $settings = []) {
     foreach (['sep1', 'sep2', 'sep3'] as $sep_key) {
@@ -623,19 +612,6 @@ class NameFormatParser {
         }
       }
     }
-
-    // Placeholders for token support insertion on the [object / key | entity / bundle].
-    $unsupported_tokens = [
-      '1' => $this->t('Token placeholder 1.'),
-      '2' => $this->t('Token placeholder 2.'),
-      '3' => $this->t('Token placeholder 3.'),
-      '4' => $this->t('Token placeholder 4.'),
-      '5' => $this->t('Token placeholder 5.'),
-      '6' => $this->t('Token placeholder 6.'),
-      '7' => $this->t('Token placeholder 7.'),
-      '8' => $this->t('Token placeholder 8.'),
-      '9' => $this->t('Token placeholder 9.'),
-    ];
 
     return $tokens;
   }

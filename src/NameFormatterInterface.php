@@ -13,20 +13,16 @@ interface NameFormatterInterface {
    * @param array $components
    *   An array of name components to format.
    *
-   *   The Expected format of the components is:
+   *   The expected components are:
    *   - title (string): The persons title
    *   - given (string):
    *   - middle (string):
    *   - family (string):
    *   - generational (string):
    *   - credentials (string):
-   *
-   *   @todo
-   *   Optionally, additional metadata can be past along with the base components
-   *   - entity type (string): The type of entity linked to this name.
-   *   - entity (object): The entity linked to this name.
-   *   - link (bool): Boolean flag to link to the entity.
-   *
+   *   The following tokens are also supported:
+   *   - preferred (string):
+   *   - alternative (string):
    * @param string $type
    *   (optional) The name format type to load. If the format does not exist,
    *   the 'default' format is used.

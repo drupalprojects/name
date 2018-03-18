@@ -7,9 +7,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\Core\Utility\Token;
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Component\Render\HtmlEscapedText;
 use Drupal\name\Render\NameListFormattableMarkup;
 
 /**
@@ -79,13 +77,6 @@ class NameFormatter implements NameFormatterInterface {
   ];
 
   /**
-   * The token replacement system.
-   *
-   * @var \Drupal\Core\Utility\Token
-   */
-  protected $token;
-
-  /**
    * Constructs a name formatter object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -98,12 +89,8 @@ class NameFormatter implements NameFormatterInterface {
    *   The string translation.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Utility\Token $token
-   *   The token replacement system.
-   * @todo: Assess if tokens should be supported before the first proper
-   *        release of 8.x-2.x.
    */
-  public function __construct(EntityManagerInterface $entity_manager, NameFormatParser $parser, LanguageManagerInterface $language_manager, TranslationInterface $translation, ConfigFactoryInterface $config_factory, Token $token) {
+  public function __construct(EntityManagerInterface $entity_manager, NameFormatParser $parser, LanguageManagerInterface $language_manager, TranslationInterface $translation, ConfigFactoryInterface $config_factory) {
     $this->nameFormatStorage = $entity_manager->getStorage('name_format');
     $this->listFormatStorage = $entity_manager->getStorage('name_list_format');
     $this->parser = $parser;
@@ -114,8 +101,6 @@ class NameFormatter implements NameFormatterInterface {
     $this->settings['sep1'] = $config->get('sep1');
     $this->settings['sep2'] = $config->get('sep2');
     $this->settings['sep3'] = $config->get('sep3');
-    // @todo: Assess if needed.
-    $this->token = $token;
   }
 
   /**

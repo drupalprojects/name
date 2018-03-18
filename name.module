@@ -119,6 +119,7 @@ function name_user_load(array $users) {
       }
       else {
         if ($account->hasField($field->getName()) && !$account->get($field->getName())->isEmpty()) {
+          // @todo: see if the formatter flags the preferred or alt components.
           $names[$uid] = \Drupal::service('name.formatter')->format($account->get($field->getName())->get(0)->getValue(), $field->getSetting('override_format'));
           $users[$uid]->realname = $names[$uid];
         }
