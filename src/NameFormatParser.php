@@ -73,15 +73,13 @@ class NameFormatParser {
    *   The name format pattern to generate the name.
    * @param array $settings
    *   Additional settings to control the parser.
-   * @param array $tokens
-   *   An array of tokens that will override the tokens generated.
    *
    * @return \Drupal\Component\Render\MarkupInterface
    *   A renderable object representing the name.
    *
    * @todo: Make tokens private.
    */
-  public function parse($name_components, $format = '', array $settings = [], $tokens = NULL) {
+  public function parse($name_components, $format = '', array $settings = []) {
     foreach (['sep1', 'sep2', 'sep3'] as $sep_key) {
       if (isset($settings[$sep_key])) {
         $this->{$sep_key} = (string) $settings[$sep_key];
@@ -92,7 +90,7 @@ class NameFormatParser {
       $this->boundary = $settings['boundary'];
     }
 
-    $name_string = $this->format($name_components, $format, $tokens);
+    $name_string = $this->format($name_components, $format);
     switch ($this->markup) {
       // Component values are already escaped.
       case 'simple':
@@ -110,6 +108,16 @@ class NameFormatParser {
 
   /**
    * Formats an array of name components into the supplied format.
+   *
+   * @param array $name_components
+   *   A keyed array of the components.
+   * @param string $format
+   *   The name format string or segment to parse.
+   * @param array $tokens
+   *   The generated tokens.
+   *
+   * @return string
+   *   The formatted string.
    */
   protected function format($name_components, $format = '', $tokens = NULL) {
     if (empty($format)) {
@@ -244,6 +252,16 @@ class NameFormatParser {
 
   /**
    * Adds a component.
+   *
+   * @param string $string
+   *   The token string to process.
+   * @param string $modifiers
+   *   The modifiers to apply.
+   * @param string $conditions
+   *   The conditional flags.
+   *
+   * @return array
+   *   The processed piece.
    */
   protected function addComponent($string, &$modifiers = '', &$conditions = '') {
     $string = $this->applyModifiers($string, $modifiers);
@@ -258,6 +276,14 @@ class NameFormatParser {
 
   /**
    * Applies the specified modifiers to the string.
+   *
+   * @param string $string
+   *   The token string to process.
+   * @param string $modifiers
+   *   The modifiers to apply.
+   *
+   * @return string
+   *   The processed string.
    */
   protected function applyModifiers($string, $modifiers) {
     if (!is_null($string) || strlen($string)) {
@@ -317,8 +343,12 @@ class NameFormatParser {
   /**
    * Helper function to put out the first matched bracket position.
    *
-   * Accepts strings in the format, ^ marks the matched bracket.
+   * @param string $string
+   *   Accepts strings in the format, ^ marks the matched bracket.
    *   '(xxx^)xxx(xxxx)xxxx' or '(xxx(xxx(xxxx))xxx^)'
+   *
+   * @return mixed
+   *   The closing bracket position or FALSE if not found.
    */
   protected function closingBracketPosition($string) {
     // Simplify the string by removing escaped brackets.
@@ -341,6 +371,12 @@ class NameFormatParser {
 
   /**
    * Generates the tokens from the name item.
+   *
+   * @param array $name_components
+   *   The array of name components.
+   *
+   * @return array
+   *   The keyed tokens generated for the given name.
    */
   protected function generateTokens($name_components) {
     $name_components = (array) $name_components;
@@ -408,6 +444,16 @@ class NameFormatParser {
    * This function does not by default sanitize the output unless the markup
    * flag is set. If this is set, it runs the component through check_plain() and
    * wraps the component in a span with the component name set as the class.
+   *
+   * @param array $values
+   *   An array of walues to find the first to render.
+   * @param string $component_key
+   *   The component context.
+   * @param string $modifier
+   *   Internal flag for processing.
+   *
+   * @return string
+   *   The rendered component.
    */
   protected function renderFirstComponent(array $values, $component_key, $modifier = NULL) {
     foreach ($values as $value) {
@@ -426,6 +472,16 @@ class NameFormatParser {
    * This function does not by default sanitize the output unless the markup
    * flag is set. If set, it runs the component through Html::escape() and
    * wraps the component in a span with the component name set as the class.
+   *
+   * @param string $value
+   *   A value to render.
+   * @param string $component_key
+   *   The componenet context.
+   * @param string $modifier
+   *   Internal flag for processing.
+   *
+   * @return string
+   *   The rendered componenet.
    */
   protected function renderComponent($value, $component_key, $modifier = NULL) {
     if (empty($value) || !Unicode::strlen($value)) {
@@ -474,8 +530,6 @@ class NameFormatParser {
       default:
         return $value;
     }
-
-    return $value;
   }
 
   /**
