@@ -62,7 +62,7 @@ class NameAutocomplete {
       return $matches;
     }
 
-    $settings = $field->getFieldStorageDefinition()->getSettings();
+    $settings = $field->getSettings();
     foreach ($this->allComponents as $component) {
       if (!isset($settings['autocomplete_source'][$component])) {
         $settings['autocomplete_source'][$component] = [];

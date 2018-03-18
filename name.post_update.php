@@ -86,9 +86,6 @@ function name_post_update_formatter_settings() {
  * Updates the field formatter settings for new link and alternative data sources settings.
  */
 function name_post_update_formatter_settings_link_and_external_sources() {
-  $field_storage_configs = \Drupal::entityManager()
-      ->getStorage('field_storage_config')
-      ->loadByProperties(['type' => 'name']);
   $new_settings = [
     "format" => "default",
     "markup" => "none",
@@ -99,7 +96,9 @@ function name_post_update_formatter_settings_link_and_external_sources() {
     "alternative_field_reference" => "",
     "alternative_field_reference_separator" => ", ",
   ];
-
+  $field_storage_configs = \Drupal::entityManager()
+    ->getStorage('field_storage_config')
+    ->loadByProperties(['type' => 'name']);
   foreach ($field_storage_configs as $field_storage) {
     $field_name = $field_storage->getName();
     $fields = \Drupal::entityManager()
@@ -131,5 +130,45 @@ function name_post_update_formatter_settings_link_and_external_sources() {
         }
       }
     }
+  }
+}
+
+/**
+ * Merges the custom field and storage settings together.
+ */
+function name_post_update_field_settings_merge() {
+  $merged_fields = [
+    'components',
+    'minimum_components',
+    'max_length',
+    'labels',
+    'allow_family_or_given',
+    'autocomplete_source',
+    'autocomplete_separator',
+    'title_options',
+    'generational_options',
+    'sort_options',
+  ];
+  $merged_fields = array_combine($merged_fields, $merged_fields);
+
+  $field_storage_configs = \Drupal::entityManager()
+    ->getStorage('field_storage_config')
+    ->loadByProperties(['type' => 'name']);
+  foreach ($field_storage_configs as $field_storage) {
+    /* @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    $storage_settings = $field_storage->getSettings();
+    $merged_settings = array_intersect_key($storage_settings, $merged_fields);
+    $field_name = $field_storage->getName();
+    $fields = \Drupal::entityManager()
+      ->getStorage('field_config')
+      ->loadByProperties(['field_name' => $field_name]);
+    foreach ($fields as $field) {
+      /* @var \Drupal\field\Entity\FieldConfig $field */
+      $field_settings = $field->getSettings();
+      $field_settings += $merged_settings;
+      $field->setSettings($field_settings)->save();
+    }
+    $storage_settings = array_diff_key($storage_settings, $merged_fields);
+    $field_storage->setSettings($storage_settings)->save();
   }
 }

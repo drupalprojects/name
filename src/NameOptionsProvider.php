@@ -69,7 +69,7 @@ class NameOptionsProvider {
    * Options for a name component.
    */
   public function getOptions(FieldDefinitionInterface $field, $component) {
-    $fs = $field->getFieldStorageDefinition()->getSettings();
+    $fs = $field->getSettings();
     $options = $fs[$component . '_options'];
     foreach ($options as $index => $opt) {
       if (preg_match(self::vocabularyRegExp, trim($opt), $matches)) {

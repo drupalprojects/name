@@ -55,16 +55,15 @@ class NameOptionsProviderTest extends KernelTestBase {
    */
   public function testTitleOptionsFromField() {
     $field = $this->createNameField('field_name_test', 'entity_test', 'entity_test');
-    $field_storage = $field->getFieldStorageDefinition();
-    $settings = $field_storage->getSettings();
+
+    $settings = $field->getSettings();
     $settings['title_options'] = [
       '-- --',
       'b',
       'a',
       'c',
     ];
-    $field_storage->set('settings', $settings);
-    $field_storage->save();
+    $field->getConfig('entity_test')->setSettings($settings)->save();
 
     $expected = [
       '' => '--',
@@ -76,7 +75,7 @@ class NameOptionsProviderTest extends KernelTestBase {
 
     // Enable sorting.
     $settings['sort_options']['title'] = TRUE;
-    $field_storage->set('settings', $settings)->save();
+    $field->getConfig('entity_test')->setSettings($settings)->save();
     $expected = [
       '' => '--',
       'a' => 'a',
@@ -106,15 +105,13 @@ class NameOptionsProviderTest extends KernelTestBase {
       $term->save();
     }
 
-    $field_storage = $field->getFieldStorageDefinition();
-    $settings = $field_storage->getSettings();
+    $settings = $field->getSettings();
     $settings['title_options'] = [
       '-- --',
       '[vocabulary:title_options]',
     ];
     $settings['sort_options']['title'] = TRUE;
-    $field_storage->set('settings', $settings);
-    $field_storage->save();
+    $field->getConfig('entity_test')->setSettings($settings)->save();
 
     $expected = [
       '' => '--',

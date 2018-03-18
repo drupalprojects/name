@@ -290,6 +290,7 @@ function name_element_expand($element, &$form_state, $complete_form) {
     $element['#prefix'] = '<div class="clearfix">';
     $element['#suffix'] = '</div>';
   }
+
   return $element;
 }
 
@@ -591,22 +592,6 @@ function _name_value_sanitize($item, $column = NULL, $type = 'default') {
     default:
       return Html::escape($value);
   }
-}
-
-/**
- * A #pre_render function callback for formatting field instance settings.
- */
-function name_field_settings_pre_render($form) {
-  module_load_include('inc', 'name', 'name.admin');
-  return _name_field_settings_pre_render($form);
-}
-
-/**
- * A #pre_render function callback for formatting field settings.
- */
-function name_field_storage_settings_pre_render($form) {
-  module_load_include('inc', 'name', 'name.admin');
-  return _name_field_storage_settings_pre_render($form);
 }
 
 /**

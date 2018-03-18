@@ -59,6 +59,8 @@ class NameFieldTest extends NameTestBase {
     ];
 
     $this->drupalPostForm('admin/structure/types/manage/page/fields/add-field', $new_name_field, t('Save and continue'));
+    $storage_settings = [];
+    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $storage_settings, t('Save field settings'));
     $this->resetAll();
 
     // Required test.
@@ -70,7 +72,7 @@ class NameFieldTest extends NameTestBase {
       $field_settings[$key] = FALSE;
     }
 
-    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
+    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test', $field_settings, t('Save settings'));
 
     $n = _name_translations();
     $required_messages = [
@@ -125,7 +127,7 @@ class NameFieldTest extends NameTestBase {
       'settings[generational_options]' => "-- --\nJr.\nSr.\nI\nII\nIII\nIV\nV\nVI\nVII\nVIII\nIX\nX\n[vocabulary:123]",
     ];
     $this->resetAll();
-    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
+    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test', $field_settings, t('Save settings'));
 
     $required_messages = [
       /*
@@ -163,7 +165,7 @@ class NameFieldTest extends NameTestBase {
       'settings[generational_options]' => "AAAA\n-- --\nJr.\nSr.\nI\nII\nIII\nIV\nV\nVI\nVII\nVIII\nIX\nX\nBBBB",
     ];
     $this->resetAll();
-    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
+    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test', $field_settings, t('Save settings'));
     $required_messages = [
       t('The following options exceed the maximum allowed @field length: Aaaaa., Bbbbbbbb, Ccccc.', [
         '@field' => t('@title options', ['@title' => $n['title']]),
@@ -183,7 +185,7 @@ class NameFieldTest extends NameTestBase {
       'settings[generational_options]' => " \n-- --\n ",
     ];
     $this->resetAll();
-    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
+    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test', $field_settings, t('Save settings'));
     $required_messages = [
       t('@field are required.', ['@field' => t('@title options', ['@title' => $n['title']])]),
       t('@field are required.', ['@field' => t('@generational options', ['@generational' => $n['generational']])]),
@@ -198,7 +200,7 @@ class NameFieldTest extends NameTestBase {
       'settings[generational_options]' => "-- --\nJr.\nSr.\nI\nII\nIII\nIV\nV\nVI\n--",
     ];
     $this->resetAll();
-    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
+    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test', $field_settings, t('Save settings'));
     $required_messages = [
       t('@field can only have one blank value assigned to it.', [
         '@field' => t('@title options', [
@@ -217,9 +219,9 @@ class NameFieldTest extends NameTestBase {
 
     // Save the field again with the default values.
     $this->resetAll();
-    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $this->nameGetFieldStorageSettings(), t('Save field settings'));
+    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test', $this->nameGetFieldStorageSettings(), t('Save settings'));
 
-    $this->assertText(t('Updated field Test name field settings.'));
+    $this->assertText(t('Saved Test name configuration.'));
 
     // Now the widget settings...
     // First, check that field validation is working.
@@ -250,7 +252,7 @@ class NameFieldTest extends NameTestBase {
 
     ];
     $this->resetAll();
-    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test/storage', $field_settings, t('Save field settings'));
+    $this->drupalPostForm('admin/structure/types/manage/page/fields/node.page.field_name_test', $field_settings, t('Save settings'));
 
     $required_messages = [
       /*
@@ -352,7 +354,7 @@ class NameFieldTest extends NameTestBase {
    *   The settings.
    */
   public function nameGetFieldStorageSettings() {
-    $field_settings = [
+    return [
       'settings[components][title]' => TRUE,
       'settings[components][given]' => TRUE,
       'settings[components][middle]' => TRUE,
@@ -386,9 +388,7 @@ class NameFieldTest extends NameTestBase {
 
       'settings[title_options]' => "-- --\nMr.\nMrs.\nMiss\nMs.\nDr.\nProf.",
       'settings[generational_options]' => "-- --\nJr.\nSr.\nI\nII\nIII\nIV\nV\nVI\nVII\nVIII\nIX\nX",
-
     ];
-    return $field_settings;
   }
 
   /**
@@ -398,7 +398,7 @@ class NameFieldTest extends NameTestBase {
    *   The settings.
    */
   public function nameGetFieldStorageSettingsCheckboxes() {
-    $field_settings = [
+    return [
       'settings[components][title]' => TRUE,
       'settings[components][given]' => TRUE,
       'settings[components][middle]' => TRUE,
@@ -416,7 +416,6 @@ class NameFieldTest extends NameTestBase {
       'settings[sort_options][title]' => TRUE,
       'settings[sort_options][generational]' => FALSE,
     ];
-    return $field_settings;
   }
 
 }

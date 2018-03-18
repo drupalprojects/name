@@ -396,7 +396,6 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
             case 'entity_reference':
               foreach ($target_items as $item) {
                 if (!empty($item->entity) && !$item->entity->isNew() && $item->entity->access('view')) {
-                  kint($item->entity->toUrl());
                   return $item->entity->toUrl();
                 }
               }
@@ -405,7 +404,6 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
             case 'link':
               foreach ($target_items as $item) {
                 if ($url = $item->getUrl()) {
-                  kint($item);
                   return $url;
                 }
               }

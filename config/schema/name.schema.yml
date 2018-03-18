@@ -281,7 +281,7 @@ name.generate.preferred:
       label: 'Preferred names'
       sequence:
         type: string
-field.storage_settings.name:
+field.field_settings.name:
   type: mapping
   label: 'Name field settings'
   mapping:
@@ -447,11 +447,6 @@ field.storage_settings.name:
       label: 'Sort options'
       sequence:
         - type: boolean
-
-field.field_settings.name:
-  type: mapping
-  label: 'Name field settings'
-  mapping:
     component_css:
       type: string
       label: 'Component CSS'

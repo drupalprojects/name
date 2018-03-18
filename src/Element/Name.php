@@ -22,8 +22,7 @@ class Name extends RenderElement {
    */
   public function getInfo() {
     $parts = _name_translations();
-    $field_settings = \Drupal::service('plugin.manager.field.field_type')->getDefaultStorageSettings('name');
-    $instance_settings = \Drupal::service('plugin.manager.field.field_type')->getDefaultFieldSettings('name');
+    $field_settings = \Drupal::service('plugin.manager.field.field_type')->getDefaultFieldSettings('name');
 
     return [
       '#input' => TRUE,
@@ -44,11 +43,11 @@ class Name extends RenderElement {
       '#allow_family_or_given' => $field_settings['allow_family_or_given'],
       '#components' => [
         'title' => [
-          'type' => $instance_settings['field_type']['title'],
+          'type' => $field_settings['field_type']['title'],
           'title' => $parts['title'],
           'title_display' => 'description',
-          'inline_css' => $instance_settings['inline_css']['title'],
-          'size' => $instance_settings['size']['title'],
+          'inline_css' => $field_settings['inline_css']['title'],
+          'size' => $field_settings['size']['title'],
           'maxlength' => $field_settings['max_length']['title'],
           'options' => $field_settings['title_options'],
           'autocomplete' => FALSE,
@@ -57,8 +56,8 @@ class Name extends RenderElement {
           'type' => 'textfield',
           'title' => $parts['given'],
           'title_display' => 'description',
-          'inline_css' => $instance_settings['inline_css']['given'],
-          'size' => $instance_settings['size']['given'],
+          'inline_css' => $field_settings['inline_css']['given'],
+          'size' => $field_settings['size']['given'],
           'maxlength' => $field_settings['max_length']['given'],
           'autocomplete' => FALSE,
         ],
@@ -66,8 +65,8 @@ class Name extends RenderElement {
           'type' => 'textfield',
           'title' => $parts['middle'],
           'title_display' => 'description',
-          'inline_css' => $instance_settings['inline_css']['middle'],
-          'size' => $instance_settings['size']['middle'],
+          'inline_css' => $field_settings['inline_css']['middle'],
+          'size' => $field_settings['size']['middle'],
           'maxlength' => $field_settings['max_length']['middle'],
           'autocomplete' => FALSE,
         ],
@@ -75,17 +74,17 @@ class Name extends RenderElement {
           'type' => 'textfield',
           'title' => $parts['family'],
           'title_display' => 'description',
-          'inline_css' => $instance_settings['inline_css']['family'],
-          'size' => $instance_settings['size']['family'],
+          'inline_css' => $field_settings['inline_css']['family'],
+          'size' => $field_settings['size']['family'],
           'maxlength' => $field_settings['max_length']['family'],
           'autocomplete' => FALSE,
         ],
         'generational' => [
-          'type' => $instance_settings['field_type']['generational'],
+          'type' => $field_settings['field_type']['generational'],
           'title' => $parts['generational'],
           'title_display' => 'description',
-          'inline_css' => $instance_settings['inline_css']['generational'],
-          'size' => $instance_settings['size']['generational'],
+          'inline_css' => $field_settings['inline_css']['generational'],
+          'size' => $field_settings['size']['generational'],
           'maxlength' => $field_settings['max_length']['generational'],
           'options' => $field_settings['generational_options'],
           'autocomplete' => FALSE,
@@ -94,8 +93,8 @@ class Name extends RenderElement {
           'type' => 'textfield',
           'title' => $parts['credentials'],
           'title_display' => 'description',
-          'inline_css' => $instance_settings['inline_css']['credentials'],
-          'size' => $instance_settings['size']['credentials'],
+          'inline_css' => $field_settings['inline_css']['credentials'],
+          'size' => $field_settings['size']['credentials'],
           'maxlength' => $field_settings['max_length']['credentials'],
           'autocomplete' => FALSE,
         ],
