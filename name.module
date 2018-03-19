@@ -620,6 +620,9 @@ function _name_formatter_output_options() {
  *     'default' runs through check_plain()
  *     'plain' runs through strip_tags()
  *     'raw' has no processing applied to it.
+ *
+ * @return string
+ *   Sanitized string (depending on type specified).
  */
 function _name_value_sanitize($item, $column = NULL, $type = 'default') {
   $safe_key = 'safe' . ($type == 'default' ? '' : '_' . $type);
