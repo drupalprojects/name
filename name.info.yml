@@ -5,5 +5,7 @@ core: 8.x
 dependencies:
   - 'drupal:field'
   - 'drupal:system (>= 8.4)'
+test_dependencies:
+  - 'token:token'
 package: Field types
 configure: name.settings
