@@ -223,7 +223,6 @@ class NameFieldTest extends NameTestBase {
 
     $this->assertText(t('Saved Test name configuration.'));
 
-    // Now the widget settings...
     // First, check that field validation is working.
     $field_settings = [
       'settings[components][title]' => FALSE,
@@ -283,7 +282,7 @@ class NameFieldTest extends NameTestBase {
       $this->assertText($message);
     }
 
-    $widget_settings = [
+    $field_settings = [
     // title, description, none.
       'settings[title_display][title]' => 'description',
       'settings[title_display][given]' => 'description',
@@ -310,7 +309,7 @@ class NameFieldTest extends NameTestBase {
     $this->resetAll();
     $this->drupalGet('admin/structure/types/manage/page/fields/node.page.field_name_test');
 
-    foreach ($widget_settings as $name => $value) {
+    foreach ($field_settings as $name => $value) {
       $this->assertFieldByName($name, $value);
     }
 

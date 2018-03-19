@@ -370,6 +370,9 @@ function name_element_render_component(array $components, $component_key, array 
 
     case 'placeholder':
       $element['#attributes']['placeholder'] = $element['#title'];
+      if (!empty($element['#required'])) {
+        $element['#attributes']['placeholder'] .= ' (' . t('Required') . ')';
+      }
       $element['#title_display'] = 'invisible';
       break;
 
@@ -380,15 +383,43 @@ function name_element_render_component(array $components, $component_key, array 
     case 'attribute':
       $element['#title_display'] = 'attribute';
       $element['#attributes']['title'] = $element['#title'];
+      if (!empty($element['#required'])) {
+        $element['#attributes']['title'] .= ' (' . t('Required') . ')';
+      }
       break;
 
     case 'description':
     default:
+      $label = [
+        '#theme' => 'form_element_label',
+        '#title' => $element['#title'],
+        '#required' => !empty($element['#required']),
+        '#title_display' => 'before',
+      ];
       $element['#title_display'] = 'invisible';
-      $element['#description'] = $element['#title'];
+      $element['#description'] = $label;
+      $element['#after_build'][] = 'name_component_description_after_build_label_alter';
       break;
   }
 
+  return $element;
+}
+
+/**
+ * Afterbuild for setting the correct ID on the description labels.
+ *
+ * @param $form_element
+ *   The form element that needs the for attribute set.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The current state of the form.
+ *
+ * @return array
+ *   The form element.
+ */
+function name_component_description_after_build_label_alter($element, FormStateInterface $form_state) {
+  if (!empty($element['#description']) && !empty($element['#id']) && is_array($element['#description'])) {
+    $element['#description']['#for'] = $element['#id'];
+  }
   return $element;
 }
 
