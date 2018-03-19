@@ -182,6 +182,7 @@ trait NameSettingsTrait {
       'title' => $this->t('above'),
       'description' => $this->t('below'),
       'placeholder' => $this->t('placeholder'),
+      'attribute' => $this->t('attribute'),
       'none' => $this->t('hidden'),
     ];
     // @todo: Refactor out for alternative sources.
@@ -231,10 +232,11 @@ trait NameSettingsTrait {
     ];
     $element['title_display'] = [
       '#title' => $this->t('Label display'),
-      '#description' => $this->t('The title display controls how the label of the name component is displayed in the form:<br>"%above" is the standard title;<br>"%below" is the standard description;<br>"%placeholder" uses the placeholder attribute, select lists do not support this option;<br>"%hidden" removes the label.', [
+      '#description' => $this->t('The title display controls how the label of the name component is displayed in the form:<br>"%above" is the standard title;<br>"%below" is the standard description;<br>"%placeholder" uses the placeholder attribute, select lists do not support this option;<br>"%attribute" adds a title attribute to create a tooltip rather than a label.<br>"%hidden" removes the label.', [
         '%above' => t('above'),
         '%below' => t('below'),
         '%placeholder' => t('placeholder'),
+        '%attribute' => t('attribute'),
         '%hidden' => t('hidden'),
       ]),
     ];
