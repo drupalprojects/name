@@ -72,7 +72,7 @@ class NameFieldBuilder extends FieldDiffBuilderBase {
     $definition = $items->getFieldDefinition();
     $settings = $definition->getSettings();
 
-    $result = array();
+    $result = [];
     if ($this->configuration['compare_format']) {
       foreach ($items as $item) {
         $result[] = (string) $this->formatter->format($item->filteredArray(), $this->configuration['compare_format']);
@@ -120,9 +120,9 @@ class NameFieldBuilder extends FieldDiffBuilderBase {
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    $default_configuration = array(
+    $default_configuration = [
       'format' => '',
-    );
+    ];
     $default_configuration += parent::defaultConfiguration();
 
     return $default_configuration;

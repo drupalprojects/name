@@ -76,7 +76,7 @@ class NameNodeTokenReplaceTest extends NameTestBase {
     ]);
     $node->save();
 
-    /* @var \Drupal\name\Plugin\Field\FieldType\NameItem  $item */
+    /* @var \Drupal\name\Plugin\Field\FieldType\NameItem $item */
     $item = $node->get('field_name')->get(0);
     $components = $item->filteredArray();
 
@@ -92,7 +92,7 @@ class NameNodeTokenReplaceTest extends NameTestBase {
 
     // @todo: consider multiple value tests, "[node:field_name:1:family]".
 
-    /* @var \Drupal\name\Plugin\Field\FieldType\NameItem  $item */
+    /* @var \Drupal\name\Plugin\Field\FieldType\NameItem $item */
     $item = $account->get('field_realname')->get(0);
     $components = $item->filteredArray();
 

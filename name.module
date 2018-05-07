@@ -7,7 +7,7 @@
  * TODO: Make sure that all labels are based on the _name_translations()
  * function and use a name:: prefix. This can be parsed out here to allow
  * string overrides to work and to integrate with i18n too.
- * t('@name_given', array('@name_given' => t('Given')))
+ * t('@name_given', ['@name_given' => t('Given')])
  */
 
 use Drupal\field\FieldConfigInterface;

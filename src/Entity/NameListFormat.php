@@ -132,13 +132,13 @@ class NameListFormat extends ConfigEntityBase implements NameListFormatInterface
    * {@inheritdoc}
    */
   public function uri() {
-    return array(
+    return [
       'path' => 'admin/config/regional/name/list/manage/' . $this->id(),
-      'options' => array(
+      'options' => [
         'entity_type' => $this->getEntityType(),
         'entity' => $this,
-      ),
-    );
+      ],
+    ];
   }
 
   /**

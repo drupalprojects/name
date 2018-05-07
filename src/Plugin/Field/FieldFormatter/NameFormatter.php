@@ -203,11 +203,11 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       '#title' => $this->t('Preferred component source multivalue separator'),
       '#default_value' => $this->getSetting('preferred_field_reference_separator'),
       '#description' => $this->t('Used to separate multi-value items in an inline list.'),
-      '#states' => array(
-        'invisible' => array(
-          ':input[name="fields[' . $field_name . '][settings_edit_form][settings][preferred_field_reference]"]' => array('value' => ''),
-        ),
-      ),
+      '#states' => [
+        'invisible' => [
+          ':input[name="fields[' . $field_name . '][settings_edit_form][settings][preferred_field_reference]"]' => ['value' => ''],
+        ],
+      ],
     ];
 
     $elements['alternative_field_reference'] = [
@@ -224,11 +224,11 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       '#title' => $this->t('Alternative component source multivalue separator'),
       '#default_value' => $this->getSetting('alternative_field_reference_separator'),
       '#description' => $this->t('Used to separate multi-value items in an inline list.'),
-      '#states' => array(
-        'invisible' => array(
-          ':input[name="fields[' . $field_name . '][settings_edit_form][settings][alternative_field_reference]"]' => array('value' => ''),
-        ),
-      ),
+      '#states' => [
+        'invisible' => [
+          ':input[name="fields[' . $field_name . '][settings_edit_form][settings][alternative_field_reference]"]' => ['value' => ''],
+        ],
+      ],
     ];
 
     return $elements;

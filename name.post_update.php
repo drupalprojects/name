@@ -70,10 +70,10 @@ function name_post_update_formatter_settings() {
           $settings['list_format'] = isset($settings['multiple']) && $settings['multiple'] == 'default' ? '' : 'default';
           $settings = array_intersect_key($settings, $default_settings);
           $settings += $default_settings;
-          $view_display->setComponent($field_name, array(
+          $view_display->setComponent($field_name, [
               'type' => 'name_default',
               'settings' => $settings,
-            ) + $component)->save();
+            ] + $component)->save();
         }
       }
     }

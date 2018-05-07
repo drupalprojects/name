@@ -545,9 +545,9 @@ trait NameSettingsTrait {
             if ($child != 'components') {
               $form['name_settings']['tbody'][$child][$key]['#states'] = [
                 'visible' => [
-                  ':input[name$="[components][' . $key . ']"]' => array(
+                  ':input[name$="[components][' . $key . ']"]' => [
                     'checked' => TRUE,
-                  ),
+                  ],
                 ],
               ];
             }
