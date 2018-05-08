@@ -22,11 +22,11 @@ class NameUserTest extends KernelTestBase {
   ];
 
   /**
-   * The entity manager.
+   * The entity listener.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeListener
    */
-  protected $entityManager;
+  protected $entityListener;
 
   /**
    * {@inheritdoc}
@@ -36,8 +36,8 @@ class NameUserTest extends KernelTestBase {
     $this->installConfig(self::$modules);
     $this->installSchema('system', ['sequences']);
 
-    $this->entityManager = \Drupal::entityManager();
-    $this->entityManager->onEntityTypeCreate(\Drupal::entityManager()->getDefinition('user'));
+    $this->entityListener = \Drupal::service('entity_type.listener');
+    $this->entityListener->onEntityTypeCreate(\Drupal::entityTypeManager()->getDefinition('user'));
   }
 
   /**

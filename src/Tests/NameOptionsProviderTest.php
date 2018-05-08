@@ -24,11 +24,11 @@ class NameOptionsProviderTest extends KernelTestBase {
   ];
 
   /**
-   * The entity manager.
+   * The entity listener.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeListener
    */
-  protected $entityManager;
+  protected $entityListener;
 
   /**
    * The name options provider.
@@ -44,8 +44,8 @@ class NameOptionsProviderTest extends KernelTestBase {
     parent::setUp();
 
     $this->installConfig(self::$modules);
-    $this->entityManager = \Drupal::entityManager();
-    $this->entityManager->onEntityTypeCreate(\Drupal::entityManager()->getDefinition('taxonomy_term'));
+    $this->entityListener = \Drupal::service('entity_type.listener');
+    $this->entityListener->onEntityTypeCreate(\Drupal::entityTypeManager()->getDefinition('taxonomy_term'));
 
     $this->optionsProvider = \Drupal::service('name.options_provider');
   }

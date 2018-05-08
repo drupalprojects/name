@@ -2,7 +2,8 @@
 
 namespace Drupal\name\Controller;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityFieldManager;
+use Drupal\Core\Entity\EntityTypeManager;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -23,16 +24,33 @@ class NameAutocompleteController implements ContainerInjectionInterface {
   protected $nameAutocomplete;
 
   /**
+   * Entity field manager.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManager
+   */
+  protected $entityFieldManager;
+
+  /**
+   * Entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected $entityTypeManager;
+
+  /**
    * Constructs an NameAutocompleteController object.
    *
    * @param \Drupal\name\NameAutocomplete $name_autocomplete
    *   The name autocomplete helper class to find matching name values.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityFieldManager $entityFieldManager
+   *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   *   The entity field manager.
    */
-  public function __construct(NameAutocomplete $name_autocomplete, EntityManagerInterface $entity_manager) {
+  public function __construct(NameAutocomplete $name_autocomplete, EntityFieldManager $entityFieldManager, EntityTypeManager $entityTypeManager) {
     $this->nameAutocomplete = $name_autocomplete;
-    $this->entityManager = $entity_manager;
+    $this->entityFieldManager = $entityFieldManager;
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
@@ -41,7 +59,8 @@ class NameAutocompleteController implements ContainerInjectionInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('name.autocomplete'),
-      $container->get('entity.manager')
+      $container->get('entity_field.manager'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -68,14 +87,14 @@ class NameAutocompleteController implements ContainerInjectionInterface {
    * @see \Drupal\name\NameAutocomplete::getMatches()
    */
   public function autocomplete(Request $request, $field_name, $entity_type, $bundle, $component) {
-    $definitions = $this->entityManager->getFieldDefinitions($entity_type, $bundle);
+    $definitions = $this->entityFieldManager->getFieldDefinitions($entity_type, $bundle);
 
     if (!isset($definitions[$field_name])) {
       throw new AccessDeniedHttpException();
     }
 
     $field_definition = $definitions[$field_name];
-    $access_control_handler = $this->entityManager->getAccessControlHandler($entity_type);
+    $access_control_handler = $this->entityTypeManager->getAccessControlHandler($entity_type);
     if ($field_definition->getType() != 'name' || !$access_control_handler->fieldAccess('edit', $field_definition)) {
       throw new AccessDeniedHttpException();
     }

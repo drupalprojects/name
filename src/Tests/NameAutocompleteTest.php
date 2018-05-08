@@ -26,11 +26,11 @@ class NameAutocompleteTest extends KernelTestBase {
   ];
 
   /**
-   * The entity manager.
+   * The entity listener.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeListener
    */
-  protected $entityManager;
+  protected $entityListener;
 
   /**
    * The field definition.
@@ -46,8 +46,8 @@ class NameAutocompleteTest extends KernelTestBase {
     parent::setUp();
     $this->installConfig(self::$modules);
 
-    $this->entityManager = \Drupal::entityManager();
-    $this->entityManager->onEntityTypeCreate(\Drupal::entityManager()->getDefinition('entity_test'));
+    $this->entityListener = \Drupal::service('entity_type.listener');
+    $this->entityListener->onEntityTypeCreate(\Drupal::entityTypeManager()->getDefinition('entity_test'));
 
     $this->field = $this->createNameField('field_name_test', 'entity_test', 'entity_test');
   }

@@ -9,7 +9,7 @@
  * Adds the default list format.
  */
 function name_post_update_create_name_list_format() {
-  $default_list = \Drupal::entityManager()->getStorage('name_list_format')->load('default');
+  $default_list = \Drupal::entityTypeManager()->getStorage('name_list_format')->load('default');
   if ($default_list) {
     if (!$default_list->locked) {
       $default_list->locked = TRUE;
@@ -41,7 +41,7 @@ function name_post_update_create_name_list_format() {
  * Corrects the field formatter settings for new name list type settings.
  */
 function name_post_update_formatter_settings() {
-  $field_storage_configs = \Drupal::entityManager()
+  $field_storage_configs = \Drupal::entityTypeManager()
       ->getStorage('field_storage_config')
       ->loadByProperties(['type' => 'name']);
   $default_settings = [
@@ -53,7 +53,7 @@ function name_post_update_formatter_settings() {
 
   foreach ($field_storage_configs as $field_storage) {
     $field_name = $field_storage->getName();
-    $fields = \Drupal::entityManager()
+    $fields = \Drupal::entityTypeManager()
       ->getStorage('field_config')
       ->loadByProperties(['field_name' => $field_name]);
     foreach ($fields as $field) {
@@ -61,7 +61,7 @@ function name_post_update_formatter_settings() {
         'targetEntityType' => $field->getTargetEntityTypeId(),
         'bundle' => $field->getTargetBundle()
       ];
-      $view_displays = \Drupal::entityManager()
+      $view_displays = \Drupal::entityTypeManager()
           ->getStorage('entity_view_display')
           ->loadByProperties($properties);
       foreach ($view_displays as $view_display) {
@@ -96,12 +96,12 @@ function name_post_update_formatter_settings_link_and_external_sources() {
     "alternative_field_reference" => "",
     "alternative_field_reference_separator" => ", ",
   ];
-  $field_storage_configs = \Drupal::entityManager()
+  $field_storage_configs = \Drupal::entityTypeManager()
     ->getStorage('field_storage_config')
     ->loadByProperties(['type' => 'name']);
   foreach ($field_storage_configs as $field_storage) {
     $field_name = $field_storage->getName();
-    $fields = \Drupal::entityManager()
+    $fields = \Drupal::entityTypeManager()
       ->getStorage('field_config')
       ->loadByProperties(['field_name' => $field_name]);
     foreach ($fields as $field) {
@@ -109,7 +109,7 @@ function name_post_update_formatter_settings_link_and_external_sources() {
         'targetEntityType' => $field->getTargetEntityTypeId(),
         'bundle' => $field->getTargetBundle()
       ];
-      $view_displays = \Drupal::entityManager()
+      $view_displays = \Drupal::entityTypeManager()
           ->getStorage('entity_view_display')
           ->loadByProperties($properties);
       foreach ($view_displays as $view_display) {
@@ -151,7 +151,7 @@ function name_post_update_field_settings_merge() {
   ];
   $merged_fields = array_combine($merged_fields, $merged_fields);
 
-  $field_storage_configs = \Drupal::entityManager()
+  $field_storage_configs = \Drupal::entityTypeManager()
     ->getStorage('field_storage_config')
     ->loadByProperties(['type' => 'name']);
   foreach ($field_storage_configs as $field_storage) {
@@ -159,7 +159,7 @@ function name_post_update_field_settings_merge() {
     $storage_settings = $field_storage->getSettings();
     $merged_settings = array_intersect_key($storage_settings, $merged_fields);
     $field_name = $field_storage->getName();
-    $fields = \Drupal::entityManager()
+    $fields = \Drupal::entityTypeManager()
       ->getStorage('field_config')
       ->loadByProperties(['field_name' => $field_name]);
     foreach ($fields as $field) {

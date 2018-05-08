@@ -254,7 +254,7 @@ function name_token_types_chained($type = NULL, $reset = FALSE) {
             }
 
             // Make sure we get the correct token type.
-            $entity_info = Drupal::entityManager()->getDefinition($entity_type);
+            $entity_info = Drupal::entityTypeManager()->getDefinition($entity_type);
             $token_type = isset($entity_info['token type']) ? $entity_info['token type'] : $entity_type;
             $types[$token_type]['name-' . $clean] = [
               'name' => check_plain($label),

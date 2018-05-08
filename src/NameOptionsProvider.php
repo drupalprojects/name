@@ -3,7 +3,7 @@
 namespace Drupal\name;
 
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 
@@ -20,11 +20,11 @@ class NameOptionsProvider {
   const vocabularyRegExp = '/^\[vocabulary:([0-9a-z\_]{1,})\]/';
 
   /**
-   * The entity manager.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManager
    */
-  protected $entityManger;
+  protected $entityTypeManager;
 
   /**
    * The module handler.
@@ -50,18 +50,18 @@ class NameOptionsProvider {
   /**
    * Contructs the service.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
-  public function __construct(EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler) {
-    $this->entityManger = $entity_manager;
+  public function __construct(EntityTypeManager $entityTypeManager, ModuleHandlerInterface $module_handler) {
+    $this->entityTypeManager = $entityTypeManager;
     $this->moduleHandler = $module_handler;
 
-    if ($this->entityManger && $this->moduleHandler->moduleExists('taxonomy')) {
-      $this->termStorage = $this->entityManger->getStorage('taxonomy_term');
-      $this->vocabularyStorage = $this->entityManger->getStorage('taxonomy_vocabulary');
+    if ($this->entityTypeManager && $this->moduleHandler->moduleExists('taxonomy')) {
+      $this->termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
+      $this->vocabularyStorage = $this->entityTypeManager->getStorage('taxonomy_vocabulary');
     }
   }
 

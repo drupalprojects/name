@@ -3,8 +3,9 @@
 namespace Drupal\name\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityFieldManager;
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Url;
-use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -35,11 +36,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class NameFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity manager to load name_format entities.
+   * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityFieldManager
    */
-  protected $entityManager;
+  protected $entityFieldManager;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected $entityTypeManager;
 
   /**
    * The field renderer for any additional components.
@@ -88,8 +96,10 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings settings.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityFieldManager $entityFieldManager
+   *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   *   The entity type manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The rendering service.
    * @param \Drupal\name\NameFormatter $formatter
@@ -99,10 +109,11 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
    * @param \Drupal\name\NameGeneratorInterface $generator
    *   The name format parser.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityManagerInterface $entity_manager, RendererInterface $renderer, \Drupal\name\NameFormatter $formatter, NameFormatParser $parser, NameGeneratorInterface $generator) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityFieldManager $entityFieldManager, EntityTypeManager $entityTypeManager, RendererInterface $renderer, \Drupal\name\NameFormatter $formatter, NameFormatParser $parser, NameGeneratorInterface $generator) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
-    $this->entityManager = $entity_manager;
+    $this->entityFieldManager = $entityFieldManager;
+    $this->entityTypeManager = $entityTypeManager;
     $this->renderer = $renderer;
     $this->formatter = $formatter;
     $this->parser = $parser;
@@ -121,7 +132,8 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('entity.manager'),
+      $container->get('entity_field.manager'),
+      $container->get('entity_type.manager'),
       $container->get('renderer'),
       $container->get('name.formatter'),
       $container->get('name.format_parser'),
@@ -244,7 +256,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
     $field_name = $this->fieldDefinition->getName();
 
     $machine_name = isset($settings['format']) ? $settings['format'] : 'default';
-    $name_format = $this->entityManager->getStorage('name_format')->load($machine_name);
+    $name_format = $this->entityTypeManager->getStorage('name_format')->load($machine_name);
     if ($name_format) {
       $summary[] = $this->t('Format: @format (@machine_name)', [
         '@format' => $name_format->label(),
@@ -357,7 +369,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
     $targets = ['_self' => $this->t('Entity URL')];
     $bundle = $this->fieldDefinition->getTargetBundle();
     $entity_type_id = $this->fieldDefinition->getTargetEntityTypeId();
-    $fields = $this->entityManager->getFieldDefinitions($entity_type_id, $bundle);
+    $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
     foreach ($fields as $field) {
       if (!$field->getFieldStorageDefinition()->isBaseField()) {
         switch ($field->getType()) {
@@ -420,7 +432,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
 
   protected function getAdditionalSources() {
     $entity_type_id = $this->fieldDefinition->getTargetEntityTypeId();
-    $entity_type = $this->entityManager
+    $entity_type = $this->entityTypeManager
         ->getStorage($entity_type_id)
         ->getEntityType();
     $bundle = $this->fieldDefinition->getTargetBundle();
@@ -434,7 +446,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
     if ($entity_type_id == 'user') {
       $sources['_self_property_name'] = $this->t('@label login name', ['@label' => $entity_type_label]);
     }
-    $fields = $this->entityManager->getFieldDefinitions($entity_type_id, $bundle);
+    $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
     foreach ($fields as $field_name => $field) {
       if (!$field->getFieldStorageDefinition()->isBaseField() && $field_name != $this->fieldDefinition->getName()) {
         $sources[$field->getName()] = $field->getLabel();
@@ -494,7 +506,7 @@ class NameFormatter extends FormatterBase implements ContainerFactoryPluginInter
                 break;
 
               default:
-                $viewBuilder = $this->entityManager->getViewBuilder($parent->getEntityTypeId());
+                $viewBuilder = $this->entityTypeManager->getViewBuilder($parent->getEntityTypeId());
                 foreach ($target_items as $item) {
                   $renderable = $viewBuilder->viewFieldItem($item, ['label' => 'hidden']);
                   /* @var $value \Drupal\Component\Render\MarkupInterface */
