@@ -685,7 +685,7 @@ trait NameSettingsTrait {
           ]));
         }
         else {
-          $vocabulary = entity_load('taxonomy_vocabulary', $matches[1]);
+          $vocabulary = \Drupal::entityTypeManager()->getStorage('taxonomy_vocabulary')->load($matches[1]);
           if ($vocabulary) {
             $valid_options[] = $value;
           }

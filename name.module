@@ -142,7 +142,7 @@ function name_user_save(UserInterface $entity) {
  */
 function name_get_custom_format_options() {
   $options = [];
-  foreach (entity_load_multiple('name_format') as $format) {
+  foreach (\Drupal::entityTypeManager()->getStorage('name_format')->loadMultiple() as $format) {
     $options[$format->id()] = $format->label();
   }
   natcasesort($options);
@@ -154,7 +154,7 @@ function name_get_custom_format_options() {
  */
 function name_get_custom_list_format_options() {
   $options = [];
-  foreach (entity_load_multiple('name_list_format') as $format) {
+  foreach (\Drupal::entityTypeManager()->getStorage('name_list_format')->loadMultiple() as $format) {
     $options[$format->id()] = $format->label();
   }
   natcasesort($options);
@@ -165,7 +165,7 @@ function name_get_custom_list_format_options() {
  * Loads a format based on the machine name.
  */
 function name_get_format_by_machine_name($machine_name) {
-  $entity = entity_load('name_format', $machine_name);
+  $entity = \Drupal::entityTypeManager()->getStorage('name_format')->load($machine_name);
   if ($entity) {
     return $entity->get('pattern');
   }
