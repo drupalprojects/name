@@ -10,7 +10,9 @@ use Drupal\migrate_drupal\Plugin\migrate\cckfield\CckFieldPluginBase;
  *
  * @MigrateCckField(
  *   id = "name",
- *   core = {7}
+ *   core = {7},
+ *   source_module = "name",
+ *   destination_module = "name",
  * )
  */
 class NameItem extends CckFieldPluginBase {
